@@ -5,6 +5,7 @@ import { getOptionalUser } from './middlewares/auth'
 import { sendError, sendSuccess } from './utils/response'
 import { eventCreateSchema } from './validators/event'
 import { serializeEvent } from './utils/eventSerializer'
+import { logAdminAction } from './utils/auditLog'
 
 const PAGE_SIZE = 9
 
@@ -25,12 +26,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 async function handleList(req: VercelRequest, res: VercelResponse): Promise<void> {
   const pageParam = Array.isArray(req.query.page) ? req.query.page[0] : req.query.page
   const searchParam = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search
+  const allParam = Array.isArray(req.query.all) ? req.query.all[0] : req.query.all
 
   const page = Math.max(1, Number(pageParam) || 1)
   const search = searchParam?.trim() ?? ''
 
+  const user = await getOptionalUser(req)
+
+  // `all=true` drops the ACTIVE-only filter so the admin events page (which
+  // must manage cancelled events too, per FEATURES.md "Gestion des
+  // événements") can see everything. Not in API.md's literal query list —
+  // gated server-side on the caller's actual role (never trusting the
+  // query string itself) rather than adding a whole parallel admin-only
+  // listing endpoint that would duplicate this pagination/search logic.
+  let includeAll = false
+  if (allParam === 'true' && user) {
+    const dbUser = await prisma.user.findUnique({ where: { id: user.id }, select: { role: true } })
+    includeAll = dbUser?.role === 'ADMIN'
+  }
+
   const where = {
-    status: 'ACTIVE' as const,
+    ...(includeAll ? {} : { status: 'ACTIVE' as const }),
     ...(search
       ? {
           OR: [
@@ -61,7 +77,6 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
       _count: { _all: true },
     }),
     (async () => {
-      const user = await getOptionalUser(req)
       if (!user || eventIds.length === 0) return []
       return prisma.eventRegistration.findMany({
         where: { eventId: { in: eventIds }, userId: user.id },
@@ -108,6 +123,8 @@ async function handleCreate(req: VercelRequest, res: VercelResponse, user: { id:
       createdBy: user.id,
     },
   })
+
+  await logAdminAction(user.id, 'EVENT_CREATED', event.id)
 
   sendSuccess(res, serializeEvent({ ...event, registeredCount: 0 }, null), 201)
 }

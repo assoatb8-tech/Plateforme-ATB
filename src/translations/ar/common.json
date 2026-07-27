@@ -240,5 +240,152 @@
     "empty": "لست مشاركًا في أي نشاط حاليًا.",
     "upcoming": "القادمة",
     "past": "السابقة"
+  },
+  "admin": {
+    "title": "الإدارة",
+    "loading": "جارٍ التحميل...",
+    "errorGeneric": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+    "nav": {
+      "dashboard": "لوحة التحكم",
+      "members": "الأعضاء",
+      "events": "الأنشطة",
+      "payments": "الاشتراكات"
+    },
+    "dashboard": {
+      "title": "لوحة تحكم الإدارة",
+      "subtitle": "نظرة عامة على الجمعية.",
+      "stats": {
+        "totalMembers": "إجمالي المنخرطين",
+        "newMembers": "منخرطون جدد (30 يومًا)",
+        "activeEvents": "الأنشطة النشطة",
+        "totalRegistrations": "التسجيلات في الأنشطة",
+        "pendingPayments": "اشتراكات في الانتظار"
+      }
+    },
+    "users": {
+      "title": "إدارة المنخرطين",
+      "subtitle": "البحث والتصفية وإدارة حسابات المنخرطين.",
+      "searchPlaceholder": "البحث بالبريد الإلكتروني أو الاسم...",
+      "search": "بحث",
+      "statusFilterLabel": "التصفية حسب الحالة",
+      "statusFilterAll": "كل الحالات",
+      "noResults": "لا يوجد منخرط يطابق بحثك.",
+      "noUsersYet": "لا يوجد أي منخرط حاليًا.",
+      "noName": "بدون اسم",
+      "columns": {
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "status": "الحالة",
+        "joined": "تاريخ التسجيل"
+      },
+      "detail": {
+        "back": "العودة إلى المنخرطين",
+        "role": "الدور",
+        "status": "الحالة",
+        "changeStatus": "تغيير الحالة",
+        "banAction": "حظر",
+        "banReason": "سبب الحظر",
+        "banCancel": "إلغاء",
+        "banConfirm": "حظر هذا المنخرط",
+        "deleteAction": "حذف الحساب",
+        "deleteConfirmTitle": "هل تريد حذف هذا الحساب؟",
+        "deleteConfirmText": "هذا الإجراء نهائي: سيتم حذف الحساب والوصول إليه بشكل دائم.",
+        "deleteCancel": "إلغاء",
+        "deleteConfirm": "حذف",
+        "notFound": "هذا العضو غير موجود.",
+        "actionError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+        "profileTitle": "معلومات الملف",
+        "noProfile": "لم يتم تقديم ملف انخراط.",
+        "paymentsTitle": "سجل الاشتراكات",
+        "noPayments": "لا توجد اشتراكات مسجلة.",
+        "registrationsTitle": "التسجيلات في الأنشطة",
+        "noRegistrations": "لا يوجد أي تسجيل.",
+        "bansTitle": "سجل الحظر"
+      }
+    },
+    "events": {
+      "title": "إدارة الأنشطة",
+      "subtitle": "إنشاء الأنشطة وتعديلها وحذفها.",
+      "create": "إنشاء نشاط",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "back": "العودة إلى الأنشطة",
+      "actionError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+      "noEventsYet": "لا يوجد أي نشاط حاليًا.",
+      "deleteConfirmTitle": "هل تريد حذف هذا النشاط؟",
+      "deleteConfirmText": "هذا الإجراء نهائي.",
+      "deleteCancel": "إلغاء",
+      "deleteConfirm": "حذف",
+      "columns": {
+        "title": "العنوان",
+        "date": "التاريخ",
+        "capacity": "الأماكن",
+        "status": "الحالة",
+        "actions": "إجراءات"
+      },
+      "status": {
+        "ACTIVE": "نشيط",
+        "CANCELLED": "ملغى"
+      },
+      "form": {
+        "createTitle": "إنشاء نشاط",
+        "editTitle": "تعديل النشاط",
+        "titleFr": "العنوان (بالفرنسية)",
+        "titleAr": "العنوان (بالعربية)",
+        "descriptionFr": "الوصف (بالفرنسية)",
+        "descriptionAr": "الوصف (بالعربية)",
+        "location": "المكان",
+        "startDate": "تاريخ البداية",
+        "endDate": "تاريخ النهاية",
+        "maxParticipants": "عدد الأماكن",
+        "status": "الحالة",
+        "dateOrderError": "يجب أن يكون تاريخ النهاية بعد تاريخ البداية.",
+        "submit": "إنشاء النشاط",
+        "save": "حفظ التعديلات",
+        "errorGeneric": "حدث خطأ. يرجى المحاولة مرة أخرى."
+      }
+    },
+    "payments": {
+      "title": "إدارة الاشتراكات",
+      "subtitle": "متابعة الاشتراكات وإنشاؤها والمصادقة عليها.",
+      "filterStatusLabel": "التصفية حسب الحالة",
+      "filterStatusAll": "كل الحالات",
+      "filterTypeLabel": "التصفية حسب النوع",
+      "filterTypeAll": "كل الأنواع",
+      "noPaymentsYet": "لا توجد أي اشتراكات مسجلة حاليًا.",
+      "actionError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+      "validate": "مصادقة",
+      "reject": "رفض",
+      "columns": {
+        "member": "المنخرط",
+        "amount": "المبلغ",
+        "type": "النوع",
+        "status": "الحالة",
+        "date": "التاريخ",
+        "actions": "إجراءات"
+      },
+      "status": {
+        "PENDING": "في الانتظار",
+        "VALIDATED": "مصادق عليها",
+        "REJECTED": "مرفوضة"
+      },
+      "type": {
+        "MEMBERSHIP": "اشتراك",
+        "DONATION": "تبرع",
+        "OTHER": "أخرى"
+      },
+      "create": {
+        "action": "اشتراك جديد",
+        "title": "تسجيل اشتراك",
+        "memberSearchLabel": "المنخرط",
+        "memberSearchPlaceholder": "البحث بالبريد الإلكتروني أو الاسم...",
+        "noMembersFound": "لم يتم العثور على أي منخرط.",
+        "memberRequired": "يرجى اختيار منخرط.",
+        "amountLabel": "المبلغ (د.ت)",
+        "typeLabel": "النوع",
+        "cancel": "إلغاء",
+        "submit": "حفظ"
+      }
+    }
   }
 }

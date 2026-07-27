@@ -240,5 +240,152 @@
     "empty": "Vous ne participez à aucun événement pour le moment.",
     "upcoming": "À venir",
     "past": "Passées"
+  },
+  "admin": {
+    "title": "Administration",
+    "loading": "Chargement...",
+    "errorGeneric": "Une erreur est survenue. Merci de réessayer.",
+    "nav": {
+      "dashboard": "Tableau de bord",
+      "members": "Membres",
+      "events": "Événements",
+      "payments": "Cotisations"
+    },
+    "dashboard": {
+      "title": "Tableau de bord administrateur",
+      "subtitle": "Vue d'ensemble de l'association.",
+      "stats": {
+        "totalMembers": "Adhérents au total",
+        "newMembers": "Nouveaux adhérents (30 jours)",
+        "activeEvents": "Événements actifs",
+        "totalRegistrations": "Inscriptions aux événements",
+        "pendingPayments": "Cotisations en attente"
+      }
+    },
+    "users": {
+      "title": "Gestion des adhérents",
+      "subtitle": "Rechercher, filtrer et gérer les comptes des adhérents.",
+      "searchPlaceholder": "Rechercher par email ou nom...",
+      "search": "Rechercher",
+      "statusFilterLabel": "Filtrer par statut",
+      "statusFilterAll": "Tous les statuts",
+      "noResults": "Aucun adhérent ne correspond à votre recherche.",
+      "noUsersYet": "Aucun adhérent pour le moment.",
+      "noName": "Sans nom",
+      "columns": {
+        "name": "Nom",
+        "email": "Email",
+        "status": "Statut",
+        "joined": "Inscrit le"
+      },
+      "detail": {
+        "back": "Retour aux membres",
+        "role": "Rôle",
+        "status": "Statut",
+        "changeStatus": "Modifier le statut",
+        "banAction": "Bannir",
+        "banReason": "Motif du bannissement",
+        "banCancel": "Annuler",
+        "banConfirm": "Bannir cet adhérent",
+        "deleteAction": "Supprimer le compte",
+        "deleteConfirmTitle": "Supprimer ce compte ?",
+        "deleteConfirmText": "Cette action est irréversible : le compte et l'accès seront définitivement supprimés.",
+        "deleteCancel": "Annuler",
+        "deleteConfirm": "Supprimer",
+        "notFound": "Ce membre est introuvable.",
+        "actionError": "Une erreur est survenue. Merci de réessayer.",
+        "profileTitle": "Informations du dossier",
+        "noProfile": "Aucun dossier d'adhésion soumis.",
+        "paymentsTitle": "Historique des cotisations",
+        "noPayments": "Aucune cotisation enregistrée.",
+        "registrationsTitle": "Inscriptions aux événements",
+        "noRegistrations": "Aucune inscription.",
+        "bansTitle": "Historique des bannissements"
+      }
+    },
+    "events": {
+      "title": "Gestion des événements",
+      "subtitle": "Créer, modifier et supprimer les événements de l'association.",
+      "create": "Créer un événement",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "back": "Retour aux événements",
+      "actionError": "Une erreur est survenue. Merci de réessayer.",
+      "noEventsYet": "Aucun événement pour le moment.",
+      "deleteConfirmTitle": "Supprimer cet événement ?",
+      "deleteConfirmText": "Cette action est irréversible.",
+      "deleteCancel": "Annuler",
+      "deleteConfirm": "Supprimer",
+      "columns": {
+        "title": "Titre",
+        "date": "Date",
+        "capacity": "Places",
+        "status": "Statut",
+        "actions": "Actions"
+      },
+      "status": {
+        "ACTIVE": "Actif",
+        "CANCELLED": "Annulé"
+      },
+      "form": {
+        "createTitle": "Créer un événement",
+        "editTitle": "Modifier l'événement",
+        "titleFr": "Titre (français)",
+        "titleAr": "Titre (arabe)",
+        "descriptionFr": "Description (français)",
+        "descriptionAr": "Description (arabe)",
+        "location": "Lieu",
+        "startDate": "Date de début",
+        "endDate": "Date de fin",
+        "maxParticipants": "Nombre de places",
+        "status": "Statut",
+        "dateOrderError": "La date de fin doit être postérieure à la date de début.",
+        "submit": "Créer l'événement",
+        "save": "Enregistrer les modifications",
+        "errorGeneric": "Une erreur est survenue. Merci de réessayer."
+      }
+    },
+    "payments": {
+      "title": "Gestion des cotisations",
+      "subtitle": "Suivre, créer et valider les cotisations des adhérents.",
+      "filterStatusLabel": "Filtrer par statut",
+      "filterStatusAll": "Tous les statuts",
+      "filterTypeLabel": "Filtrer par type",
+      "filterTypeAll": "Tous les types",
+      "noPaymentsYet": "Aucune cotisation enregistrée pour le moment.",
+      "actionError": "Une erreur est survenue. Merci de réessayer.",
+      "validate": "Valider",
+      "reject": "Refuser",
+      "columns": {
+        "member": "Adhérent",
+        "amount": "Montant",
+        "type": "Type",
+        "status": "Statut",
+        "date": "Date",
+        "actions": "Actions"
+      },
+      "status": {
+        "PENDING": "En attente",
+        "VALIDATED": "Validée",
+        "REJECTED": "Refusée"
+      },
+      "type": {
+        "MEMBERSHIP": "Cotisation",
+        "DONATION": "Don",
+        "OTHER": "Autre"
+      },
+      "create": {
+        "action": "Nouvelle cotisation",
+        "title": "Enregistrer une cotisation",
+        "memberSearchLabel": "Adhérent",
+        "memberSearchPlaceholder": "Rechercher par email ou nom...",
+        "noMembersFound": "Aucun adhérent trouvé.",
+        "memberRequired": "Veuillez sélectionner un adhérent.",
+        "amountLabel": "Montant (TND)",
+        "typeLabel": "Type",
+        "cancel": "Annuler",
+        "submit": "Enregistrer"
+      }
+    }
   }
 }

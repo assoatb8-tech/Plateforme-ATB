@@ -5,6 +5,7 @@ import { getOptionalUser } from '../middlewares/auth'
 import { sendError, sendSuccess } from '../utils/response'
 import { eventUpdateSchema } from '../validators/event'
 import { serializeEvent } from '../utils/eventSerializer'
+import { logAdminAction } from '../utils/auditLog'
 
 function getEventId(req: VercelRequest): string | undefined {
   return Array.isArray(req.query.id) ? req.query.id[0] : req.query.id
@@ -23,12 +24,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   }
 
   if (req.method === 'PATCH') {
-    await withRole(['ADMIN'], (roleReq, roleRes) => handleUpdate(id, roleReq, roleRes))(req, res)
+    await withRole(['ADMIN'], (roleReq, roleRes, user) =>
+      handleUpdate(id, roleReq, roleRes, user.id),
+    )(req, res)
     return
   }
 
   if (req.method === 'DELETE') {
-    await withRole(['ADMIN'], (_roleReq, roleRes) => handleDelete(id, roleRes))(req, res)
+    await withRole(['ADMIN'], (_roleReq, roleRes, user) => handleDelete(id, roleRes, user.id))(
+      req,
+      res,
+    )
     return
   }
 
@@ -56,7 +62,12 @@ async function handleGet(id: string, req: VercelRequest, res: VercelResponse): P
   sendSuccess(res, serializeEvent({ ...event, registeredCount }, myRegistration?.status ?? null))
 }
 
-async function handleUpdate(id: string, req: VercelRequest, res: VercelResponse): Promise<void> {
+async function handleUpdate(
+  id: string,
+  req: VercelRequest,
+  res: VercelResponse,
+  adminId: string,
+): Promise<void> {
   const parsed = eventUpdateSchema.safeParse(req.body)
   if (!parsed.success) {
     sendError(res, parsed.error.issues.map((issue) => issue.message).join(', '), 400)
@@ -79,6 +90,8 @@ async function handleUpdate(id: string, req: VercelRequest, res: VercelResponse)
     },
   })
 
+  await logAdminAction(adminId, 'EVENT_UPDATED', id)
+
   const registeredCount = await prisma.eventRegistration.count({
     where: { eventId: id, status: 'REGISTERED' },
   })
@@ -86,7 +99,7 @@ async function handleUpdate(id: string, req: VercelRequest, res: VercelResponse)
   sendSuccess(res, serializeEvent({ ...event, registeredCount }, null))
 }
 
-async function handleDelete(id: string, res: VercelResponse): Promise<void> {
+async function handleDelete(id: string, res: VercelResponse, adminId: string): Promise<void> {
   const existing = await prisma.event.findUnique({ where: { id } })
   if (!existing) {
     sendError(res, 'Event not found', 404)
@@ -94,5 +107,6 @@ async function handleDelete(id: string, res: VercelResponse): Promise<void> {
   }
 
   await prisma.event.delete({ where: { id } })
+  await logAdminAction(adminId, 'EVENT_DELETED', id)
   sendSuccess(res, { id })
 }
