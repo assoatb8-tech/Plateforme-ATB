@@ -8,7 +8,10 @@
     "about": "À propos",
     "events": "Événements",
     "login": "Connexion",
-    "register": "Devenir bénévole"
+    "register": "Devenir bénévole",
+    "dashboard": "Tableau de bord",
+    "admin": "Administration",
+    "logout": "Déconnexion"
   },
   "language": {
     "fr": "Français",
@@ -51,5 +54,53 @@
   "footer": {
     "rights": "Tous droits réservés.",
     "tagline": "Association Tunisienne de Bénévolat"
+  },
+  "auth": {
+    "login": {
+      "title": "Connexion",
+      "subtitle": "Accédez à votre espace adhérent.",
+      "emailLabel": "Adresse email",
+      "passwordLabel": "Mot de passe",
+      "submit": "Se connecter",
+      "forgotPassword": "Mot de passe oublié ?",
+      "noAccount": "Pas encore de compte ?",
+      "registerLink": "Créer un compte",
+      "errorInvalidCredentials": "Email ou mot de passe incorrect."
+    },
+    "register": {
+      "title": "Créer un compte",
+      "subtitle": "Rejoignez la communauté des bénévoles de l'ATB.",
+      "emailLabel": "Adresse email",
+      "passwordLabel": "Mot de passe",
+      "confirmPasswordLabel": "Confirmer le mot de passe",
+      "submit": "Créer mon compte",
+      "hasAccount": "Déjà un compte ?",
+      "loginLink": "Se connecter",
+      "success": "Compte créé ! Vérifiez votre boîte email pour confirmer votre inscription.",
+      "errorGeneric": "Une erreur est survenue. Merci de réessayer."
+    },
+    "forgotPassword": {
+      "title": "Mot de passe oublié",
+      "subtitle": "Recevez un lien pour réinitialiser votre mot de passe.",
+      "emailLabel": "Adresse email",
+      "submit": "Envoyer le lien",
+      "success": "Si un compte existe avec cet email, un lien de réinitialisation a été envoyé.",
+      "backToLogin": "Retour à la connexion",
+      "errorGeneric": "Une erreur est survenue. Merci de réessayer."
+    },
+    "resetPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Choisissez un nouveau mot de passe.",
+      "passwordLabel": "Nouveau mot de passe",
+      "confirmPasswordLabel": "Confirmer le mot de passe",
+      "submit": "Enregistrer",
+      "errorGeneric": "Une erreur est survenue. Le lien a peut-être expiré."
+    }
+  },
+  "validation": {
+    "emailInvalid": "Adresse email invalide.",
+    "required": "Ce champ est obligatoire.",
+    "passwordMin": "Le mot de passe doit contenir au moins 8 caractères.",
+    "passwordMismatch": "Les mots de passe ne correspondent pas."
   }
 }

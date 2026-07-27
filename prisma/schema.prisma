@@ -1,0 +1,238 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// --- Enums --------------------------------------------------------------
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING
+  BANNED
+}
+
+enum Gender {
+  MALE
+  FEMALE
+}
+
+enum MaritalStatus {
+  SINGLE
+  MARRIED
+  DIVORCED
+  WIDOWED
+}
+
+enum BloodType {
+  A_POSITIVE  @map("A+")
+  A_NEGATIVE  @map("A-")
+  B_POSITIVE  @map("B+")
+  B_NEGATIVE  @map("B-")
+  AB_POSITIVE @map("AB+")
+  AB_NEGATIVE @map("AB-")
+  O_POSITIVE  @map("O+")
+  O_NEGATIVE  @map("O-")
+}
+
+enum EventStatus {
+  ACTIVE
+  CANCELLED
+}
+
+enum RegistrationStatus {
+  REGISTERED
+  CANCELLED
+  WAITING_LIST
+}
+
+enum PaymentType {
+  MEMBERSHIP
+  DONATION
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  VALIDATED
+  REJECTED
+}
+
+enum DocumentType {
+  PROFILE_IMAGE
+  CIN_COPY
+  CERTIFICATE
+  OTHER
+}
+
+// --- Models ---------------------------------------------------------------
+
+/// Mirrors Supabase Auth's auth.users — id must match the Supabase Auth user id.
+model User {
+  id        String     @id @db.Uuid
+  email     String     @unique
+  role      Role       @default(USER)
+  status    UserStatus @default(PENDING)
+  createdAt DateTime   @default(now()) @map("created_at")
+  updatedAt DateTime   @updatedAt @map("updated_at")
+
+  memberProfile      MemberProfile?
+  eventRegistrations EventRegistration[]
+  payments           Payment[]           @relation("PaymentPayer")
+  validatedPayments  Payment[]           @relation("PaymentValidator")
+  documents          Document[]
+  bans               Ban[]               @relation("BannedUser")
+  bansIssued         Ban[]               @relation("BanIssuer")
+  eventsCreated      Event[]             @relation("EventCreator")
+  auditLogs          AuditLog[]
+
+  @@map("users")
+}
+
+model MemberProfile {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @unique @map("user_id") @db.Uuid
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Informations personnelles
+  firstName       String   @map("first_name")
+  lastName        String   @map("last_name")
+  gender          Gender
+  fatherName      String?  @map("father_name")
+  grandfatherName String?  @map("grandfather_name")
+  motherFullName  String?  @map("mother_full_name")
+  birthDate       DateTime @map("birth_date") @db.Date
+  birthPlace      String   @map("birth_place")
+  cinNumber       String   @unique @map("cin_number")
+  cinIssuedPlace  String   @map("cin_issued_place")
+  cinIssueDate    DateTime @map("cin_issue_date") @db.Date
+
+  // Coordonnées
+  address      String  @db.Text
+  phoneHome    String? @map("phone_home")
+  phoneMobile  String  @map("phone_mobile")
+  contactEmail String? @map("contact_email")
+
+  // Situation familiale
+  maritalStatus  MaritalStatus @map("marital_status")
+  childrenCount  Int           @default(0) @map("children_count")
+  bloodType      BloodType?    @map("blood_type")
+  educationLevel String?       @map("education_level")
+
+  // Informations professionnelles
+  profession      String?
+  speciality      String?
+  employer        String?
+  employerAddress String? @map("employer_address") @db.Text
+  employerPhone   String? @map("employer_phone")
+  workFax         String? @map("work_fax")
+
+  // Expérience associative et activités
+  previousAssociations String? @map("previous_associations") @db.Text
+  sports               String? @db.Text
+  firstAidCertificates String? @map("first_aid_certificates") @db.Text
+
+  // Déclaration
+  declarationAccepted Boolean   @default(false) @map("declaration_accepted")
+  signature           String?
+  signatureDate       DateTime? @map("signature_date")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("member_profiles")
+}
+
+model Event {
+  id              String      @id @default(uuid()) @db.Uuid
+  titleFr         String      @map("title_fr")
+  titleAr         String      @map("title_ar")
+  descriptionFr   String      @map("description_fr") @db.Text
+  descriptionAr   String      @map("description_ar") @db.Text
+  location        String
+  startDate       DateTime    @map("start_date")
+  endDate         DateTime    @map("end_date")
+  maxParticipants Int         @map("max_participants")
+  status          EventStatus @default(ACTIVE)
+  createdBy       String      @map("created_by") @db.Uuid
+  creator         User        @relation("EventCreator", fields: [createdBy], references: [id])
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+
+  registrations EventRegistration[]
+
+  @@index([startDate])
+  @@map("events")
+}
+
+model EventRegistration {
+  id           String             @id @default(uuid()) @db.Uuid
+  eventId      String             @map("event_id") @db.Uuid
+  event        Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId       String             @map("user_id") @db.Uuid
+  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status       RegistrationStatus @default(REGISTERED)
+  registeredAt DateTime           @default(now()) @map("registered_at")
+
+  @@unique([eventId, userId])
+  @@index([eventId])
+  @@index([userId])
+  @@map("event_registrations")
+}
+
+model Payment {
+  id          String        @id @default(uuid()) @db.Uuid
+  userId      String        @map("user_id") @db.Uuid
+  user        User          @relation("PaymentPayer", fields: [userId], references: [id], onDelete: Cascade)
+  amount      Decimal       @db.Decimal(10, 2)
+  paymentType PaymentType   @map("payment_type")
+  status      PaymentStatus @default(PENDING)
+  validatedBy String?       @map("validated_by") @db.Uuid
+  validator   User?         @relation("PaymentValidator", fields: [validatedBy], references: [id])
+  validatedAt DateTime?     @map("validated_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+
+  @@map("payments")
+}
+
+model Document {
+  id         String       @id @default(uuid()) @db.Uuid
+  userId     String       @map("user_id") @db.Uuid
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type       DocumentType
+  url        String
+  uploadedAt DateTime     @default(now()) @map("uploaded_at")
+
+  @@map("documents")
+}
+
+model Ban {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  user      User     @relation("BannedUser", fields: [userId], references: [id], onDelete: Cascade)
+  reason    String   @db.Text
+  createdBy String   @map("created_by") @db.Uuid
+  issuer    User     @relation("BanIssuer", fields: [createdBy], references: [id])
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("bans")
+}
+
+model AuditLog {
+  id        String   @id @default(uuid()) @db.Uuid
+  adminId   String   @map("admin_id") @db.Uuid
+  admin     User     @relation(fields: [adminId], references: [id])
+  action    String
+  targetId  String?  @map("target_id") @db.Uuid
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("audit_logs")
+}
