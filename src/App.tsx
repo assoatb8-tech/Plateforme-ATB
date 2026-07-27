@@ -23,6 +23,7 @@ import { AdminPaymentsListPage } from '@/features/admin/payments/pages/AdminPaym
 import { AuthProvider } from '@/features/auth/hooks/AuthProvider'
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { useDirection } from '@/hooks/useDirection'
+import { PwaPrompts } from '@/pwa/PwaPrompts'
 
 const queryClient = new QueryClient()
 
@@ -102,6 +103,7 @@ export function App() {
         <AuthProvider>
           <AppRoutes />
         </AuthProvider>
+        <PwaPrompts />
       </BrowserRouter>
     </QueryClientProvider>
   )

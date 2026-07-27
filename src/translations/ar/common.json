@@ -100,6 +100,13 @@
       "errorGeneric": "حدث خطأ. ربما تكون صلاحية الرابط قد انتهت."
     }
   },
+  "pwa": {
+    "updateAvailable": "يتوفر إصدار جديد.",
+    "updateCta": "تحديث",
+    "installPrompt": "ثبّت تطبيق الجمعية التونسية للتطوع للوصول بشكل أسرع.",
+    "installCta": "تثبيت",
+    "dismiss": "إغلاق"
+  },
   "validation": {
     "emailInvalid": "بريد إلكتروني غير صالح.",
     "required": "هذا الحقل إلزامي.",

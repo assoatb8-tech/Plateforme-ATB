@@ -3,12 +3,23 @@
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/jpeg" href="/logo.jpeg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#E02424" />
     <meta
       name="description"
       content="Association Tunisienne de Bénévolat — plateforme de gestion des adhérents, événements et cotisations."
     />
+
+    <!-- PWA installability (Android/desktop): vite-plugin-pwa injects
+         <link rel="manifest"> automatically at build time. -->
+
+    <!-- iOS home-screen install support (Safari ignores the manifest for
+         these three, so they're set explicitly rather than left to
+         vite-plugin-pwa's manifest-only injection). -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="ATB" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link

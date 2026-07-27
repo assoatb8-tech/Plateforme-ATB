@@ -100,6 +100,13 @@
       "errorGeneric": "Une erreur est survenue. Le lien a peut-être expiré."
     }
   },
+  "pwa": {
+    "updateAvailable": "Une nouvelle version est disponible.",
+    "updateCta": "Mettre à jour",
+    "installPrompt": "Installez l'application ATB pour un accès plus rapide.",
+    "installCta": "Installer",
+    "dismiss": "Fermer"
+  },
   "validation": {
     "emailInvalid": "Adresse email invalide.",
     "required": "Ce champ est obligatoire.",
