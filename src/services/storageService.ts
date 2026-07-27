@@ -17,6 +17,10 @@ export function validateDocumentFile(file: File): string | null {
   return null
 }
 
+// The "members" bucket is private (CIN copies and certificates are
+// sensitive per MEMBER_FORM.md's confidentiality rules), so we store the
+// storage path — not a public URL — and mint short-lived signed URLs only
+// when a document actually needs to be displayed.
 async function uploadFile(
   userId: string,
   folder: 'cin' | 'certificates' | 'profile',
@@ -25,9 +29,7 @@ async function uploadFile(
   const path = `${userId}/${folder}/${Date.now()}-${file.name}`
   const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: false })
   if (error) throw error
-
-  const { data } = supabase.storage.from(BUCKET).getPublicUrl(path)
-  return data.publicUrl
+  return path
 }
 
 export async function uploadMemberDocument(
@@ -35,14 +37,22 @@ export async function uploadMemberDocument(
   folder: 'cin' | 'certificates' | 'profile',
   documentType: DocumentType,
   file: File,
-): Promise<{ url: string }> {
-  const url = await uploadFile(userId, folder, file)
+): Promise<{ path: string }> {
+  const path = await uploadFile(userId, folder, file)
 
   const { error } = await supabase
     .from('documents')
-    .insert({ user_id: userId, type: documentType, url })
+    .insert({ user_id: userId, type: documentType, url: path })
 
   if (error) throw error
 
-  return { url }
+  return { path }
+}
+
+export async function getSignedDocumentUrl(path: string, expiresInSeconds = 60): Promise<string> {
+  const { data, error } = await supabase.storage
+    .from(BUCKET)
+    .createSignedUrl(path, expiresInSeconds)
+  if (error) throw error
+  return data.signedUrl
 }

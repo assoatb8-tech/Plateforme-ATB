@@ -9,7 +9,7 @@ import type { MemberFormValues } from '@/features/member-form/validation'
 
 interface UploadedFile {
   name: string
-  url: string
+  path: string
 }
 
 export function Step7Documents({ form }: { form: UseFormReturn<MemberFormValues> }) {
@@ -35,8 +35,8 @@ export function Step7Documents({ form }: { form: UseFormReturn<MemberFormValues>
     setUploading(true)
     setUploadError(null)
     try {
-      const { url } = await uploadMemberDocument(user.id, 'certificates', 'CERTIFICATE', file)
-      setUploadedFiles((prev) => [...prev, { name: file.name, url }])
+      const { path } = await uploadMemberDocument(user.id, 'certificates', 'CERTIFICATE', file)
+      setUploadedFiles((prev) => [...prev, { name: file.name, path }])
     } catch {
       setUploadError(t('memberForm.uploadError'))
     } finally {
@@ -72,7 +72,7 @@ export function Step7Documents({ form }: { form: UseFormReturn<MemberFormValues>
         {uploadedFiles.length > 0 && (
           <ul className="flex flex-col gap-1">
             {uploadedFiles.map((file) => (
-              <li key={file.url} className="text-sm text-slate-600">
+              <li key={file.path} className="text-sm text-slate-600">
                 {file.name}
               </li>
             ))}

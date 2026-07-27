@@ -178,6 +178,7 @@ model Event {
   registrations EventRegistration[]
 
   @@index([startDate])
+  @@index([createdBy])
   @@map("events")
 }
 
@@ -208,6 +209,8 @@ model Payment {
   validatedAt DateTime?     @map("validated_at")
   createdAt   DateTime      @default(now()) @map("created_at")
 
+  @@index([userId])
+  @@index([validatedBy])
   @@map("payments")
 }
 
@@ -219,6 +222,7 @@ model Document {
   url        String
   uploadedAt DateTime     @default(now()) @map("uploaded_at")
 
+  @@index([userId])
   @@map("documents")
 }
 
@@ -231,6 +235,8 @@ model Ban {
   issuer    User     @relation("BanIssuer", fields: [createdBy], references: [id])
   createdAt DateTime @default(now()) @map("created_at")
 
+  @@index([userId])
+  @@index([createdBy])
   @@map("bans")
 }
 
@@ -242,5 +248,6 @@ model AuditLog {
   targetId  String?  @map("target_id") @db.Uuid
   createdAt DateTime @default(now()) @map("created_at")
 
+  @@index([adminId])
   @@map("audit_logs")
 }

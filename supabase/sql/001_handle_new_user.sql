@@ -12,8 +12,8 @@ security definer
 set search_path = public
 as $$
 begin
-  insert into public.users (id, email, role, status)
-  values (new.id, new.email, 'USER', 'PENDING');
+  insert into public.users (id, email, role, status, updated_at)
+  values (new.id, new.email, 'USER', 'PENDING', now());
   return new;
 end;
 $$;
