@@ -1,0 +1,55 @@
+{
+  "app": {
+    "name": "Association Tunisienne de Bénévolat",
+    "shortName": "ATB"
+  },
+  "nav": {
+    "home": "Accueil",
+    "about": "À propos",
+    "events": "Événements",
+    "login": "Connexion",
+    "register": "Devenir bénévole"
+  },
+  "language": {
+    "fr": "Français",
+    "ar": "العربية",
+    "switch": "Changer de langue"
+  },
+  "home": {
+    "hero": {
+      "title": "Ensemble, agissons pour la Tunisie",
+      "subtitle": "Rejoignez une communauté de bénévoles engagés et participez à des actions solidaires partout en Tunisie.",
+      "cta": "Rejoindre l'association",
+      "ctaSecondary": "Découvrir nos activités"
+    },
+    "mission": {
+      "title": "Notre mission",
+      "text": "L'Association Tunisienne de Bénévolat fédère des volontaires autour de projets solidaires, éducatifs et environnementaux, pour un impact durable dans les communautés locales."
+    },
+    "values": {
+      "title": "Nos valeurs",
+      "solidarity": "Solidarité",
+      "solidarityText": "Nous croyons en l'entraide et au soutien mutuel entre tous les membres de la communauté.",
+      "commitment": "Engagement",
+      "commitmentText": "Chaque bénévole s'implique avec sérieux et constance dans les actions de l'association.",
+      "trust": "Confiance",
+      "trustText": "Une gestion transparente et professionnelle au service de nos adhérents.",
+      "community": "Communauté",
+      "communityText": "Une communauté nationale unie autour de valeurs communes de partage."
+    },
+    "stats": {
+      "title": "L'association en chiffres",
+      "members": "Adhérents actifs",
+      "events": "Événements organisés",
+      "years": "Années d'engagement"
+    },
+    "contact": {
+      "title": "Nous contacter",
+      "text": "Une question ? Envie de nous rejoindre ? Notre équipe vous répond avec plaisir."
+    }
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "tagline": "Association Tunisienne de Bénévolat"
+  }
+}
