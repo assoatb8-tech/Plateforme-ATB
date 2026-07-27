@@ -41,10 +41,18 @@ export function Navbar() {
           )}
           {user && (
             <Link
-              to="/dossier-adhesion"
+              to="/mes-participations"
               className="text-sm font-medium text-slate-700 hover:text-primary"
             >
-              {t('nav.memberForm')}
+              {t('nav.participations')}
+            </Link>
+          )}
+          {user && (
+            <Link
+              to="/mon-profil"
+              className="text-sm font-medium text-slate-700 hover:text-primary"
+            >
+              {t('nav.profile')}
             </Link>
           )}
           {user?.role === 'ADMIN' && (

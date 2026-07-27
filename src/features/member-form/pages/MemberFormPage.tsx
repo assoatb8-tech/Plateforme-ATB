@@ -8,6 +8,7 @@ import {
   memberFormSchema,
   memberFormDefaultValues,
   stepFields,
+  stepLabelKeys,
   TOTAL_STEPS,
   type MemberFormValues,
 } from '@/features/member-form/validation'
@@ -38,17 +39,6 @@ const STEP_COMPONENTS = [
   Step6Experience,
   Step7Documents,
   Step8Declaration,
-]
-
-const STEP_LABEL_KEYS = [
-  'personalInfo',
-  'identity',
-  'contact',
-  'family',
-  'profession',
-  'experience',
-  'documents',
-  'declaration',
 ]
 
 export function MemberFormPage() {
@@ -110,7 +100,7 @@ export function MemberFormPage() {
       <StepIndicator
         currentStep={step}
         totalSteps={TOTAL_STEPS}
-        stepLabel={t(`memberForm.steps.${STEP_LABEL_KEYS[step - 1]}`)}
+        stepLabel={t(`memberForm.steps.${stepLabelKeys[step - 1]}`)}
       />
 
       <Card className="mt-6">

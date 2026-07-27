@@ -140,6 +140,20 @@ export const memberFormDefaultValues: MemberFormValues = {
 
 export const TOTAL_STEPS = 8
 
+// Shared between MemberFormPage (wizard) and the "Mon profil" edit page
+// (single-page view of the same 8 sections) so the step order/labels never
+// drift apart between the two.
+export const stepLabelKeys = [
+  'personalInfo',
+  'identity',
+  'contact',
+  'family',
+  'profession',
+  'experience',
+  'documents',
+  'declaration',
+] as const
+
 export const stepFields: Record<number, (keyof MemberFormValues)[]> = {
   1: ['fullName', 'gender', 'fatherName', 'grandfatherName', 'motherFullName'],
   2: ['birthDate', 'birthPlace', 'cinNumber', 'cinIssuedPlace', 'cinIssueDate'],

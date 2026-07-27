@@ -1,4 +1,18 @@
 import { supabase } from '@/services/supabaseClient'
+import { apiRequest } from '@/services/apiClient'
+import type { Role, UserStatus } from '@/types/domain'
+
+export interface CurrentUserDto {
+  id: string
+  email: string
+  role: Role
+  status: UserStatus
+  hasProfile: boolean
+}
+
+export async function fetchCurrentUser(): Promise<CurrentUserDto> {
+  return apiRequest<CurrentUserDto>('/api/auth/me')
+}
 
 export async function signUp(email: string, password: string): Promise<void> {
   const { error } = await supabase.auth.signUp({ email, password })

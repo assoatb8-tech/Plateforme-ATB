@@ -12,7 +12,9 @@
     "dashboard": "Tableau de bord",
     "admin": "Administration",
     "logout": "Déconnexion",
-    "memberForm": "Dossier d'adhésion"
+    "memberForm": "Dossier d'adhésion",
+    "participations": "Mes participations",
+    "profile": "Mon profil"
   },
   "language": {
     "fr": "Français",
@@ -179,5 +181,64 @@
     "declaration": {
       "text": "Je certifie que les informations fournies sont exactes."
     }
+  },
+  "events": {
+    "title": "Événements",
+    "subtitle": "Découvrez et rejoignez les activités de l'association.",
+    "searchPlaceholder": "Rechercher un événement...",
+    "search": "Rechercher",
+    "loading": "Chargement...",
+    "errorGeneric": "Impossible de charger les événements. Merci de réessayer.",
+    "noResults": "Aucun événement ne correspond à votre recherche.",
+    "noEventsYet": "Aucun événement n'est publié pour le moment. Revenez bientôt !",
+    "previousPage": "Précédent",
+    "nextPage": "Suivant",
+    "pageIndicator": "Page {{current}} / {{total}}",
+    "full": "Complet",
+    "spotsLeft": "{{count}} places restantes",
+    "notFound": "Cet événement est introuvable.",
+    "backToList": "Retour aux événements",
+    "cancelled": "Événement annulé",
+    "dateRange": "Du {{start}} au {{end}}",
+    "capacity": "{{registered}} / {{max}} participants",
+    "actionError": "Une erreur est survenue. Merci de réessayer.",
+    "loginToRegister": "Se connecter pour s'inscrire",
+    "register": "S'inscrire",
+    "joinWaitingList": "Rejoindre la liste d'attente",
+    "cancelRegistration": "Annuler mon inscription",
+    "status": {
+      "registered": "Inscrit(e)",
+      "waitingList": "Liste d'attente"
+    }
+  },
+  "dashboard": {
+    "greeting": "Bienvenue, {{email}}",
+    "loading": "Chargement...",
+    "membershipStatus": "Statut d'adhésion",
+    "status": {
+      "ACTIVE": "Actif",
+      "PENDING": "En attente de validation",
+      "BANNED": "Suspendu"
+    },
+    "noProfileYet": "Vous n'avez pas encore complété votre dossier d'adhésion.",
+    "completeProfileCta": "Compléter mon dossier",
+    "viewProfile": "Voir mon profil",
+    "upcomingEvents": "Prochains événements",
+    "viewAllParticipations": "Toutes mes participations",
+    "noUpcomingEvents": "Vous n'êtes inscrit(e) à aucun événement à venir.",
+    "browseEvents": "Découvrir les événements"
+  },
+  "profile": {
+    "title": "Mon profil",
+    "noProfileYet": "Vous n'avez pas encore de dossier d'adhésion.",
+    "save": "Enregistrer les modifications",
+    "saveSuccess": "Votre profil a été mis à jour.",
+    "errorGeneric": "Une erreur est survenue. Merci de réessayer."
+  },
+  "participations": {
+    "title": "Mes participations",
+    "empty": "Vous ne participez à aucun événement pour le moment.",
+    "upcoming": "À venir",
+    "past": "Passées"
   }
 }

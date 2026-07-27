@@ -9,6 +9,11 @@ import { RegisterPage } from '@/features/auth/pages/RegisterPage'
 import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage'
 import { MemberFormPage } from '@/features/member-form/pages/MemberFormPage'
+import { EventsListPage } from '@/features/events/pages/EventsListPage'
+import { EventDetailPage } from '@/features/events/pages/EventDetailPage'
+import { DashboardPage } from '@/features/dashboard/pages/DashboardPage'
+import { ProfilePage } from '@/features/profile/pages/ProfilePage'
+import { ParticipationsPage } from '@/features/participations/pages/ParticipationsPage'
 import { AuthProvider } from '@/features/auth/hooks/AuthProvider'
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { useDirection } from '@/hooks/useDirection'
@@ -22,12 +27,13 @@ function AppRoutes() {
     <Routes>
       <Route element={<PublicLayout />}>
         <Route index element={<HomePage />} />
-        <Route path="evenements" element={<ComingSoonPage titleKey="nav.events" />} />
+        <Route path="evenements" element={<EventsListPage />} />
+        <Route path="evenements/:id" element={<EventDetailPage />} />
         <Route
           path="tableau-de-bord"
           element={
             <ProtectedRoute>
-              <ComingSoonPage titleKey="nav.dashboard" />
+              <DashboardPage />
             </ProtectedRoute>
           }
         />
@@ -44,6 +50,22 @@ function AppRoutes() {
           element={
             <ProtectedRoute>
               <MemberFormPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="mon-profil"
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="mes-participations"
+          element={
+            <ProtectedRoute>
+              <ParticipationsPage />
             </ProtectedRoute>
           }
         />

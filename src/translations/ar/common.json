@@ -12,7 +12,9 @@
     "dashboard": "لوحة التحكم",
     "admin": "الإدارة",
     "logout": "تسجيل الخروج",
-    "memberForm": "ملف الانخراط"
+    "memberForm": "ملف الانخراط",
+    "participations": "مشاركاتي",
+    "profile": "ملفي الشخصي"
   },
   "language": {
     "fr": "Français",
@@ -179,5 +181,64 @@
     "declaration": {
       "text": "أشهد بصحة هذه المعطيات"
     }
+  },
+  "events": {
+    "title": "الأنشطة",
+    "subtitle": "اكتشف أنشطة الجمعية وانضم إليها.",
+    "searchPlaceholder": "البحث عن نشاط...",
+    "search": "بحث",
+    "loading": "جارٍ التحميل...",
+    "errorGeneric": "تعذّر تحميل الأنشطة. يرجى المحاولة مرة أخرى.",
+    "noResults": "لا يوجد نشاط يطابق بحثك.",
+    "noEventsYet": "لا يوجد أي نشاط منشور حاليًا. عد قريبًا!",
+    "previousPage": "السابق",
+    "nextPage": "التالي",
+    "pageIndicator": "صفحة {{current}} / {{total}}",
+    "full": "مكتمل العدد",
+    "spotsLeft": "{{count}} مقاعد متبقية",
+    "notFound": "هذا النشاط غير موجود.",
+    "backToList": "العودة إلى الأنشطة",
+    "cancelled": "نشاط ملغى",
+    "dateRange": "من {{start}} إلى {{end}}",
+    "capacity": "{{registered}} / {{max}} مشارك",
+    "actionError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+    "loginToRegister": "تسجيل الدخول للتسجيل في النشاط",
+    "register": "التسجيل",
+    "joinWaitingList": "الانضمام إلى قائمة الانتظار",
+    "cancelRegistration": "إلغاء تسجيلي",
+    "status": {
+      "registered": "مسجَّل",
+      "waitingList": "قائمة الانتظار"
+    }
+  },
+  "dashboard": {
+    "greeting": "مرحبًا، {{email}}",
+    "loading": "جارٍ التحميل...",
+    "membershipStatus": "حالة الانخراط",
+    "status": {
+      "ACTIVE": "نشيط",
+      "PENDING": "في انتظار المصادقة",
+      "BANNED": "موقوف"
+    },
+    "noProfileYet": "لم تُكمل بعد ملف انخراطك.",
+    "completeProfileCta": "إكمال ملفي",
+    "viewProfile": "عرض ملفي الشخصي",
+    "upcomingEvents": "الأنشطة القادمة",
+    "viewAllParticipations": "كل مشاركاتي",
+    "noUpcomingEvents": "لست مسجَّلاً في أي نشاط قادم.",
+    "browseEvents": "اكتشف الأنشطة"
+  },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "noProfileYet": "ليس لديك ملف انخراط بعد.",
+    "save": "حفظ التعديلات",
+    "saveSuccess": "تم تحديث ملفك الشخصي.",
+    "errorGeneric": "حدث خطأ. يرجى المحاولة مرة أخرى."
+  },
+  "participations": {
+    "title": "مشاركاتي",
+    "empty": "لست مشاركًا في أي نشاط حاليًا.",
+    "upcoming": "القادمة",
+    "past": "السابقة"
   }
 }
