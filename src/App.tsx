@@ -8,6 +8,7 @@ import { LoginPage } from '@/features/auth/pages/LoginPage'
 import { RegisterPage } from '@/features/auth/pages/RegisterPage'
 import { ForgotPasswordPage } from '@/features/auth/pages/ForgotPasswordPage'
 import { ResetPasswordPage } from '@/features/auth/pages/ResetPasswordPage'
+import { MemberFormPage } from '@/features/member-form/pages/MemberFormPage'
 import { AuthProvider } from '@/features/auth/hooks/AuthProvider'
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { useDirection } from '@/hooks/useDirection'
@@ -35,6 +36,14 @@ function AppRoutes() {
           element={
             <ProtectedRoute allowedRoles={['ADMIN']}>
               <ComingSoonPage titleKey="nav.admin" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="dossier-adhesion"
+          element={
+            <ProtectedRoute>
+              <MemberFormPage />
             </ProtectedRoute>
           }
         />

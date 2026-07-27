@@ -4,3 +4,4 @@
 
 export type Role = 'USER' | 'ADMIN'
 export type UserStatus = 'ACTIVE' | 'PENDING' | 'BANNED'
+export type DocumentType = 'PROFILE_IMAGE' | 'CIN_COPY' | 'CERTIFICATE' | 'OTHER'

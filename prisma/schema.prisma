@@ -102,32 +102,35 @@ model MemberProfile {
   userId String @unique @map("user_id") @db.Uuid
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  // Informations personnelles
-  firstName       String   @map("first_name")
-  lastName        String   @map("last_name")
-  gender          Gender
-  fatherName      String?  @map("father_name")
-  grandfatherName String?  @map("grandfather_name")
-  motherFullName  String?  @map("mother_full_name")
-  birthDate       DateTime @map("birth_date") @db.Date
-  birthPlace      String   @map("birth_place")
-  cinNumber       String   @unique @map("cin_number")
-  cinIssuedPlace  String   @map("cin_issued_place")
-  cinIssueDate    DateTime @map("cin_issue_date") @db.Date
+  // Section 1 — Informations personnelles (MEMBER_FORM.md)
+  fullName        String  @map("full_name")
+  gender          Gender?
+  fatherName      String? @map("father_name")
+  grandfatherName String? @map("grandfather_name")
+  motherFullName  String? @map("mother_full_name")
 
-  // Coordonnées
+  // Section 2 — Naissance et identité
+  birthDate      DateTime? @map("birth_date") @db.Date
+  birthPlace     String?   @map("birth_place")
+  cinNumber      String?   @unique @map("cin_number")
+  cinIssuedPlace String?   @map("cin_issued_place")
+  cinIssueDate   DateTime? @map("cin_issue_date") @db.Date
+
+  // Section 3 — Coordonnées
   address      String  @db.Text
   phoneHome    String? @map("phone_home")
   phoneMobile  String  @map("phone_mobile")
   contactEmail String? @map("contact_email")
 
-  // Situation familiale
-  maritalStatus  MaritalStatus @map("marital_status")
-  childrenCount  Int           @default(0) @map("children_count")
-  bloodType      BloodType?    @map("blood_type")
-  educationLevel String?       @map("education_level")
+  // Section 4 — Situation familiale
+  maritalStatus MaritalStatus? @map("marital_status")
+  childrenCount Int?           @map("children_count")
+  bloodType     BloodType?     @map("blood_type")
 
-  // Informations professionnelles
+  // Section 5 — Formation
+  educationLevel String? @map("education_level")
+
+  // Section 6 — Profession
   profession      String?
   speciality      String?
   employer        String?
@@ -135,15 +138,20 @@ model MemberProfile {
   employerPhone   String? @map("employer_phone")
   workFax         String? @map("work_fax")
 
-  // Expérience associative et activités
+  // Section 7 — Expérience associative
   previousAssociations String? @map("previous_associations") @db.Text
-  sports               String? @db.Text
+
+  // Section 8 — Activités sportives
+  sports String? @db.Text
+
+  // Section 9 — Secourisme
   firstAidCertificates String? @map("first_aid_certificates") @db.Text
 
-  // Déclaration
+  // Section 10 — Déclaration
   declarationAccepted Boolean   @default(false) @map("declaration_accepted")
+  declarationPlace    String?   @map("declaration_place")
   signature           String?
-  signatureDate       DateTime? @map("signature_date")
+  signatureDate       DateTime? @map("signature_date") @db.Date
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")

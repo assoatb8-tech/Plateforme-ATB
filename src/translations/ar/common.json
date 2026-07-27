@@ -11,7 +11,8 @@
     "register": "انضم كمتطوع",
     "dashboard": "لوحة التحكم",
     "admin": "الإدارة",
-    "logout": "تسجيل الخروج"
+    "logout": "تسجيل الخروج",
+    "memberForm": "ملف الانخراط"
   },
   "language": {
     "fr": "Français",
@@ -101,6 +102,82 @@
     "emailInvalid": "بريد إلكتروني غير صالح.",
     "required": "هذا الحقل إلزامي.",
     "passwordMin": "يجب أن تحتوي كلمة المرور على 8 أحرف على الأقل.",
-    "passwordMismatch": "كلمتا المرور غير متطابقتين."
+    "passwordMismatch": "كلمتا المرور غير متطابقتين.",
+    "phoneInvalid": "رقم هاتف غير صالح (8 أرقام، +216 اختياري).",
+    "cinInvalid": "رقم بطاقة تعريف غير صالح (8 أرقام).",
+    "invalidDate": "تاريخ غير صالح.",
+    "declarationRequired": "يجب عليك الإشهاد بصحة المعطيات المقدمة."
+  },
+  "memberForm": {
+    "title": "ملف الانخراط",
+    "stepProgress": "المرحلة {{current}} / {{total}}",
+    "previous": "السابق",
+    "next": "التالي",
+    "submit": "إرسال ملفي",
+    "selectPlaceholder": "اختر...",
+    "successTitle": "تم إرسال الملف",
+    "successText": "تم إرسال ملف انخراطك. سيقوم أحد المسؤولين بمراجعته قريبًا.",
+    "errorGeneric": "حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.",
+    "uploadLabel": "الشهائد والدبلومات (ملفات)",
+    "uploadHint": "الصيغ المقبولة: PDF, JPG, PNG (بحد أقصى 5 ميغابايت).",
+    "uploadCta": "إضافة ملف",
+    "uploadError": "تعذّر إرسال الملف. يرجى المحاولة مرة أخرى.",
+    "uploadInvalidType": "صيغة ملف غير مسموح بها (PDF, JPG, PNG فقط).",
+    "uploadTooLarge": "حجم الملف يتجاوز الحد الأقصى المسموح به (5 ميغابايت).",
+    "steps": {
+      "personalInfo": "معلومات شخصية",
+      "identity": "الولادة والهوية",
+      "contact": "بيانات الاتصال",
+      "family": "الحالة العائلية",
+      "profession": "المهنة",
+      "experience": "التجربة الجمعياتية والرياضية",
+      "documents": "الإسعاف والوثائق",
+      "declaration": "الإشهاد"
+    },
+    "fields": {
+      "fullName": "الإسم واللقب",
+      "gender": "الجنس",
+      "fatherName": "إسم الأب",
+      "grandfatherName": "إسم الجد",
+      "motherFullName": "إسم الأم ولقبها",
+      "birthDate": "تاريخ الولادة",
+      "birthPlace": "مكانها",
+      "cinNumber": "رقم بطاقة التعريف الوطنية",
+      "cinIssuedPlace": "الصادرة",
+      "cinIssueDate": "بتاريخ",
+      "address": "العنوان الشخصي بكلّ دقة ووضوح",
+      "phoneHome": "الهاتف القار",
+      "phoneMobile": "الهاتف الجوال",
+      "contactEmail": "البريد الإلكتروني",
+      "maritalStatus": "الحالة العائلية",
+      "childrenCount": "عدد الأبناء",
+      "bloodType": "صنف الدم",
+      "educationLevel": "المستوى التعليمي",
+      "profession": "المهنة",
+      "speciality": "الإختصاص",
+      "employer": "المؤسسة المشغلة",
+      "employerAddress": "عنوانها بكل دقة",
+      "employerPhone": "رقم هاتفها",
+      "workFax": "فاكس العمل",
+      "previousAssociations": "الجمعيات التي شاركت فيها",
+      "sports": "الرياضة التي مارستها أو تمارسها إلى حد الآن",
+      "firstAidCertificates": "الشهائد المتحصل عليها في ميدان الإسعاف",
+      "declarationPlace": "حرر ب",
+      "signatureDate": "بتاريخ",
+      "signature": "الإمضاء"
+    },
+    "genderOptions": {
+      "male": "ذكر",
+      "female": "أنثى"
+    },
+    "maritalStatusOptions": {
+      "single": "أعزب",
+      "married": "متزوج(ة)",
+      "divorced": "مطلق(ة)",
+      "widowed": "أرمل(ة)"
+    },
+    "declaration": {
+      "text": "أشهد بصحة هذه المعطيات"
+    }
   }
 }

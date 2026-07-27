@@ -11,7 +11,8 @@
     "register": "Devenir bénévole",
     "dashboard": "Tableau de bord",
     "admin": "Administration",
-    "logout": "Déconnexion"
+    "logout": "Déconnexion",
+    "memberForm": "Dossier d'adhésion"
   },
   "language": {
     "fr": "Français",
@@ -101,6 +102,82 @@
     "emailInvalid": "Adresse email invalide.",
     "required": "Ce champ est obligatoire.",
     "passwordMin": "Le mot de passe doit contenir au moins 8 caractères.",
-    "passwordMismatch": "Les mots de passe ne correspondent pas."
+    "passwordMismatch": "Les mots de passe ne correspondent pas.",
+    "phoneInvalid": "Numéro de téléphone invalide (8 chiffres, +216 optionnel).",
+    "cinInvalid": "Numéro de CIN invalide (8 chiffres).",
+    "invalidDate": "Date invalide.",
+    "declarationRequired": "Vous devez certifier l'exactitude des informations fournies."
+  },
+  "memberForm": {
+    "title": "Dossier d'adhésion",
+    "stepProgress": "Étape {{current}} / {{total}}",
+    "previous": "Précédent",
+    "next": "Suivant",
+    "submit": "Envoyer mon dossier",
+    "selectPlaceholder": "Sélectionner...",
+    "successTitle": "Dossier envoyé",
+    "successText": "Votre dossier d'adhésion a été transmis. Un administrateur va l'examiner prochainement.",
+    "errorGeneric": "Une erreur est survenue lors de l'envoi. Merci de réessayer.",
+    "uploadLabel": "Diplômes et certificats (fichiers)",
+    "uploadHint": "Formats acceptés : PDF, JPG, PNG (5 Mo maximum).",
+    "uploadCta": "Ajouter un fichier",
+    "uploadError": "Le fichier n'a pas pu être envoyé. Merci de réessayer.",
+    "uploadInvalidType": "Format de fichier non autorisé (PDF, JPG, PNG uniquement).",
+    "uploadTooLarge": "Le fichier dépasse la taille maximale autorisée (5 Mo).",
+    "steps": {
+      "personalInfo": "Informations personnelles",
+      "identity": "Naissance et identité",
+      "contact": "Coordonnées",
+      "family": "Situation familiale",
+      "profession": "Profession",
+      "experience": "Expérience associative et sportive",
+      "documents": "Secourisme et documents",
+      "declaration": "Déclaration"
+    },
+    "fields": {
+      "fullName": "Nom et prénom",
+      "gender": "Sexe",
+      "fatherName": "Nom du père",
+      "grandfatherName": "Nom du grand-père",
+      "motherFullName": "Nom et prénom de la mère",
+      "birthDate": "Date de naissance",
+      "birthPlace": "Lieu de naissance",
+      "cinNumber": "Numéro de carte d'identité nationale",
+      "cinIssuedPlace": "Lieu de délivrance de la CIN",
+      "cinIssueDate": "Date de délivrance de la CIN",
+      "address": "Adresse complète",
+      "phoneHome": "Téléphone fixe",
+      "phoneMobile": "Téléphone mobile",
+      "contactEmail": "Email",
+      "maritalStatus": "Situation familiale",
+      "childrenCount": "Nombre d'enfants",
+      "bloodType": "Groupe sanguin",
+      "educationLevel": "Niveau éducatif",
+      "profession": "Profession",
+      "speciality": "Spécialité",
+      "employer": "Institution employeur",
+      "employerAddress": "Adresse de l'employeur",
+      "employerPhone": "Téléphone de l'employeur",
+      "workFax": "Fax professionnel",
+      "previousAssociations": "Associations précédentes",
+      "sports": "Sports pratiqués",
+      "firstAidCertificates": "Diplômes et certificats de secourisme",
+      "declarationPlace": "Lieu",
+      "signatureDate": "Date",
+      "signature": "Signature"
+    },
+    "genderOptions": {
+      "male": "Homme",
+      "female": "Femme"
+    },
+    "maritalStatusOptions": {
+      "single": "Célibataire",
+      "married": "Marié(e)",
+      "divorced": "Divorcé(e)",
+      "widowed": "Veuf(ve)"
+    },
+    "declaration": {
+      "text": "Je certifie que les informations fournies sont exactes."
+    }
   }
 }

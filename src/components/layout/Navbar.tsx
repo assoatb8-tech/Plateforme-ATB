@@ -39,6 +39,14 @@ export function Navbar() {
               {t('nav.dashboard')}
             </Link>
           )}
+          {user && (
+            <Link
+              to="/dossier-adhesion"
+              className="text-sm font-medium text-slate-700 hover:text-primary"
+            >
+              {t('nav.memberForm')}
+            </Link>
+          )}
           {user?.role === 'ADMIN' && (
             <Link to="/admin" className="text-sm font-medium text-slate-700 hover:text-primary">
               {t('nav.admin')}
