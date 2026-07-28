@@ -1,5 +1,13 @@
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // Vercel's build container and its Node.js Function (Lambda) execution
+  // runtime aren't the same OS/glibc, so without an explicit binary target
+  // the query engine compiled during build often can't load at execution
+  // time — surfaces as a generic 500 FUNCTION_INVOCATION_FAILED with no
+  // Prisma-specific error reaching our sendError() envelope, since the
+  // crash happens before Prisma can even attempt the connection. This is
+  // Prisma's own documented target for Vercel's current Node.js runtime.
+  binaryTargets = ["native", "rhel-openssl-3.0.x"]
 }
 
 datasource db {

@@ -6,36 +6,19 @@ import { supabaseAdmin } from '../_lib/utils/supabaseAdmin.js'
 import { userBanSchema, userStatusUpdateSchema } from '../_lib/validators/user.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
 
-const PAGE_SIZE = 20
-const STATUS_VALUES = ['ACTIVE', 'PENDING', 'BANNED'] as const
-type StatusFilter = (typeof STATUS_VALUES)[number]
-
-function firstParam(value: string | string[] | undefined): string | undefined {
-  return Array.isArray(value) ? value[0] : value
-}
-
+// '/api/users' itself lives in ../users.ts — see api/events.ts for why a
+// required catch-all can't also own the zero-segment base path on Vercel's
+// plain Functions. This file owns everything with at least one segment
+// after /api/users/. Every route here is ADMIN-only, so withRole wraps the
+// whole dispatcher once.
 function getSegments(req: VercelRequest): string[] {
   const raw = req.query.segments
   if (!raw) return []
   return Array.isArray(raw) ? raw : [raw]
 }
 
-// See api/events/[[...segments]].ts for why this got consolidated from 4
-// files into one — same Vercel Hobby-plan function-count limit. Every
-// route here happens to be ADMIN-only, so withRole wraps the whole
-// dispatcher once instead of being repeated per branch.
 const dispatch: RoleHandler = async (req, res, user) => {
   const segments = getSegments(req)
-
-  if (segments.length === 0) {
-    if (req.method === 'GET') {
-      await handleList(req, res)
-      return
-    }
-    sendError(res, 'Method not allowed', 405)
-    return
-  }
-
   const [id, action] = segments
 
   if (segments.length === 1) {
@@ -73,66 +56,6 @@ const dispatch: RoleHandler = async (req, res, user) => {
 }
 
 export default withRole(['ADMIN'], dispatch)
-
-// --- /api/users --------------------------------------------------------------
-
-// GET /api/users — ADMIN. Paginated list, searchable by email or member
-// full name, filterable by status. Joins MemberProfile for display purposes
-// only (fullName/phoneMobile) — full detail lives behind GET /api/users/:id.
-async function handleList(req: VercelRequest, res: VercelResponse): Promise<void> {
-  const page = Math.max(1, Number(firstParam(req.query.page)) || 1)
-  const search = firstParam(req.query.search)?.trim() ?? ''
-  const statusParam = firstParam(req.query.status)
-  const status: StatusFilter | undefined = STATUS_VALUES.includes(statusParam as StatusFilter)
-    ? (statusParam as StatusFilter)
-    : undefined
-
-  const where = {
-    ...(status ? { status } : {}),
-    ...(search
-      ? {
-          OR: [
-            { email: { contains: search, mode: 'insensitive' as const } },
-            { memberProfile: { fullName: { contains: search, mode: 'insensitive' as const } } },
-          ],
-        }
-      : {}),
-  }
-
-  const [users, total] = await Promise.all([
-    prisma.user.findMany({
-      where,
-      orderBy: { createdAt: 'desc' },
-      skip: (page - 1) * PAGE_SIZE,
-      take: PAGE_SIZE,
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        status: true,
-        createdAt: true,
-        memberProfile: { select: { fullName: true, phoneMobile: true } },
-      },
-    }),
-    prisma.user.count({ where }),
-  ])
-
-  sendSuccess(res, {
-    users: users.map((u) => ({
-      id: u.id,
-      email: u.email,
-      role: u.role,
-      status: u.status,
-      createdAt: u.createdAt,
-      fullName: u.memberProfile?.fullName ?? null,
-      phoneMobile: u.memberProfile?.phoneMobile ?? null,
-    })),
-    page,
-    pageSize: PAGE_SIZE,
-    total,
-    totalPages: Math.max(1, Math.ceil(total / PAGE_SIZE)),
-  })
-}
 
 // --- /api/users/:id ------------------------------------------------------------
 
