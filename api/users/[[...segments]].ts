@@ -1,10 +1,10 @@
-import type { VercelRequest, VercelResponse } from '../types.js'
-import { prisma } from '../utils/prisma.js'
-import { withRole, type RoleHandler } from '../middlewares/rbac.js'
-import { sendError, sendSuccess } from '../utils/response.js'
-import { supabaseAdmin } from '../utils/supabaseAdmin.js'
-import { userBanSchema, userStatusUpdateSchema } from '../validators/user.js'
-import { logAdminAction } from '../utils/auditLog.js'
+import type { VercelRequest, VercelResponse } from '../_lib/types.js'
+import { prisma } from '../_lib/utils/prisma.js'
+import { withRole, type RoleHandler } from '../_lib/middlewares/rbac.js'
+import { sendError, sendSuccess } from '../_lib/utils/response.js'
+import { supabaseAdmin } from '../_lib/utils/supabaseAdmin.js'
+import { userBanSchema, userStatusUpdateSchema } from '../_lib/validators/user.js'
+import { logAdminAction } from '../_lib/utils/auditLog.js'
 
 const PAGE_SIZE = 20
 const STATUS_VALUES = ['ACTIVE', 'PENDING', 'BANNED'] as const

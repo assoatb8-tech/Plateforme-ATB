@@ -1,7 +1,7 @@
-import type { VercelRequest, VercelResponse } from './types.js'
-import { prisma } from './utils/prisma.js'
-import { withAuth } from './middlewares/auth.js'
-import { sendError, sendSuccess } from './utils/response.js'
+import type { VercelRequest, VercelResponse } from './_lib/types.js'
+import { prisma } from './_lib/utils/prisma.js'
+import { withAuth } from './_lib/middlewares/auth.js'
+import { sendError, sendSuccess } from './_lib/utils/response.js'
 
 // Not listed in API.md's "Registration API" section, which only covers
 // per-event register/cancel/participants routes. Added for the "Mes

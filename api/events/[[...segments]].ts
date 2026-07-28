@@ -1,12 +1,12 @@
 import { Prisma } from '@prisma/client'
-import type { VercelRequest, VercelResponse } from '../types.js'
-import { prisma } from '../utils/prisma.js'
-import { withRole } from '../middlewares/rbac.js'
-import { withAuth, getOptionalUser, type AuthedUser } from '../middlewares/auth.js'
-import { sendError, sendSuccess } from '../utils/response.js'
-import { eventCreateSchema, eventUpdateSchema } from '../validators/event.js'
-import { serializeEvent } from '../utils/eventSerializer.js'
-import { logAdminAction } from '../utils/auditLog.js'
+import type { VercelRequest, VercelResponse } from '../_lib/types.js'
+import { prisma } from '../_lib/utils/prisma.js'
+import { withRole } from '../_lib/middlewares/rbac.js'
+import { withAuth, getOptionalUser, type AuthedUser } from '../_lib/middlewares/auth.js'
+import { sendError, sendSuccess } from '../_lib/utils/response.js'
+import { eventCreateSchema, eventUpdateSchema } from '../_lib/validators/event.js'
+import { serializeEvent } from '../_lib/utils/eventSerializer.js'
+import { logAdminAction } from '../_lib/utils/auditLog.js'
 
 const PAGE_SIZE = 9
 
