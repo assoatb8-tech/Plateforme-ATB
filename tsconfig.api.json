@@ -3,8 +3,13 @@
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.api.tsbuildinfo",
     "target": "es2023",
     "lib": ["ES2023"],
-    "module": "commonjs",
-    "moduleResolution": "node",
+    // Matches Vercel's actual Node.js Function runtime: package.json has
+    // "type": "module", so Vercel treats api/*.ts as native ESM and
+    // enforces NodeNext resolution (explicit .js extensions on relative
+    // imports) at build time — commonjs/node here would silently pass
+    // locally while failing on deploy, which is exactly what happened.
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "types": ["node"],

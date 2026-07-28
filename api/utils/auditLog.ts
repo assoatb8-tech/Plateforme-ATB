@@ -1,4 +1,4 @@
-import { prisma } from './prisma'
+import { prisma } from './prisma.js'
 
 // Shared helper so every admin-authored mutation writes an AuditLog row the
 // same way (SECURITY.md: "Les actions administratives doivent être

@@ -1,7 +1,7 @@
-import type { VercelRequest, VercelResponse } from './types'
-import { prisma } from './utils/prisma'
-import { withRole } from './middlewares/rbac'
-import { sendError, sendSuccess } from './utils/response'
+import type { VercelRequest, VercelResponse } from './types.js'
+import { prisma } from './utils/prisma.js'
+import { withRole } from './middlewares/rbac.js'
+import { sendError, sendSuccess } from './utils/response.js'
 
 const PAGE_SIZE = 20
 const STATUS_VALUES = ['ACTIVE', 'PENDING', 'BANNED'] as const

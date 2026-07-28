@@ -1,7 +1,7 @@
-import type { VercelRequest, VercelResponse } from '../types'
-import { prisma } from '../utils/prisma'
-import { withRole } from '../middlewares/rbac'
-import { sendError, sendSuccess } from '../utils/response'
+import type { VercelRequest, VercelResponse } from '../types.js'
+import { prisma } from '../utils/prisma.js'
+import { withRole } from '../middlewares/rbac.js'
+import { sendError, sendSuccess } from '../utils/response.js'
 
 // GET /api/admin/stats — ADMIN. FEATURES.md "Dashboard administrateur":
 // total adherents, new adherents (last 30 days), active events, total

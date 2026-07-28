@@ -1,9 +1,9 @@
-import type { VercelRequest, VercelResponse } from '../types'
-import { prisma } from '../utils/prisma'
-import { withRole } from '../middlewares/rbac'
-import { sendError, sendSuccess } from '../utils/response'
-import { supabaseAdmin } from '../utils/supabaseAdmin'
-import { logAdminAction } from '../utils/auditLog'
+import type { VercelRequest, VercelResponse } from '../types.js'
+import { prisma } from '../utils/prisma.js'
+import { withRole } from '../middlewares/rbac.js'
+import { sendError, sendSuccess } from '../utils/response.js'
+import { supabaseAdmin } from '../utils/supabaseAdmin.js'
+import { logAdminAction } from '../utils/auditLog.js'
 
 function getUserId(req: VercelRequest): string | undefined {
   return Array.isArray(req.query.id) ? req.query.id[0] : req.query.id

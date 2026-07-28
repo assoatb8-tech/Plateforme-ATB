@@ -1,8 +1,8 @@
-import type { VercelRequest, VercelResponse } from '../types'
+import type { VercelRequest, VercelResponse } from '../types.js'
 import type { Role } from '@prisma/client'
-import { prisma } from '../utils/prisma'
-import { sendError } from '../utils/response'
-import { withAuth, type AuthedUser } from './auth'
+import { prisma } from '../utils/prisma.js'
+import { sendError } from '../utils/response.js'
+import { withAuth, type AuthedUser } from './auth.js'
 
 export type RoleHandler = (
   req: VercelRequest,

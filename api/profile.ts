@@ -1,8 +1,8 @@
-import type { VercelRequest, VercelResponse } from './types'
-import { prisma } from './utils/prisma'
-import { withAuth } from './middlewares/auth'
-import { sendError, sendSuccess } from './utils/response'
-import { memberProfileInputSchema, type MemberProfileInput } from './validators/memberProfile'
+import type { VercelRequest, VercelResponse } from './types.js'
+import { prisma } from './utils/prisma.js'
+import { withAuth } from './middlewares/auth.js'
+import { sendError, sendSuccess } from './utils/response.js'
+import { memberProfileInputSchema, type MemberProfileInput } from './validators/memberProfile.js'
 
 function toProfileData(input: MemberProfileInput) {
   return {

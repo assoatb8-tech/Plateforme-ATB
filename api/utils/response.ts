@@ -1,4 +1,4 @@
-import type { VercelResponse } from '../types'
+import type { VercelResponse } from '../types.js'
 
 export function sendSuccess<T>(res: VercelResponse, data: T, status = 200): void {
   res.status(status).json({ success: true, data })

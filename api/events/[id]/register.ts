@@ -1,8 +1,8 @@
 import { Prisma } from '@prisma/client'
-import type { VercelRequest, VercelResponse } from '../../types'
-import { prisma } from '../../utils/prisma'
-import { withAuth, type AuthedUser } from '../../middlewares/auth'
-import { sendError, sendSuccess } from '../../utils/response'
+import type { VercelRequest, VercelResponse } from '../../types.js'
+import { prisma } from '../../utils/prisma.js'
+import { withAuth, type AuthedUser } from '../../middlewares/auth.js'
+import { sendError, sendSuccess } from '../../utils/response.js'
 
 function getEventId(req: VercelRequest): string | undefined {
   return Array.isArray(req.query.id) ? req.query.id[0] : req.query.id

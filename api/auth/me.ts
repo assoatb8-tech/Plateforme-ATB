@@ -1,7 +1,7 @@
-import type { VercelRequest, VercelResponse } from '../types'
-import { prisma } from '../utils/prisma'
-import { withAuth } from '../middlewares/auth'
-import { sendError, sendSuccess } from '../utils/response'
+import type { VercelRequest, VercelResponse } from '../types.js'
+import { prisma } from '../utils/prisma.js'
+import { withAuth } from '../middlewares/auth.js'
+import { sendError, sendSuccess } from '../utils/response.js'
 
 export default withAuth(async (req: VercelRequest, res: VercelResponse, user) => {
   if (req.method !== 'GET') {

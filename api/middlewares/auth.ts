@@ -1,6 +1,6 @@
-import type { VercelRequest, VercelResponse } from '../types'
-import { supabaseAdmin } from '../utils/supabaseAdmin'
-import { sendError } from '../utils/response'
+import type { VercelRequest, VercelResponse } from '../types.js'
+import { supabaseAdmin } from '../utils/supabaseAdmin.js'
+import { sendError } from '../utils/response.js'
 
 export interface AuthedUser {
   id: string

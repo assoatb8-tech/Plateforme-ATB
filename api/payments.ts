@@ -1,9 +1,9 @@
-import type { VercelRequest, VercelResponse } from './types'
-import { prisma } from './utils/prisma'
-import { withRole } from './middlewares/rbac'
-import { sendError, sendSuccess } from './utils/response'
-import { paymentCreateSchema } from './validators/payment'
-import { logAdminAction } from './utils/auditLog'
+import type { VercelRequest, VercelResponse } from './types.js'
+import { prisma } from './utils/prisma.js'
+import { withRole } from './middlewares/rbac.js'
+import { sendError, sendSuccess } from './utils/response.js'
+import { paymentCreateSchema } from './validators/payment.js'
+import { logAdminAction } from './utils/auditLog.js'
 
 const PAGE_SIZE = 20
 const STATUS_VALUES = ['PENDING', 'VALIDATED', 'REJECTED'] as const
