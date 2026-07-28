@@ -16,11 +16,11 @@ export async function fetchEvent(id: string): Promise<EventDto> {
 }
 
 export async function registerForEvent(id: string): Promise<void> {
-  await apiRequest(`/api/events/${id}/register`, { method: 'POST' })
+  await apiRequest(`/api/events/${id}`, { method: 'POST', query: { action: 'register' } })
 }
 
 export async function cancelEventRegistration(id: string): Promise<void> {
-  await apiRequest(`/api/events/${id}/register`, { method: 'DELETE' })
+  await apiRequest(`/api/events/${id}`, { method: 'DELETE', query: { action: 'register' } })
 }
 
 export async function fetchMyRegistrations(): Promise<RegistrationDto[]> {

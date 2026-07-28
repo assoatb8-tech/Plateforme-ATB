@@ -8,23 +8,40 @@ import { eventUpdateSchema } from '../_lib/validators/event.js'
 import { serializeEvent } from '../_lib/utils/eventSerializer.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
 
-// '/api/events' itself lives in ../events.ts (see that file for why: a
-// required catch-all here can't match the zero-segment base path — Vercel's
-// plain, non-Next.js Functions don't support the optional [[...]] form the
-// way Next.js does, confirmed by a live 404 on GET /api/events despite every
-// local check passing). This file owns everything with at least one path
-// segment after /api/events/.
-function getSegments(req: VercelRequest): string[] {
-  const raw = req.query.segments
-  if (!raw) return []
-  return Array.isArray(raw) ? raw : [raw]
+// '/api/events' itself lives in ../events.ts.
+//
+// This used to be a required catch-all (`[...segments].ts`) covering
+// '/api/events/:id', '/api/events/:id/register' and
+// '/api/events/:id/participants' by parsing req.query.segments. In
+// production that was unreliable: GET /api/events/:id came back with our
+// own "Not found" (meaning the function WAS invoked, but req.query.segments
+// was empty — Vercel wasn't populating it), and the two-segment paths
+// (.../register, .../participants) got a platform-level 404 (the function
+// was never invoked at all for those). This was reproducible 3/3, not a
+// fluke, and identical code had worked correctly on a different Vercel
+// project earlier — so this reads as an inconsistency in how Vercel's
+// non-Next.js catch-all routing resolves in some deployments, not a bug in
+// our code. `[id].ts` (a single dynamic segment) is Vercel's most basic,
+// most heavily-used routing primitive; "sub-actions" that used to be extra
+// path segments are now a `?action=` query param instead, which is always
+// reliably delivered on req.query regardless of catch-all quirks.
+function getId(req: VercelRequest): string | undefined {
+  return Array.isArray(req.query.id) ? req.query.id[0] : req.query.id
+}
+
+function getAction(req: VercelRequest): string | undefined {
+  return Array.isArray(req.query.action) ? req.query.action[0] : req.query.action
 }
 
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
-  const segments = getSegments(req)
-  const [id, action] = segments
+  const id = getId(req)
+  if (!id) {
+    sendError(res, 'Missing event id', 400)
+    return
+  }
+  const action = getAction(req)
 
-  if (segments.length === 1) {
+  if (!action) {
     if (req.method === 'GET') {
       await handleGet(id, req, res)
       return
@@ -46,7 +63,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return
   }
 
-  if (segments.length === 2 && action === 'register') {
+  if (action === 'register') {
     await withAuth(async (authReq, authRes, user) => {
       if (authReq.method === 'POST') {
         await handleRegister(id, user, authRes)
@@ -61,7 +78,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
     return
   }
 
-  if (segments.length === 2 && action === 'participants') {
+  if (action === 'participants') {
     if (req.method !== 'GET') {
       sendError(res, 'Method not allowed', 405)
       return
@@ -145,7 +162,7 @@ async function handleDelete(id: string, res: VercelResponse, adminId: string): P
   sendSuccess(res, { id })
 }
 
-// --- /api/events/:id/register ------------------------------------------------
+// --- /api/events/:id?action=register ------------------------------------------
 
 // Thrown from inside the transaction when the caller already holds an
 // active registration — caught outside and translated to a clean 409,
@@ -176,6 +193,14 @@ async function handleRegister(
     // Capacity check + write happen inside a transaction so two concurrent
     // registrations can't both read "1 spot left" and both get REGISTERED.
     const registration = await prisma.$transaction(async (tx) => {
+      // Postgres's default READ COMMITTED isolation lets two concurrent
+      // transactions both read the same activeCount before either commits,
+      // over-filling a nearly-full event — an advisory lock keyed on this
+      // event's id serializes concurrent registration attempts for THE
+      // SAME event (different events don't contend), and auto-releases at
+      // commit/rollback since this is the _xact_ variant.
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${eventId})::bigint)`
+
       const existing = await tx.eventRegistration.findUnique({
         where: { eventId_userId: { eventId, userId: user.id } },
       })
@@ -244,7 +269,7 @@ async function handleCancel(eventId: string, user: AuthedUser, res: VercelRespon
   sendSuccess(res, { status: 'CANCELLED' })
 }
 
-// --- /api/events/:id/participants --------------------------------------------
+// --- /api/events/:id?action=participants ---------------------------------------
 
 async function handleParticipants(eventId: string, res: VercelResponse): Promise<void> {
   const event = await prisma.event.findUnique({ where: { id: eventId } })

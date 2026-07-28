@@ -17,14 +17,19 @@ export async function fetchUser(id: string): Promise<UserDetailDto> {
 }
 
 export async function updateUserStatus(id: string, status: UserStatus): Promise<UserSummaryDto> {
-  return apiRequest<UserSummaryDto>(`/api/users/${id}/status`, {
+  return apiRequest<UserSummaryDto>(`/api/users/${id}`, {
     method: 'PATCH',
+    query: { action: 'status' },
     body: { status },
   })
 }
 
 export async function banUser(id: string, reason: string): Promise<void> {
-  await apiRequest(`/api/users/${id}/ban`, { method: 'POST', body: { reason } })
+  await apiRequest(`/api/users/${id}`, {
+    method: 'POST',
+    query: { action: 'ban' },
+    body: { reason },
+  })
 }
 
 export async function deleteUser(id: string): Promise<void> {

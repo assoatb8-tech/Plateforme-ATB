@@ -5,20 +5,19 @@ import { sendError, sendSuccess } from '../_lib/utils/response.js'
 import { paymentStatusUpdateSchema } from '../_lib/validators/payment.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
 
-// '/api/payments' itself lives in ../payments.ts — see api/events.ts for
-// why a required catch-all can't also own the zero-segment base path on
-// Vercel's plain Functions. This file owns '/api/payments/:id'.
-function getSegments(req: VercelRequest): string[] {
-  const raw = req.query.segments
-  if (!raw) return []
-  return Array.isArray(raw) ? raw : [raw]
+// '/api/payments' itself lives in ../payments.ts. Single dynamic segment
+// rather than a required catch-all (`[...segments].ts`) — see
+// api/events/[id].ts for why: the catch-all form was unreliable in
+// production even for this single-segment case (reproducible "Not found"
+// on a path it should have matched).
+function getId(req: VercelRequest): string | undefined {
+  return Array.isArray(req.query.id) ? req.query.id[0] : req.query.id
 }
 
 export default withRole(['ADMIN'], async (req, res, user) => {
-  const segments = getSegments(req)
-
-  if (segments.length !== 1) {
-    sendError(res, 'Not found', 404)
+  const id = getId(req)
+  if (!id) {
+    sendError(res, 'Missing payment id', 400)
     return
   }
 
@@ -27,7 +26,7 @@ export default withRole(['ADMIN'], async (req, res, user) => {
     return
   }
 
-  await handleUpdateStatus(segments[0], req, res, user.id)
+  await handleUpdateStatus(id, req, res, user.id)
 })
 
 // PATCH /api/payments/:id — ADMIN. Validates or rejects a cotisation.

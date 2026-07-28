@@ -1,27 +1,34 @@
 import type { VercelRequest, VercelResponse } from '../_lib/types.js'
 import { prisma } from '../_lib/utils/prisma.js'
-import { withRole, type RoleHandler } from '../_lib/middlewares/rbac.js'
+import { withRole } from '../_lib/middlewares/rbac.js'
 import { sendError, sendSuccess } from '../_lib/utils/response.js'
 import { supabaseAdmin } from '../_lib/utils/supabaseAdmin.js'
 import { userBanSchema, userStatusUpdateSchema } from '../_lib/validators/user.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
 
-// '/api/users' itself lives in ../users.ts — see api/events.ts for why a
-// required catch-all can't also own the zero-segment base path on Vercel's
-// plain Functions. This file owns everything with at least one segment
-// after /api/users/. Every route here is ADMIN-only, so withRole wraps the
-// whole dispatcher once.
-function getSegments(req: VercelRequest): string[] {
-  const raw = req.query.segments
-  if (!raw) return []
-  return Array.isArray(raw) ? raw : [raw]
+// '/api/users' itself lives in ../users.ts. See api/events/[id].ts for why
+// this is a single dynamic segment with a `?action=` query param for
+// sub-actions rather than a required catch-all (`[...segments].ts`) —
+// the catch-all was unreliable in production (reproducible 404s on paths
+// it should have matched). Every route here is ADMIN-only, so withRole
+// wraps the whole dispatcher once.
+function getId(req: VercelRequest): string | undefined {
+  return Array.isArray(req.query.id) ? req.query.id[0] : req.query.id
 }
 
-const dispatch: RoleHandler = async (req, res, user) => {
-  const segments = getSegments(req)
-  const [id, action] = segments
+function getAction(req: VercelRequest): string | undefined {
+  return Array.isArray(req.query.action) ? req.query.action[0] : req.query.action
+}
 
-  if (segments.length === 1) {
+export default withRole(['ADMIN'], async (req, res, user) => {
+  const id = getId(req)
+  if (!id) {
+    sendError(res, 'Missing user id', 400)
+    return
+  }
+  const action = getAction(req)
+
+  if (!action) {
     if (req.method === 'GET') {
       await handleGet(id, res)
       return
@@ -34,7 +41,7 @@ const dispatch: RoleHandler = async (req, res, user) => {
     return
   }
 
-  if (segments.length === 2 && action === 'ban') {
+  if (action === 'ban') {
     if (req.method !== 'POST') {
       sendError(res, 'Method not allowed', 405)
       return
@@ -43,7 +50,7 @@ const dispatch: RoleHandler = async (req, res, user) => {
     return
   }
 
-  if (segments.length === 2 && action === 'status') {
+  if (action === 'status') {
     if (req.method !== 'PATCH') {
       sendError(res, 'Method not allowed', 405)
       return
@@ -53,9 +60,7 @@ const dispatch: RoleHandler = async (req, res, user) => {
   }
 
   sendError(res, 'Not found', 404)
-}
-
-export default withRole(['ADMIN'], dispatch)
+})
 
 // --- /api/users/:id ------------------------------------------------------------
 
@@ -115,10 +120,10 @@ async function handleDelete(id: string, res: VercelResponse, adminId: string): P
   sendSuccess(res, { id })
 }
 
-// --- /api/users/:id/ban --------------------------------------------------------
+// --- /api/users/:id?action=ban --------------------------------------------------
 
-// POST /api/users/:id/ban — ADMIN. Creates a Ban row AND sets status to
-// BANNED atomically (a single $transaction — either both writes land or
+// POST /api/users/:id?action=ban — ADMIN. Creates a Ban row AND sets status
+// to BANNED atomically (a single $transaction — either both writes land or
 // neither does, so a user is never left BANNED without a recorded reason,
 // or with a Ban row while still ACTIVE).
 async function handleBan(
@@ -151,12 +156,12 @@ async function handleBan(
   sendSuccess(res, ban, 201)
 }
 
-// --- /api/users/:id/status -------------------------------------------------------
+// --- /api/users/:id?action=status -------------------------------------------------
 
-// PATCH /api/users/:id/status — ADMIN. Direct status transition, distinct
-// from POST /api/users/:id/ban which additionally records a Ban row with a
-// reason. UserStatus only has ACTIVE/PENDING/BANNED (prisma/schema.prisma) —
-// no separate "suspended" state.
+// PATCH /api/users/:id?action=status — ADMIN. Direct status transition,
+// distinct from POST .../?action=ban which additionally records a Ban row
+// with a reason. UserStatus only has ACTIVE/PENDING/BANNED
+// (prisma/schema.prisma) — no separate "suspended" state.
 async function handleStatus(
   id: string,
   req: VercelRequest,
