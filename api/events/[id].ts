@@ -8,6 +8,7 @@ import { eventUpdateSchema } from '../_lib/validators/event.js'
 import { serializeEvent } from '../_lib/utils/eventSerializer.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
 import { enforceIpRateLimit } from '../_lib/utils/rateLimit.js'
+import { isValidUuid } from '../_lib/utils/validateId.js'
 
 // '/api/events' itself lives in ../events.ts.
 //
@@ -38,6 +39,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   const id = getId(req)
   if (!id) {
     sendError(res, 'Missing event id', 400)
+    return
+  }
+  if (!isValidUuid(id)) {
+    sendError(res, 'Event not found', 404)
     return
   }
   const action = getAction(req)

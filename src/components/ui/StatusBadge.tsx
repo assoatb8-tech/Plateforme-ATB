@@ -3,13 +3,20 @@ import { cn } from '@/utils/cn'
 
 export type BadgeTone = 'success' | 'warning' | 'error' | 'secondary' | 'neutral'
 
+// Backgrounds stay the DESIGN.md-pinned brand tints (bg-*/10); text colors
+// are deliberately darker than the pinned accent hexes — the accents
+// themselves (#16A34A, #F59E0B, brand gold) fall well under the 4.5:1 WCAG
+// AA ratio needed for 13px/500-weight text, even against their own near-
+// white tint. These text-only shades exist solely to fix that; they don't
+// change the brand palette (DESIGN.md's pinned values are untouched) and
+// aren't used anywhere outside this one component.
 const TONE_STYLES: Record<BadgeTone, string> = {
-  success: 'bg-success/10 text-success',
-  warning: 'bg-warning/10 text-warning',
-  error: 'bg-error/10 text-error',
+  success: 'bg-success/10 text-[#15803D]', // ~5:1 on the tint, vs 3.3:1 for #16A34A
+  warning: 'bg-warning/10 text-[#B45309]', // ~5:1 on the tint, vs 2.15:1 for #F59E0B
+  error: 'bg-error/10 text-error', // #DC2626 already passes at 4.83:1
   // Sable Doré (brand secondary) — used specifically for "waiting list",
   // deliberately distinct from the semantic warning amber.
-  secondary: 'bg-secondary/10 text-secondary',
+  secondary: 'bg-secondary/10 text-[#6B4F1D]', // ~7.6:1 on the tint, vs 2.14:1 for #D1AC63
   neutral: 'bg-slate-100 text-slate-600',
 }
 

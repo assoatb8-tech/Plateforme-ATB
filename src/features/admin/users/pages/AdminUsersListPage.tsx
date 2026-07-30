@@ -79,7 +79,7 @@ export function AdminUsersListPage() {
       {!isLoading && data && data.users.length > 0 && (
         <>
           <Card className="overflow-x-auto p-0">
-            <table className="w-full min-w-[560px] text-left text-sm">
+            <table className="w-full min-w-[560px] text-start text-sm">
               <thead className="border-b border-slate-200 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-4 py-3">{t('admin.users.columns.name')}</th>

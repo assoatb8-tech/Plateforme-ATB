@@ -12,8 +12,16 @@ import { USER_STATUS_TONE } from '@/utils/statusTones'
 export function DashboardPage() {
   const { t } = useTranslation()
   const { user } = useAuth()
-  const { data: currentUser, isLoading: isLoadingUser } = useCurrentUserProfile()
-  const { data: registrations, isLoading: isLoadingRegistrations } = useMyRegistrations()
+  const {
+    data: currentUser,
+    isLoading: isLoadingUser,
+    isError: isUserError,
+  } = useCurrentUserProfile()
+  const {
+    data: registrations,
+    isLoading: isLoadingRegistrations,
+    isError: isRegistrationsError,
+  } = useMyRegistrations()
 
   const upcomingRegistrations = (registrations ?? [])
     .filter((registration) => new Date(registration.event.startDate) >= new Date())
@@ -34,14 +42,14 @@ export function DashboardPage() {
             </h2>
           </div>
 
-          {isLoadingUser ? (
-            <p className="text-sm text-slate-500">{t('dashboard.loading')}</p>
-          ) : (
-            currentUser && (
-              <StatusBadge tone={USER_STATUS_TONE[currentUser.status]}>
-                {t(`dashboard.status.${currentUser.status}`)}
-              </StatusBadge>
-            )
+          {isLoadingUser && <p className="text-sm text-slate-500">{t('dashboard.loading')}</p>}
+
+          {isUserError && <p className="text-sm text-error">{t('dashboard.errorGeneric')}</p>}
+
+          {!isLoadingUser && !isUserError && currentUser && (
+            <StatusBadge tone={USER_STATUS_TONE[currentUser.status]}>
+              {t(`dashboard.status.${currentUser.status}`)}
+            </StatusBadge>
           )}
 
           {currentUser && !currentUser.hasProfile && (
@@ -81,16 +89,22 @@ export function DashboardPage() {
             <p className="text-sm text-slate-500">{t('dashboard.loading')}</p>
           )}
 
-          {!isLoadingRegistrations && upcomingRegistrations.length === 0 && (
-            <div className="flex flex-col items-center gap-3 py-8 text-center">
-              <p className="text-sm text-slate-500">{t('dashboard.noUpcomingEvents')}</p>
-              <Link to="/evenements">
-                <Button type="button" variant="secondary">
-                  {t('dashboard.browseEvents')}
-                </Button>
-              </Link>
-            </div>
+          {isRegistrationsError && (
+            <p className="text-sm text-error">{t('dashboard.errorGeneric')}</p>
           )}
+
+          {!isLoadingRegistrations &&
+            !isRegistrationsError &&
+            upcomingRegistrations.length === 0 && (
+              <div className="flex flex-col items-center gap-3 py-8 text-center">
+                <p className="text-sm text-slate-500">{t('dashboard.noUpcomingEvents')}</p>
+                <Link to="/evenements">
+                  <Button type="button" variant="secondary">
+                    {t('dashboard.browseEvents')}
+                  </Button>
+                </Link>
+              </div>
+            )}
 
           {upcomingRegistrations.length > 0 && (
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

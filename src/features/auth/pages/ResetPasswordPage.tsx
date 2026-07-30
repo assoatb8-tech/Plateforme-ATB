@@ -39,6 +39,7 @@ export function ResetPasswordPage() {
         <Input
           type="password"
           autoComplete="new-password"
+          required
           label={t('auth.resetPassword.passwordLabel')}
           error={errors.password && t(errors.password.message ?? 'validation.required')}
           {...register('password')}
@@ -46,6 +47,7 @@ export function ResetPasswordPage() {
         <Input
           type="password"
           autoComplete="new-password"
+          required
           label={t('auth.resetPassword.confirmPasswordLabel')}
           error={
             errors.confirmPassword && t(errors.confirmPassword.message ?? 'validation.required')

@@ -7,8 +7,9 @@ interface CheckboxProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'typ
 }
 
 export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
-  ({ label, error, id, className, ...props }, ref) => {
+  ({ label, error, id, className, required, ...props }, ref) => {
     const checkboxId = id ?? props.name
+    const errorId = checkboxId ? `${checkboxId}-error` : undefined
 
     return (
       <div className="flex flex-col gap-1.5">
@@ -17,7 +18,10 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
             id={checkboxId}
             ref={ref}
             type="checkbox"
+            required={required}
+            aria-required={required}
             aria-invalid={Boolean(error)}
+            aria-describedby={error ? errorId : undefined}
             className={cn(
               'mt-0.5 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary/30',
               className,
@@ -26,7 +30,11 @@ export const Checkbox = forwardRef<HTMLInputElement, CheckboxProps>(
           />
           <span>{label}</span>
         </label>
-        {error && <p className="text-sm text-error">{error}</p>}
+        {error && (
+          <p id={errorId} role="alert" className="text-sm text-error">
+            {error}
+          </p>
+        )}
       </div>
     )
   },

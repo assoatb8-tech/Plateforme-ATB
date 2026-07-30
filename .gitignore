@@ -20,6 +20,9 @@ dist-ssr
 # Prisma
 prisma/generated
 
+# Playwright MCP debug output
+.playwright-mcp
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

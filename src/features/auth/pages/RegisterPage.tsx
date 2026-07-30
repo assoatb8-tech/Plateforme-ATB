@@ -54,6 +54,7 @@ export function RegisterPage() {
         <Input
           type="email"
           autoComplete="email"
+          required
           label={t('auth.register.emailLabel')}
           error={errors.email && t(errors.email.message ?? 'validation.required')}
           {...register('email')}
@@ -61,6 +62,7 @@ export function RegisterPage() {
         <Input
           type="password"
           autoComplete="new-password"
+          required
           label={t('auth.register.passwordLabel')}
           error={errors.password && t(errors.password.message ?? 'validation.required')}
           {...register('password')}
@@ -68,6 +70,7 @@ export function RegisterPage() {
         <Input
           type="password"
           autoComplete="new-password"
+          required
           label={t('auth.register.confirmPasswordLabel')}
           error={
             errors.confirmPassword && t(errors.confirmPassword.message ?? 'validation.required')

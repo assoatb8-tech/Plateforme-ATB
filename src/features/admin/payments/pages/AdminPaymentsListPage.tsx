@@ -149,7 +149,7 @@ export function AdminPaymentsListPage() {
       {!isLoading && data && data.payments.length > 0 && (
         <>
           <Card className="overflow-x-auto p-0">
-            <table className="w-full min-w-[680px] text-left text-sm">
+            <table className="w-full min-w-[680px] text-start text-sm">
               <thead className="border-b border-slate-200 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-4 py-3">{t('admin.payments.columns.member')}</th>
@@ -157,7 +157,7 @@ export function AdminPaymentsListPage() {
                   <th className="px-4 py-3">{t('admin.payments.columns.type')}</th>
                   <th className="px-4 py-3">{t('admin.payments.columns.status')}</th>
                   <th className="px-4 py-3">{t('admin.payments.columns.date')}</th>
-                  <th className="px-4 py-3 text-right">{t('admin.payments.columns.actions')}</th>
+                  <th className="px-4 py-3 text-end">{t('admin.payments.columns.actions')}</th>
                 </tr>
               </thead>
               <tbody>
@@ -262,7 +262,7 @@ export function AdminPaymentsListPage() {
                   <li key={memberOption.id}>
                     <button
                       type="button"
-                      className="w-full px-3 py-2 text-left text-sm hover:bg-slate-50"
+                      className="w-full px-3 py-2 text-start text-sm hover:bg-slate-50"
                       onClick={() => {
                         setSelectedUserId(memberOption.id)
                         setSelectedUserLabel(memberOption.fullName ?? memberOption.email)

@@ -41,7 +41,7 @@ export function AdminLayout() {
           </nav>
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent md:hidden"
+            className="pointer-events-none absolute inset-y-0 end-0 w-8 bg-gradient-to-l from-white to-transparent md:hidden rtl:bg-gradient-to-r"
           />
         </div>
       </aside>

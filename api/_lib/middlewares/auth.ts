@@ -2,6 +2,7 @@ import type { VercelRequest, VercelResponse } from '../types.js'
 import { supabaseAdmin } from '../utils/supabaseAdmin.js'
 import { sendError } from '../utils/response.js'
 import { enforceIpRateLimit, enforceUserRateLimit } from '../utils/rateLimit.js'
+import { prisma } from '../utils/prisma.js'
 
 export interface AuthedUser {
   id: string
@@ -37,6 +38,19 @@ export function withAuth(handler: AuthedHandler) {
     const { data, error } = await supabaseAdmin.auth.getUser(token)
     if (error || !data.user) {
       sendError(res, 'Invalid or expired token', 401)
+      return
+    }
+
+    // A valid Supabase token only proves who the caller is, not that
+    // they're still allowed in — a still-valid access token survives a ban
+    // until it expires on its own, so status has to be re-checked against
+    // the DB on every request, the same way withRole re-checks role.
+    const dbUser = await prisma.user.findUnique({
+      where: { id: data.user.id },
+      select: { status: true },
+    })
+    if (dbUser?.status === 'BANNED') {
+      sendError(res, 'Account is banned', 403)
       return
     }
 

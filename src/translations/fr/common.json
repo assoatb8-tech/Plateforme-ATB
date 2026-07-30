@@ -3,6 +3,11 @@
     "name": "Association Tunisienne de Bénévolat",
     "shortName": "ATB"
   },
+  "errorBoundary": {
+    "title": "Une erreur inattendue est survenue",
+    "message": "Quelque chose s'est mal passé de notre côté. Essayez de recharger la page ; si le problème persiste, contactez-nous.",
+    "reload": "Recharger la page"
+  },
   "nav": {
     "home": "Accueil",
     "about": "À propos",
@@ -14,7 +19,9 @@
     "logout": "Déconnexion",
     "memberForm": "Dossier d'adhésion",
     "participations": "Mes participations",
-    "profile": "Mon profil"
+    "profile": "Mon profil",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
   },
   "language": {
     "fr": "Français",
@@ -26,6 +33,7 @@
       "title": "Ensemble, agissons pour la Tunisie",
       "subtitle": "Rejoignez une communauté de bénévoles engagés et participez à des actions solidaires partout en Tunisie.",
       "cta": "Rejoindre l'association",
+      "ctaDashboard": "Voir mon tableau de bord",
       "ctaSecondary": "Découvrir nos activités"
     },
     "mission": {
@@ -221,6 +229,7 @@
   "dashboard": {
     "greeting": "Bienvenue, {{email}}",
     "loading": "Chargement...",
+    "errorGeneric": "Une erreur est survenue lors du chargement de votre tableau de bord. Merci de réessayer.",
     "membershipStatus": "Statut d'adhésion",
     "status": {
       "ACTIVE": "Actif",

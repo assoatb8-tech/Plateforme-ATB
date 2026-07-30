@@ -14,6 +14,7 @@ export function Step1PersonalInfo({ form }: { form: UseFormReturn<MemberFormValu
   return (
     <div className="flex flex-col gap-4">
       <Input
+        required
         label={t('memberForm.fields.fullName')}
         error={errors.fullName && t(errors.fullName.message ?? 'validation.required')}
         {...register('fullName')}

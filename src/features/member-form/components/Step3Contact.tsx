@@ -14,6 +14,7 @@ export function Step3Contact({ form }: { form: UseFormReturn<MemberFormValues> }
   return (
     <div className="flex flex-col gap-4">
       <Textarea
+        required
         label={t('memberForm.fields.address')}
         error={errors.address && t(errors.address.message ?? 'validation.required')}
         {...register('address')}
@@ -26,6 +27,7 @@ export function Step3Contact({ form }: { form: UseFormReturn<MemberFormValues> }
       />
       <Input
         type="tel"
+        required
         label={t('memberForm.fields.phoneMobile')}
         error={errors.phoneMobile && t(errors.phoneMobile.message ?? 'validation.phoneInvalid')}
         {...register('phoneMobile')}

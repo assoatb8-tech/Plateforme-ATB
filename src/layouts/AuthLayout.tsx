@@ -1,9 +1,22 @@
-import { Link, Outlet } from 'react-router-dom'
+import { Link, Navigate, Outlet, useLocation } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+
+// /reinitialiser-mot-de-passe is reached via Supabase's password-recovery
+// link, which establishes a real session before the user has set a new
+// password — that route must stay reachable while "authenticated", unlike
+// /connexion and /inscription.
+const SESSION_EXEMPT_PATH = '/reinitialiser-mot-de-passe'
 
 export function AuthLayout() {
   const { t } = useTranslation()
+  const { session, user, loading } = useAuth()
+  const location = useLocation()
+
+  if (!loading && session && user && location.pathname !== SESSION_EXEMPT_PATH) {
+    return <Navigate to="/" replace />
+  }
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center bg-background px-4 py-12">

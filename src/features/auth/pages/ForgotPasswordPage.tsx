@@ -54,6 +54,7 @@ export function ForgotPasswordPage() {
         <Input
           type="email"
           autoComplete="email"
+          required
           label={t('auth.forgotPassword.emailLabel')}
           error={errors.email && t(errors.email.message ?? 'validation.required')}
           {...register('email')}

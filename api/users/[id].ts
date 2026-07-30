@@ -5,6 +5,8 @@ import { sendError, sendSuccess } from '../_lib/utils/response.js'
 import { supabaseAdmin } from '../_lib/utils/supabaseAdmin.js'
 import { userBanSchema, userStatusUpdateSchema } from '../_lib/validators/user.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
+import { syncAuthBanState } from '../_lib/utils/authBan.js'
+import { isValidUuid } from '../_lib/utils/validateId.js'
 
 // '/api/users' itself lives in ../users.ts. See api/events/[id].ts for why
 // this is a single dynamic segment with a `?action=` query param for
@@ -24,6 +26,10 @@ export default withRole(['ADMIN'], async (req, res, user) => {
   const id = getId(req)
   if (!id) {
     sendError(res, 'Missing user id', 400)
+    return
+  }
+  if (!isValidUuid(id)) {
+    sendError(res, 'User not found', 404)
     return
   }
   const action = getAction(req)
@@ -97,10 +103,32 @@ async function handleGet(id: string, res: VercelResponse): Promise<void> {
 // account keeps a *live, loginable* Supabase session with no app-side user
 // row at all — invisible to RBAC/withRole and to this admin list, but still
 // able to obtain valid tokens. So Auth-first is the safer failure mode.
+//
+// `events.created_by`, `bans.created_by`, and `audit_logs.admin_id` are all
+// ON DELETE RESTRICT — any admin who has ever created an event, issued a
+// ban, or performed a logged action (which is virtually every admin who's
+// actually used the panel) will hit that constraint on the Prisma delete.
+// That's checked for up front, before the irreversible Auth deletion, so
+// this fails cleanly with a 409 instead of destroying the login credential
+// and then discovering the DB row can't follow it.
 async function handleDelete(id: string, res: VercelResponse, adminId: string): Promise<void> {
   const existing = await prisma.user.findUnique({ where: { id } })
   if (!existing) {
     sendError(res, 'User not found', 404)
+    return
+  }
+
+  const [eventCount, banCount, auditLogCount] = await Promise.all([
+    prisma.event.count({ where: { createdBy: id } }),
+    prisma.ban.count({ where: { createdBy: id } }),
+    prisma.auditLog.count({ where: { adminId: id } }),
+  ])
+  if (eventCount > 0 || banCount > 0 || auditLogCount > 0) {
+    sendError(
+      res,
+      'Cannot delete a user with recorded admin actions (created events, issued bans, or audit history)',
+      409,
+    )
     return
   }
 
@@ -115,7 +143,16 @@ async function handleDelete(id: string, res: VercelResponse, adminId: string): P
     return
   }
 
-  await prisma.user.delete({ where: { id } })
+  try {
+    await prisma.user.delete({ where: { id } })
+  } catch {
+    // TOCTOU backstop: something started referencing this user between the
+    // check above and this delete. The Auth account is already gone at
+    // this point (documented as the safer failure mode above) — surface a
+    // clear error rather than an unhandled 500.
+    sendError(res, 'Failed to delete user record after removing their login credential', 500)
+    return
+  }
 
   sendSuccess(res, { id })
 }
@@ -151,6 +188,7 @@ async function handleBan(
     prisma.user.update({ where: { id }, data: { status: 'BANNED' } }),
   ])
 
+  await syncAuthBanState(id, 'BANNED')
   await logAdminAction(adminId, 'USER_BANNED', id)
 
   sendSuccess(res, ban, 201)
@@ -185,6 +223,7 @@ async function handleStatus(
     data: { status: parsed.data.status },
   })
 
+  await syncAuthBanState(id, parsed.data.status)
   await logAdminAction(adminId, 'USER_STATUS_CHANGED', id)
 
   sendSuccess(res, updated)

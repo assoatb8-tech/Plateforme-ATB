@@ -193,28 +193,28 @@ export function AdminUserDetailPage() {
           <p className="text-sm text-slate-500">{t('admin.users.detail.noPayments')}</p>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[420px] text-left text-sm">
+            <table className="w-full min-w-[420px] text-start text-sm">
               <thead className="border-b border-slate-200 text-xs font-semibold uppercase tracking-wide text-slate-500">
                 <tr>
-                  <th className="py-2 pr-4">{t('admin.payments.columns.amount')}</th>
-                  <th className="py-2 pr-4">{t('admin.payments.columns.type')}</th>
-                  <th className="py-2 pr-4">{t('admin.payments.columns.status')}</th>
-                  <th className="py-2 pr-4">{t('admin.payments.columns.date')}</th>
+                  <th className="py-2 pe-4">{t('admin.payments.columns.amount')}</th>
+                  <th className="py-2 pe-4">{t('admin.payments.columns.type')}</th>
+                  <th className="py-2 pe-4">{t('admin.payments.columns.status')}</th>
+                  <th className="py-2 pe-4">{t('admin.payments.columns.date')}</th>
                 </tr>
               </thead>
               <tbody>
                 {user.payments.map((payment) => (
                   <tr key={payment.id} className="border-b border-slate-100 last:border-0">
-                    <td className="py-2 pr-4 text-slate-800">{payment.amount}</td>
-                    <td className="py-2 pr-4 text-slate-600">
+                    <td className="py-2 pe-4 text-slate-800">{payment.amount}</td>
+                    <td className="py-2 pe-4 text-slate-600">
                       {t(`admin.payments.type.${payment.paymentType}`)}
                     </td>
-                    <td className="py-2 pr-4">
+                    <td className="py-2 pe-4">
                       <StatusBadge tone={PAYMENT_STATUS_TONE[payment.status]}>
                         {t(`admin.payments.status.${payment.status}`)}
                       </StatusBadge>
                     </td>
-                    <td className="py-2 pr-4 text-slate-500">
+                    <td className="py-2 pe-4 text-slate-500">
                       {new Date(payment.createdAt).toLocaleDateString()}
                     </td>
                   </tr>

@@ -1,4 +1,4 @@
-import { supabase } from '@/services/supabaseClient'
+import { getSupabaseClient } from '@/services/supabaseClient'
 
 interface ApiResponse<T> {
   success: boolean
@@ -19,6 +19,7 @@ export class ApiError extends Error {
 }
 
 async function getAuthHeader(requireAuth: boolean): Promise<HeadersInit> {
+  const supabase = await getSupabaseClient()
   const {
     data: { session },
   } = await supabase.auth.getSession()

@@ -2,16 +2,17 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, type Location } from 'react-router-dom'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { loginSchema, type LoginFormValues } from '@/features/auth/validation'
-import { signIn } from '@/features/auth/services/authService'
+import { signIn, fetchCurrentUser } from '@/features/auth/services/authService'
 
 export function LoginPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
+  const location = useLocation()
   const [formError, setFormError] = useState<string | null>(null)
 
   const {
@@ -24,9 +25,21 @@ export function LoginPage() {
     setFormError(null)
     try {
       await signIn(values.email, values.password)
-      navigate('/')
     } catch {
       setFormError(t('auth.login.errorInvalidCredentials'))
+      return
+    }
+
+    // ProtectedRoute stores where the user was trying to go before being
+    // bounced to /connexion (state.from) — honor it once signed in, but a
+    // member with no membership file yet always goes to the form first,
+    // matching FEATURES.md's required post-registration/login redirect.
+    const from = (location.state as { from?: Location } | null)?.from?.pathname
+    try {
+      const currentUser = await fetchCurrentUser()
+      navigate(currentUser.hasProfile ? (from ?? '/') : '/dossier-adhesion')
+    } catch {
+      navigate(from ?? '/')
     }
   }
 
@@ -39,6 +52,7 @@ export function LoginPage() {
         <Input
           type="email"
           autoComplete="email"
+          required
           label={t('auth.login.emailLabel')}
           error={errors.email && t(errors.email.message ?? 'validation.required')}
           {...register('email')}
@@ -46,6 +60,7 @@ export function LoginPage() {
         <Input
           type="password"
           autoComplete="current-password"
+          required
           label={t('auth.login.passwordLabel')}
           error={errors.password && t(errors.password.message ?? 'validation.required')}
           {...register('password')}

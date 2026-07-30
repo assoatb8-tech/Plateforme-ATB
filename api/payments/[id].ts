@@ -4,6 +4,7 @@ import { withRole } from '../_lib/middlewares/rbac.js'
 import { sendError, sendSuccess } from '../_lib/utils/response.js'
 import { paymentStatusUpdateSchema } from '../_lib/validators/payment.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
+import { isValidUuid } from '../_lib/utils/validateId.js'
 
 // '/api/payments' itself lives in ../payments.ts. Single dynamic segment
 // rather than a required catch-all (`[...segments].ts`) — see
@@ -18,6 +19,10 @@ export default withRole(['ADMIN'], async (req, res, user) => {
   const id = getId(req)
   if (!id) {
     sendError(res, 'Missing payment id', 400)
+    return
+  }
+  if (!isValidUuid(id)) {
+    sendError(res, 'Payment not found', 404)
     return
   }
 

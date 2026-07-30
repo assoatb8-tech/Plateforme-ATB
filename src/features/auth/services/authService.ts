@@ -1,4 +1,4 @@
-import { supabase } from '@/services/supabaseClient'
+import { getSupabaseClient } from '@/services/supabaseClient'
 import { apiRequest } from '@/services/apiClient'
 import type { Role, UserStatus } from '@/types/domain'
 
@@ -15,21 +15,25 @@ export async function fetchCurrentUser(): Promise<CurrentUserDto> {
 }
 
 export async function signUp(email: string, password: string): Promise<void> {
+  const supabase = await getSupabaseClient()
   const { error } = await supabase.auth.signUp({ email, password })
   if (error) throw error
 }
 
 export async function signIn(email: string, password: string): Promise<void> {
+  const supabase = await getSupabaseClient()
   const { error } = await supabase.auth.signInWithPassword({ email, password })
   if (error) throw error
 }
 
 export async function signOut(): Promise<void> {
+  const supabase = await getSupabaseClient()
   const { error } = await supabase.auth.signOut()
   if (error) throw error
 }
 
 export async function requestPasswordReset(email: string): Promise<void> {
+  const supabase = await getSupabaseClient()
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${window.location.origin}/reinitialiser-mot-de-passe`,
   })
@@ -37,6 +41,7 @@ export async function requestPasswordReset(email: string): Promise<void> {
 }
 
 export async function updatePassword(password: string): Promise<void> {
+  const supabase = await getSupabaseClient()
   const { error } = await supabase.auth.updateUser({ password })
   if (error) throw error
 }

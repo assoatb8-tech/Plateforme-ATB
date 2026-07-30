@@ -1,9 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { supabase } from '@/services/supabaseClient'
+import { getSupabaseClient } from '@/services/supabaseClient'
 import { AuthContext, type AppUser } from '@/features/auth/hooks/AuthContext'
-import type { Session } from '@supabase/supabase-js'
+import type { Session, SupabaseClient } from '@supabase/supabase-js'
 
-async function fetchAppUser(userId: string): Promise<AppUser | null> {
+async function fetchAppUser(supabase: SupabaseClient, userId: string): Promise<AppUser | null> {
   const { data, error } = await supabase
     .from('users')
     .select('id, email, role, status')
@@ -21,8 +21,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let isMounted = true
+    let unsubscribe: (() => void) | undefined
 
-    async function syncUser(currentSession: Session | null) {
+    async function syncUser(supabase: SupabaseClient, currentSession: Session | null) {
       if (!currentSession) {
         if (isMounted) {
           setUser(null)
@@ -31,33 +32,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return
       }
 
-      const appUser = await fetchAppUser(currentSession.user.id)
+      const appUser = await fetchAppUser(supabase, currentSession.user.id)
       if (!isMounted) return
       setUser(appUser)
       setLoading(false)
     }
 
-    supabase.auth.getSession().then(({ data: { session: initialSession } }) => {
+    async function init() {
+      const supabase = await getSupabaseClient()
+      if (!isMounted) return
+
+      const {
+        data: { session: initialSession },
+      } = await supabase.auth.getSession()
       if (!isMounted) return
       setSession(initialSession)
-      void syncUser(initialSession)
-    })
+      void syncUser(supabase, initialSession)
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, newSession) => {
-      setSession(newSession)
-      setLoading(true)
-      void syncUser(newSession)
-    })
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, newSession) => {
+        setSession(newSession)
+        setLoading(true)
+        void syncUser(supabase, newSession)
+      })
+      unsubscribe = () => subscription.unsubscribe()
+    }
+
+    void init()
 
     return () => {
       isMounted = false
-      subscription.unsubscribe()
+      unsubscribe?.()
     }
   }, [])
 
   async function signOut() {
+    const supabase = await getSupabaseClient()
     await supabase.auth.signOut()
   }
 

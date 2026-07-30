@@ -9,6 +9,7 @@ import { AuthProvider } from '@/features/auth/hooks/AuthProvider'
 import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { useDirection } from '@/hooks/useDirection'
 import { PwaPrompts } from '@/pwa/PwaPrompts'
+import { ErrorBoundary } from '@/components/ErrorBoundary'
 
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })))
 const LoginPage = lazy(() =>
@@ -174,13 +175,15 @@ function AppRoutes() {
 
 export function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <AppRoutes />
-        </AuthProvider>
-        <PwaPrompts />
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthProvider>
+            <AppRoutes />
+          </AuthProvider>
+          <PwaPrompts />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   )
 }

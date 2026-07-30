@@ -1,4 +1,4 @@
-import { supabase } from '@/services/supabaseClient'
+import { getSupabaseClient } from '@/services/supabaseClient'
 import type { DocumentType } from '@/types/domain'
 
 const BUCKET = 'members'
@@ -26,6 +26,7 @@ async function uploadFile(
   folder: 'cin' | 'certificates' | 'profile',
   file: File,
 ): Promise<string> {
+  const supabase = await getSupabaseClient()
   const path = `${userId}/${folder}/${Date.now()}-${file.name}`
   const { error } = await supabase.storage.from(BUCKET).upload(path, file, { upsert: false })
   if (error) throw error
@@ -40,6 +41,7 @@ export async function uploadMemberDocument(
 ): Promise<{ path: string }> {
   const path = await uploadFile(userId, folder, file)
 
+  const supabase = await getSupabaseClient()
   const { error } = await supabase
     .from('documents')
     .insert({ user_id: userId, type: documentType, url: path })
@@ -50,6 +52,7 @@ export async function uploadMemberDocument(
 }
 
 export async function getSignedDocumentUrl(path: string, expiresInSeconds = 60): Promise<string> {
+  const supabase = await getSupabaseClient()
   const { data, error } = await supabase.storage
     .from(BUCKET)
     .createSignedUrl(path, expiresInSeconds)

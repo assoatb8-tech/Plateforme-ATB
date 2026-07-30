@@ -14,6 +14,7 @@ export function Step8Declaration({ form }: { form: UseFormReturn<MemberFormValue
   return (
     <div className="flex flex-col gap-4">
       <Checkbox
+        required
         label={t('memberForm.declaration.text')}
         error={
           errors.declarationAccepted &&

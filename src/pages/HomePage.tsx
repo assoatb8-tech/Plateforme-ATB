@@ -3,12 +3,14 @@ import { Link } from 'react-router-dom'
 import { HeartHandshake, ShieldCheck, Users, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { useAuth } from '@/features/auth/hooks/useAuth'
 
 const valueIcons = [HeartHandshake, ShieldCheck, Users, Sparkles] as const
 const valueKeys = ['solidarity', 'commitment', 'trust', 'community'] as const
 
 export function HomePage() {
   const { t } = useTranslation()
+  const { user } = useAuth()
 
   return (
     <div className="flex flex-col">
@@ -18,9 +20,15 @@ export function HomePage() {
           <h1 className="text-4xl font-bold text-slate-900 sm:text-5xl">{t('home.hero.title')}</h1>
           <p className="max-w-2xl text-base text-slate-600 sm:text-lg">{t('home.hero.subtitle')}</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
-            <Link to="/inscription">
-              <Button variant="primary">{t('home.hero.cta')}</Button>
-            </Link>
+            {user ? (
+              <Link to="/tableau-de-bord">
+                <Button variant="primary">{t('home.hero.ctaDashboard')}</Button>
+              </Link>
+            ) : (
+              <Link to="/inscription">
+                <Button variant="primary">{t('home.hero.cta')}</Button>
+              </Link>
+            )}
             <Link to="/evenements">
               <Button variant="ghost">{t('home.hero.ctaSecondary')}</Button>
             </Link>
