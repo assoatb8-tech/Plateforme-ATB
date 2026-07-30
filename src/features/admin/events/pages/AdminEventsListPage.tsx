@@ -6,13 +6,9 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Modal } from '@/components/ui/Modal'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useAdminEventsList, useDeleteEvent } from '@/features/admin/events/hooks/useAdminEvents'
-import type { EventStatus } from '@/features/events/types'
-
-const STATUS_STYLES: Record<EventStatus, string> = {
-  ACTIVE: 'bg-success/10 text-success',
-  CANCELLED: 'bg-error/10 text-error',
-}
+import { EVENT_STATUS_TONE } from '@/utils/statusTones'
 
 export function AdminEventsListPage() {
   const { t } = useTranslation()
@@ -109,11 +105,9 @@ export function AdminEventsListPage() {
                       {event.registeredCount} / {event.maxParticipants}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_STYLES[event.status]}`}
-                      >
+                      <StatusBadge tone={EVENT_STATUS_TONE[event.status]}>
                         {t(`admin.events.status.${event.status}`)}
-                      </span>
+                      </StatusBadge>
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-2">

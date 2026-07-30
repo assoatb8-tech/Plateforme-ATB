@@ -3,12 +3,14 @@ import { useTranslation } from 'react-i18next'
 import { Calendar, MapPin, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import {
   useCancelEventRegistration,
   useEvent,
   useRegisterForEvent,
 } from '@/features/events/hooks/useEvents'
+import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
 
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -67,9 +69,9 @@ export function EventDetailPage() {
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
           {isCancelledEvent && (
-            <span className="mt-2 inline-block rounded-full bg-error/10 px-3 py-1 text-xs font-medium text-error">
+            <StatusBadge tone="error" className="mt-2">
               {t('events.cancelled')}
-            </span>
+            </StatusBadge>
           )}
         </div>
 
@@ -94,15 +96,15 @@ export function EventDetailPage() {
         <p className="whitespace-pre-line text-sm text-slate-700">{description}</p>
 
         {(isRegistered || isWaitingList) && (
-          <p
-            className={
+          <StatusBadge
+            tone={
               isRegistered
-                ? 'w-fit rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success'
-                : 'w-fit rounded-full bg-secondary/10 px-3 py-1 text-xs font-medium text-secondary'
+                ? REGISTRATION_STATUS_TONE.REGISTERED
+                : REGISTRATION_STATUS_TONE.WAITING_LIST
             }
           >
             {isRegistered ? t('events.status.registered') : t('events.status.waitingList')}
-          </p>
+          </StatusBadge>
         )}
 
         {mutationError && <p className="text-sm text-error">{t('events.actionError')}</p>}

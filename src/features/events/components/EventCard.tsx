@@ -2,7 +2,9 @@ import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Calendar, MapPin, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import type { EventDto } from '@/features/events/types'
+import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
 
 interface EventCardProps {
   event: EventDto
@@ -41,15 +43,13 @@ export function EventCard({ event }: EventCardProps) {
           </span>
         </div>
 
-        {event.myRegistrationStatus === 'REGISTERED' && (
-          <span className="w-fit rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success">
-            {t('events.status.registered')}
-          </span>
-        )}
-        {event.myRegistrationStatus === 'WAITING_LIST' && (
-          <span className="w-fit rounded-full bg-secondary/10 px-3 py-1 text-xs font-medium text-secondary">
-            {t('events.status.waitingList')}
-          </span>
+        {(event.myRegistrationStatus === 'REGISTERED' ||
+          event.myRegistrationStatus === 'WAITING_LIST') && (
+          <StatusBadge tone={REGISTRATION_STATUS_TONE[event.myRegistrationStatus]}>
+            {event.myRegistrationStatus === 'REGISTERED'
+              ? t('events.status.registered')
+              : t('events.status.waitingList')}
+          </StatusBadge>
         )}
       </Card>
     </Link>

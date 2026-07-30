@@ -4,9 +4,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CalendarX } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useMyRegistrations } from '@/features/dashboard/hooks/useDashboard'
 import { cancelEventRegistration } from '@/features/events/services/eventsService'
 import type { RegistrationDto } from '@/features/events/types'
+import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
 
 export function ParticipationsPage() {
   const { t, i18n } = useTranslation()
@@ -54,17 +56,11 @@ export function ParticipationsPage() {
           <span className="text-sm text-slate-500">
             {formatDate(registration.event.startDate)} · {registration.event.location}
           </span>
-          <span
-            className={
-              registration.status === 'REGISTERED'
-                ? 'w-fit rounded-full bg-success/10 px-3 py-1 text-xs font-medium text-success'
-                : 'w-fit rounded-full bg-secondary/10 px-3 py-1 text-xs font-medium text-secondary'
-            }
-          >
+          <StatusBadge tone={REGISTRATION_STATUS_TONE[registration.status]}>
             {registration.status === 'REGISTERED'
               ? t('events.status.registered')
               : t('events.status.waitingList')}
-          </span>
+          </StatusBadge>
         </div>
 
         {allowCancel && (

@@ -6,14 +6,9 @@ import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useAdminUsersList } from '@/features/admin/users/hooks/useAdminUsers'
-import type { UserStatus } from '@/types/domain'
-
-const STATUS_STYLES: Record<UserStatus, string> = {
-  ACTIVE: 'bg-success/10 text-success',
-  PENDING: 'bg-warning/10 text-warning',
-  BANNED: 'bg-error/10 text-error',
-}
+import { USER_STATUS_TONE } from '@/utils/statusTones'
 
 export function AdminUsersListPage() {
   const { t } = useTranslation()
@@ -106,11 +101,9 @@ export function AdminUsersListPage() {
                     </td>
                     <td className="px-4 py-3 text-slate-600">{user.email}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_STYLES[user.status]}`}
-                      >
+                      <StatusBadge tone={USER_STATUS_TONE[user.status]}>
                         {t(`dashboard.status.${user.status}`)}
-                      </span>
+                      </StatusBadge>
                     </td>
                     <td className="px-4 py-3 text-slate-500">
                       {new Date(user.createdAt).toLocaleDateString()}

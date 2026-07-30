@@ -3,16 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { CalendarCheck, ClipboardList, UserRound } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useCurrentUserProfile, useMyRegistrations } from '@/features/dashboard/hooks/useDashboard'
 import { RegistrationCard } from '@/features/events/components/RegistrationCard'
-import type { UserStatus } from '@/types/domain'
-
-const STATUS_STYLES: Record<UserStatus, string> = {
-  ACTIVE: 'bg-success/10 text-success',
-  PENDING: 'bg-warning/10 text-warning',
-  BANNED: 'bg-error/10 text-error',
-}
+import { USER_STATUS_TONE } from '@/utils/statusTones'
 
 export function DashboardPage() {
   const { t } = useTranslation()
@@ -43,11 +38,9 @@ export function DashboardPage() {
             <p className="text-sm text-slate-500">{t('dashboard.loading')}</p>
           ) : (
             currentUser && (
-              <span
-                className={`w-fit rounded-full px-3 py-1 text-sm font-medium ${STATUS_STYLES[currentUser.status]}`}
-              >
+              <StatusBadge tone={USER_STATUS_TONE[currentUser.status]}>
                 {t(`dashboard.status.${currentUser.status}`)}
-              </span>
+              </StatusBadge>
             )
           )}
 

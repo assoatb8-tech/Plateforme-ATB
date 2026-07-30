@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { Modal } from '@/components/ui/Modal'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import {
   useAdminUser,
   useBanUser,
@@ -17,18 +18,7 @@ import {
 } from '@/features/admin/users/hooks/useAdminUsers'
 import { banFormSchema, type BanFormValues } from '@/features/admin/users/validation'
 import type { UserStatus } from '@/types/domain'
-
-const STATUS_STYLES: Record<UserStatus, string> = {
-  ACTIVE: 'bg-success/10 text-success',
-  PENDING: 'bg-warning/10 text-warning',
-  BANNED: 'bg-error/10 text-error',
-}
-
-const PAYMENT_STATUS_STYLES: Record<string, string> = {
-  VALIDATED: 'bg-success/10 text-success',
-  PENDING: 'bg-warning/10 text-warning',
-  REJECTED: 'bg-error/10 text-error',
-}
+import { USER_STATUS_TONE, PAYMENT_STATUS_TONE } from '@/utils/statusTones'
 
 export function AdminUserDetailPage() {
   const { t } = useTranslation()
@@ -125,11 +115,9 @@ export function AdminUserDetailPage() {
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               {t('admin.users.detail.status')}
             </p>
-            <span
-              className={`inline-block w-fit rounded-full px-3 py-1 text-xs font-medium ${STATUS_STYLES[user.status]}`}
-            >
+            <StatusBadge tone={USER_STATUS_TONE[user.status]}>
               {t(`dashboard.status.${user.status}`)}
-            </span>
+            </StatusBadge>
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -222,11 +210,9 @@ export function AdminUserDetailPage() {
                       {t(`admin.payments.type.${payment.paymentType}`)}
                     </td>
                     <td className="py-2 pr-4">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${PAYMENT_STATUS_STYLES[payment.status]}`}
-                      >
+                      <StatusBadge tone={PAYMENT_STATUS_TONE[payment.status]}>
                         {t(`admin.payments.status.${payment.status}`)}
-                      </span>
+                      </StatusBadge>
                     </td>
                     <td className="py-2 pr-4 text-slate-500">
                       {new Date(payment.createdAt).toLocaleDateString()}

@@ -7,6 +7,7 @@ import { sendError, sendSuccess } from '../_lib/utils/response.js'
 import { eventUpdateSchema } from '../_lib/validators/event.js'
 import { serializeEvent } from '../_lib/utils/eventSerializer.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
+import { enforceIpRateLimit } from '../_lib/utils/rateLimit.js'
 
 // '/api/events' itself lives in ../events.ts.
 //
@@ -43,6 +44,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 
   if (!action) {
     if (req.method === 'GET') {
+      // Public route (no withAuth to piggyback rate limiting on) —
+      // IP-scoped limit applied directly here instead.
+      if (!(await enforceIpRateLimit(req, res))) return
       await handleGet(id, req, res)
       return
     }

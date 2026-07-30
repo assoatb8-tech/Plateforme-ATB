@@ -17,27 +17,33 @@ export function AdminLayout() {
     <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 md:flex-row">
       <aside className="shrink-0 md:w-56">
         <h1 className="mb-4 text-lg font-semibold text-slate-900">{t('admin.title')}</h1>
-        <nav
-          aria-label={t('admin.title')}
-          className="flex flex-row gap-1 overflow-x-auto md:flex-col md:overflow-visible"
-        >
-          {NAV_ITEMS.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                cn(
-                  'flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors',
-                  isActive ? 'bg-primary/10 text-primary' : 'text-slate-600 hover:bg-slate-100',
-                )
-              }
-            >
-              <item.icon size={18} />
-              {t(item.labelKey)}
-            </NavLink>
-          ))}
-        </nav>
+        <div className="relative md:static">
+          <nav
+            aria-label={t('admin.title')}
+            className="flex flex-row gap-1 overflow-x-auto md:flex-col md:overflow-visible"
+          >
+            {NAV_ITEMS.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.end}
+                className={({ isActive }) =>
+                  cn(
+                    'flex items-center gap-2 whitespace-nowrap rounded-xl px-3 py-2 text-sm font-medium transition-colors',
+                    isActive ? 'bg-primary/10 text-primary' : 'text-slate-600 hover:bg-slate-100',
+                  )
+                }
+              >
+                <item.icon size={18} />
+                {t(item.labelKey)}
+              </NavLink>
+            ))}
+          </nav>
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent md:hidden"
+          />
+        </div>
       </aside>
 
       <div className="min-w-0 flex-1">

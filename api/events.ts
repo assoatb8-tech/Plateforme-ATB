@@ -6,18 +6,18 @@ import { sendError, sendSuccess } from './_lib/utils/response.js'
 import { eventCreateSchema } from './_lib/validators/event.js'
 import { serializeEvent } from './_lib/utils/eventSerializer.js'
 import { logAdminAction } from './_lib/utils/auditLog.js'
+import { enforceIpRateLimit } from './_lib/utils/rateLimit.js'
 
 const PAGE_SIZE = 9
 
-// Split from a single api/events/[[...segments]].ts: Vercel's plain (non
-// Next.js) Serverless Functions do NOT match the zero-segment base path
-// with an optional catch-all the way Next.js does — GET /api/events 404'd
-// in production despite working in every local check, since nothing local
-// exercises Vercel's actual routing layer. This file now owns exactly
-// '/api/events'; api/events/[...segments].ts (required catch-all) owns
-// everything under it. See that file for the rest of the events routes.
+// This file owns exactly '/api/events'; api/events/[id].ts owns
+// '/api/events/:id' and its ?action= sub-routes (see that file for why
+// it's a single dynamic segment rather than a catch-all).
 export default async function handler(req: VercelRequest, res: VercelResponse): Promise<void> {
   if (req.method === 'GET') {
+    // Public route (no withAuth to piggyback rate limiting on) — IP-scoped
+    // limit applied directly here instead.
+    if (!(await enforceIpRateLimit(req, res))) return
     await handleList(req, res)
     return
   }

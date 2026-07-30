@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { stripHtmlTags } from '../utils/sanitize.js'
 
 // Server-side mirror of src/features/member-form/validation.ts. Duplicated on
 // purpose — SECURITY.md: "Jamais faire confiance au frontend", validation
@@ -6,6 +7,13 @@ import { z } from 'zod'
 
 const phoneRegex = /^(\+216)?\d{8}$/
 const cinRegex = /^\d{8}$/
+
+// Strip first, then validate length against the real (post-strip) content.
+const sanitizedText = (min: number) => z.string().transform(stripHtmlTags).pipe(z.string().min(min))
+const optionalSanitizedText = z
+  .string()
+  .optional()
+  .transform((val) => (val === undefined ? undefined : stripHtmlTags(val)))
 
 const optionalDateString = z
   .string()
@@ -25,22 +33,22 @@ function optionalEnum<const T extends [string, ...string[]]>(values: T) {
 }
 
 export const memberProfileInputSchema = z.object({
-  fullName: z.string().min(2),
+  fullName: sanitizedText(2),
   gender: optionalEnum(['MALE', 'FEMALE']),
-  fatherName: z.string().optional(),
-  grandfatherName: z.string().optional(),
-  motherFullName: z.string().optional(),
+  fatherName: optionalSanitizedText,
+  grandfatherName: optionalSanitizedText,
+  motherFullName: optionalSanitizedText,
 
   birthDate: optionalDateString,
-  birthPlace: z.string().optional(),
+  birthPlace: optionalSanitizedText,
   cinNumber: z
     .string()
     .optional()
     .refine((val) => !val || cinRegex.test(val)),
-  cinIssuedPlace: z.string().optional(),
+  cinIssuedPlace: optionalSanitizedText,
   cinIssueDate: optionalDateString,
 
-  address: z.string().min(5),
+  address: sanitizedText(5),
   phoneHome: optionalPhone,
   phoneMobile: z.string().regex(phoneRegex),
   contactEmail: z.string().email().optional().or(z.literal('')),
@@ -58,22 +66,22 @@ export const memberProfileInputSchema = z.object({
     'O_NEGATIVE',
   ]),
 
-  educationLevel: z.string().optional(),
+  educationLevel: optionalSanitizedText,
 
-  profession: z.string().optional(),
-  speciality: z.string().optional(),
-  employer: z.string().optional(),
-  employerAddress: z.string().optional(),
+  profession: optionalSanitizedText,
+  speciality: optionalSanitizedText,
+  employer: optionalSanitizedText,
+  employerAddress: optionalSanitizedText,
   employerPhone: optionalPhone,
-  workFax: z.string().optional(),
+  workFax: optionalSanitizedText,
 
-  previousAssociations: z.string().optional(),
-  sports: z.string().optional(),
-  firstAidCertificates: z.string().optional(),
+  previousAssociations: optionalSanitizedText,
+  sports: optionalSanitizedText,
+  firstAidCertificates: optionalSanitizedText,
 
   declarationAccepted: z.literal(true),
-  declarationPlace: z.string().optional(),
-  signature: z.string().optional(),
+  declarationPlace: optionalSanitizedText,
+  signature: optionalSanitizedText,
   signatureDate: optionalDateString,
 })
 

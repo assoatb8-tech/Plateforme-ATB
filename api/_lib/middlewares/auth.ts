@@ -1,6 +1,7 @@
 import type { VercelRequest, VercelResponse } from '../types.js'
 import { supabaseAdmin } from '../utils/supabaseAdmin.js'
 import { sendError } from '../utils/response.js'
+import { enforceIpRateLimit, enforceUserRateLimit } from '../utils/rateLimit.js'
 
 export interface AuthedUser {
   id: string
@@ -20,6 +21,11 @@ export type AuthedHandler = (
  */
 export function withAuth(handler: AuthedHandler) {
   return async (req: VercelRequest, res: VercelResponse) => {
+    // IP-scoped first, before token verification, so repeated
+    // invalid/missing-token attempts (credential stuffing, scraping) get
+    // throttled regardless of whether they ever produce a valid user.
+    if (!(await enforceIpRateLimit(req, res))) return
+
     const authHeader = req.headers.authorization
     const token = authHeader?.startsWith('Bearer ') ? authHeader.slice(7) : undefined
 
@@ -33,6 +39,10 @@ export function withAuth(handler: AuthedHandler) {
       sendError(res, 'Invalid or expired token', 401)
       return
     }
+
+    // User-scoped on top of the IP check, tighter, so one compromised or
+    // misbehaving account can't hammer the API from many different IPs.
+    if (!(await enforceUserRateLimit(data.user.id, res))) return
 
     await handler(req, res, { id: data.user.id, email: data.user.email ?? '' })
   }

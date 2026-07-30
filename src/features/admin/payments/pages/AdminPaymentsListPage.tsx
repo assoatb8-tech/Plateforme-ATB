@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
+import { StatusBadge } from '@/components/ui/StatusBadge'
 import {
   useAdminPaymentsList,
   useCreatePayment,
@@ -17,12 +18,7 @@ import {
 import { paymentFormSchema, type PaymentFormValues } from '@/features/admin/payments/validation'
 import { fetchUsers } from '@/features/admin/users/services/usersService'
 import type { PaymentType } from '@/types/domain'
-
-const STATUS_STYLES: Record<string, string> = {
-  VALIDATED: 'bg-success/10 text-success',
-  PENDING: 'bg-warning/10 text-warning',
-  REJECTED: 'bg-error/10 text-error',
-}
+import { PAYMENT_STATUS_TONE } from '@/utils/statusTones'
 
 export function AdminPaymentsListPage() {
   const { t } = useTranslation()
@@ -175,11 +171,9 @@ export function AdminPaymentsListPage() {
                       {t(`admin.payments.type.${payment.paymentType}`)}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-medium ${STATUS_STYLES[payment.status]}`}
-                      >
+                      <StatusBadge tone={PAYMENT_STATUS_TONE[payment.status]}>
                         {t(`admin.payments.status.${payment.status}`)}
-                      </span>
+                      </StatusBadge>
                     </td>
                     <td className="px-4 py-3 text-slate-500">
                       {new Date(payment.createdAt).toLocaleDateString()}
