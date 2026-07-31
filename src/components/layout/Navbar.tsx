@@ -52,7 +52,7 @@ function NavLinks({ user, linkClassName, activeLinkClassName, onNavigate }: NavL
 
 export function Navbar() {
   const { t } = useTranslation()
-  const { user, signOut } = useAuth()
+  const { user, loading, signOut } = useAuth()
   const navigate = useNavigate()
   const [mobileOpen, setMobileOpen] = useState(false)
 
@@ -107,21 +107,27 @@ export function Navbar() {
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
           <LanguageSwitcher />
+          {/* Rendering nothing while the session is still restoring (rather
+              than defaulting to the guest buttons) avoids a brief false
+              "you're not logged in" flash on a hard reload of an
+              authenticated session — loading resolves in well under a
+              second, so this never reads as a layout jump. */}
           <div className="hidden items-center gap-3 lg:flex">
-            {user ? (
-              <Button variant="ghost" onClick={() => void handleLogout()}>
-                {t('nav.logout')}
-              </Button>
-            ) : (
-              <>
-                <Link to="/connexion">
-                  <Button variant="ghost">{t('nav.login')}</Button>
-                </Link>
-                <Link to="/inscription">
-                  <Button variant="primary">{t('nav.register')}</Button>
-                </Link>
-              </>
-            )}
+            {!loading &&
+              (user ? (
+                <Button variant="ghost" onClick={() => void handleLogout()}>
+                  {t('nav.logout')}
+                </Button>
+              ) : (
+                <>
+                  <Link to="/connexion">
+                    <Button variant="ghost">{t('nav.login')}</Button>
+                  </Link>
+                  <Link to="/inscription">
+                    <Button variant="primary">{t('nav.register')}</Button>
+                  </Link>
+                </>
+              ))}
           </div>
           <button
             type="button"
@@ -150,28 +156,29 @@ export function Navbar() {
             />
           </div>
           <div className="mt-3 flex flex-col gap-2 border-t border-slate-200 pt-3">
-            {user ? (
-              <Button
-                variant="ghost"
-                onClick={() => void handleLogout()}
-                className="justify-center"
-              >
-                {t('nav.logout')}
-              </Button>
-            ) : (
-              <>
-                <Link to="/connexion" onClick={() => setMobileOpen(false)}>
-                  <Button variant="ghost" className="w-full justify-center">
-                    {t('nav.login')}
-                  </Button>
-                </Link>
-                <Link to="/inscription" onClick={() => setMobileOpen(false)}>
-                  <Button variant="primary" className="w-full justify-center">
-                    {t('nav.register')}
-                  </Button>
-                </Link>
-              </>
-            )}
+            {!loading &&
+              (user ? (
+                <Button
+                  variant="ghost"
+                  onClick={() => void handleLogout()}
+                  className="justify-center"
+                >
+                  {t('nav.logout')}
+                </Button>
+              ) : (
+                <>
+                  <Link to="/connexion" onClick={() => setMobileOpen(false)}>
+                    <Button variant="ghost" className="w-full justify-center">
+                      {t('nav.login')}
+                    </Button>
+                  </Link>
+                  <Link to="/inscription" onClick={() => setMobileOpen(false)}>
+                    <Button variant="primary" className="w-full justify-center">
+                      {t('nav.register')}
+                    </Button>
+                  </Link>
+                </>
+              ))}
           </div>
         </div>
       )}
