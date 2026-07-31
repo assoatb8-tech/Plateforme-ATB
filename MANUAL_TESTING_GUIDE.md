@@ -1,8 +1,9 @@
 # Guide de test manuel — ATB
 
-Ce guide accompagne l'audit QA du 2026-07-31. Les identifiants des deux
-comptes permanents sont dans `PRODUCTION_CREDENTIALS.md` (non versionné,
-à la racine du projet).
+Ce guide accompagne l'audit QA du 2026-07-31 (mis à jour le même jour
+après l'ajout de la promotion administrateur et la correction de deux
+bugs mineurs). Les identifiants des deux comptes permanents sont dans
+`PRODUCTION_CREDENTIALS.md` (non versionné, à la racine du projet).
 
 URL de production : https://plateforme-atb.vercel.app
 
@@ -12,7 +13,7 @@ URL de production : https://plateforme-atb.vercel.app
 
 ### 1. Connexion
 - **Action** : aller sur `/connexion`, entrer l'email et le mot de passe admin, cliquer "Se connecter".
-- **Résultat attendu** : redirection automatique (le compte admin n'a pas de dossier d'adhésion, donc il atterrit sur `/dossier-adhesion` — c'est normal pour ce compte, à ignorer et naviguer directement vers `/admin`).
+- **Résultat attendu** : redirection directe vers l'accueil (un compte ADMIN n'est plus jamais forcé de remplir le dossier d'adhésion, même sans profil membre).
 - **Vérifier** : la barre de navigation affiche "Administration" et "Déconnexion", pas "Connexion"/"Devenir bénévole".
 
 ### 2. Tableau de bord admin
@@ -27,7 +28,15 @@ URL de production : https://plateforme-atb.vercel.app
 - **Résultat attendu** : page détail avec informations du dossier, sélecteur de statut (Actif / En attente / Suspendu), bouton "Bannir", bouton "Supprimer le compte".
 - **Vérifier** : changer le statut vers "Actif" se reflète immédiatement dans le tableau et dans le compte de l'adhérent (visible à sa prochaine connexion/rafraîchissement).
 
-### 4. Gestion des événements
+### 4. Promouvoir un adhérent en administrateur
+- **Action** : depuis la page détail d'un adhérent (pas votre propre compte), utiliser le sélecteur "Modifier le rôle" et choisir "Administrateur".
+- **Résultat attendu** : le rôle affiché en haut de page passe immédiatement à "Administrateur".
+- **Vérifier** : si cet adhérent est connecté ailleurs (autre onglet/appareil), il obtient l'accès admin **immédiatement**, sans avoir besoin de se reconnecter — naviguer vers `/admin` dans cet autre onglet doit fonctionner tout de suite.
+- **Action** : repasser ce compte en "Adhérent" via le même sélecteur.
+- **Résultat attendu** : le rôle repasse à "Adhérent", et l'accès admin est retiré tout aussi immédiatement dans l'autre onglet (`/admin` redirige vers l'accueil).
+- **Vérifier la protection anti-verrouillage** : ouvrir la page détail de **votre propre** compte admin — le sélecteur "Modifier le rôle" doit être grisé (désactivé), avec la mention "Vous ne pouvez pas modifier votre propre rôle." C'est volontaire : un administrateur ne peut jamais se rétrograder lui-même, pour éviter un blocage sans autre admin pour l'aider.
+
+### 5. Gestion des événements
 - **Action** : aller sur `/admin/evenements`, cliquer "Créer un événement".
 - **Remplir** : titre FR/AR, description FR/AR, lieu, date de début, date de fin, nombre de places, lien Facebook (optionnel).
 - **Résultat attendu** : après soumission, redirection vers la liste avec le nouvel événement affiché, statut "Actif".
@@ -35,7 +44,7 @@ URL de production : https://plateforme-atb.vercel.app
 - **Action** : modifier l'événement, changer une date pour le passé.
 - **Résultat attendu** : l'événement bascule automatiquement dans l'onglet "Précédents" côté public, et les boutons d'inscription disparaissent sur sa page détail.
 
-### 5. Gestion des sponsors
+### 6. Gestion des sponsors
 - **Action** : aller sur `/admin/sponsors`, cliquer "Ajouter un sponsor".
 - **Remplir** : nom + sélectionner un fichier image (PNG/JPEG/WEBP/SVG, max 2 Mo) — pas de champ URL, uniquement un vrai sélecteur de fichier.
 - **Résultat attendu** : le sponsor apparaît dans la grille avec sa miniature.
@@ -43,11 +52,11 @@ URL de production : https://plateforme-atb.vercel.app
 - **Action** : supprimer le sponsor.
 - **Résultat attendu** : confirmation demandée, puis disparition immédiate de la liste et de la page d'accueil.
 
-### 6. Vérification des permissions
+### 7. Vérification des permissions
 - **Action** : se déconnecter, se connecter avec le compte adhérent, essayer d'accéder directement à `/admin`.
 - **Résultat attendu** : redirection automatique vers l'accueil, aucun accès aux fonctionnalités admin.
 
-### 7. Déconnexion
+### 8. Déconnexion
 - **Action** : cliquer "Déconnexion" dans la barre de navigation.
 - **Résultat attendu** : retour à l'accueil en tant que visiteur, boutons "Connexion"/"Devenir bénévole" réapparaissent.
 
@@ -91,7 +100,16 @@ URL de production : https://plateforme-atb.vercel.app
 
 ---
 
-## Points de vigilance identifiés pendant l'audit
+## Historique des corrections
 
-- Sur un rechargement complet de page (F5) d'une route protégée, la barre de navigation peut afficher brièvement l'état "visiteur" (boutons Connexion/Inscription) avant de se corriger d'elle-même en une fraction de seconde une fois la session restaurée. C'est un effet visuel mineur, sans impact sur la sécurité (le contenu protégé lui-même ne s'affiche jamais avant vérification).
-- Un compte Administrateur sans dossier d'adhésion rempli est systématiquement redirigé vers `/dossier-adhesion` après connexion, comme n'importe quel adhérent. Ce n'est pas bloquant (on peut naviguer manuellement vers `/admin` ensuite) mais c'est une friction évitable pour un compte qui n'a pas vocation à remplir ce formulaire — voir le rapport QA pour la recommandation.
+Les deux points relevés lors de l'audit initial ont été corrigés le même
+jour et sont couverts par des tests automatisés (`npm test`) :
+
+- Le flash bref de la barre de navigation en état "visiteur" lors d'un
+  rechargement d'une route protégée — corrigé (la barre attend que la
+  session soit restaurée avant d'afficher les boutons de connexion/déconnexion).
+- La redirection systématique d'un compte Administrateur vers le dossier
+  d'adhésion — corrigé (un compte ADMIN n'est plus jamais redirigé vers
+  ce formulaire).
+
+Aucun problème connu à ce jour.
