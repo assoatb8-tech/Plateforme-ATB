@@ -69,26 +69,30 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-surface/95 backdrop-blur">
-      <nav className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6">
-        <Link
-          to="/"
-          className="flex shrink-0 items-center gap-2.5 justify-self-start"
-          onClick={() => setMobileOpen(false)}
-        >
-          <img src="/logo.jpeg" alt={t('app.name')} className="h-11 w-11 rounded-full" />
-          <span className="hidden text-sm font-semibold text-slate-900 sm:block">
-            {t('app.name')}
-          </span>
-        </Link>
+      <nav className="mx-auto flex h-16 max-w-6xl items-center gap-4 px-4 sm:px-6">
+        {/* Both side zones are min-w-0 flex-1 — identical flex-basis/grow,
+            so they always claim equal width regardless of how much content
+            each one holds, which is what actually keeps the center nav
+            centered (a plain 1fr/1fr grid doesn't: unequal min-content
+            sizes on each side skew a grid's fr tracks unevenly). The logo
+            itself stays shrink-0 so it never compresses. */}
+        <div className="flex min-w-0 flex-1 items-center">
+          <Link
+            to="/"
+            className="flex shrink-0 items-center gap-2.5"
+            onClick={() => setMobileOpen(false)}
+          >
+            <img src="/logo.jpeg" alt={t('app.name')} className="h-11 w-11 rounded-full" />
+            <span className="hidden text-sm font-semibold text-slate-900 sm:block">
+              {t('app.name')}
+            </span>
+          </Link>
+        </div>
 
         {/* Below 1024px this collapses into the hamburger drawer instead of
             squeezing onto one row — tablet gets the same clean treatment as
-            mobile rather than a cramped horizontal nav. The center grid
-            column hugs its own content and sits at the true middle of the
-            bar regardless of how many links it holds (2 for a guest, up to
-            5 for an admin) — the two 1fr side columns absorb the width
-            difference instead of the links shifting around. */}
-        <div className="hidden items-center gap-8 lg:flex">
+            mobile rather than a cramped horizontal nav. */}
+        <div className="hidden shrink-0 items-center gap-8 lg:flex">
           <NavLinks
             user={user}
             linkClassName="whitespace-nowrap text-sm font-medium text-slate-600 transition-colors hover:text-primary"
@@ -96,7 +100,7 @@ export function Navbar() {
           />
         </div>
 
-        <div className="flex shrink-0 items-center gap-3 justify-self-end">
+        <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
           <LanguageSwitcher />
           <div className="hidden items-center gap-3 lg:flex">
             {user ? (
