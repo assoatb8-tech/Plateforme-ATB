@@ -29,14 +29,15 @@ export function EventsListPage() {
       </div>
 
       <form onSubmit={handleSearchSubmit} className="mb-8 flex max-w-md gap-2">
-        <Input
-          type="search"
-          className="min-w-0 flex-1"
-          placeholder={t('events.searchPlaceholder')}
-          value={searchInput}
-          onChange={(event) => setSearchInput(event.target.value)}
-          aria-label={t('events.searchPlaceholder')}
-        />
+        <div className="min-w-0 flex-1">
+          <Input
+            type="search"
+            placeholder={t('events.searchPlaceholder')}
+            value={searchInput}
+            onChange={(event) => setSearchInput(event.target.value)}
+            aria-label={t('events.searchPlaceholder')}
+          />
+        </div>
         <Button type="submit" variant="secondary" className="shrink-0">
           <Search size={16} />
           {t('events.search')}
