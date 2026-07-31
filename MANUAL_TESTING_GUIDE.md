@@ -35,6 +35,7 @@ URL de production : https://plateforme-atb.vercel.app
 - **Action** : repasser ce compte en "Adhérent" via le même sélecteur.
 - **Résultat attendu** : le rôle repasse à "Adhérent", et l'accès admin est retiré tout aussi immédiatement dans l'autre onglet (`/admin` redirige vers l'accueil).
 - **Vérifier la protection anti-verrouillage** : ouvrir la page détail de **votre propre** compte admin — le sélecteur "Modifier le rôle" doit être grisé (désactivé), avec la mention "Vous ne pouvez pas modifier votre propre rôle." C'est volontaire : un administrateur ne peut jamais se rétrograder lui-même, pour éviter un blocage sans autre admin pour l'aider.
+- **Vérifier la protection du compte principal** : `assoatb8@gmail.com` est marqué comme compte protégé — **aucun autre administrateur** ne peut le rétrograder, même si `assoatb8@gmail.com` peut librement rétrograder n'importe quel autre admin. En vous connectant avec un *autre* compte admin, ouvrir la fiche de `assoatb8@gmail.com` : le sélecteur "Modifier le rôle" doit être grisé avec la mention "Ce compte est protégé et ne peut pas être rétrogradé."
 
 ### 5. Gestion des événements
 - **Action** : aller sur `/admin/evenements`, cliquer "Créer un événement".
