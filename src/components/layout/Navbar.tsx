@@ -74,16 +74,21 @@ export function Navbar() {
             so they always claim equal width regardless of how much content
             each one holds, which is what actually keeps the center nav
             centered (a plain 1fr/1fr grid doesn't: unequal min-content
-            sizes on each side skew a grid's fr tracks unevenly). The logo
-            itself stays shrink-0 so it never compresses. */}
+            sizes on each side skew a grid's fr tracks unevenly). */}
         <div className="flex min-w-0 flex-1 items-center">
           <Link
             to="/"
-            className="flex shrink-0 items-center gap-2.5"
+            className="flex min-w-0 items-center gap-2.5"
             onClick={() => setMobileOpen(false)}
           >
-            <img src="/logo.jpeg" alt={t('app.name')} className="h-11 w-11 rounded-full" />
-            <span className="hidden text-sm font-semibold text-slate-900 sm:block">
+            <img src="/logo.jpeg" alt={t('app.name')} className="h-11 w-11 shrink-0 rounded-full" />
+            {/* Truncates with an ellipsis rather than overflowing into the
+                center nav — at the narrow end of the lg: desktop range, an
+                admin's 5 nav links leave this zone less room than the full
+                name needs, and truncating is what actually prevents the
+                overlap (the equal-width side zones only fix horizontal
+                balance, not content that's wider than its share). */}
+            <span className="hidden truncate text-sm font-semibold text-slate-900 sm:block">
               {t('app.name')}
             </span>
           </Link>
