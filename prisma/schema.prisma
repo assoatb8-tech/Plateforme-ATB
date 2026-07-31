@@ -73,14 +73,20 @@ enum DocumentType {
 
 /// Mirrors Supabase Auth's auth.users — id must match the Supabase Auth user id.
 model User {
-  id        String     @id @db.Uuid
-  email     String     @unique
-  firstName String?    @map("first_name")
-  lastName  String?    @map("last_name")
-  role      Role       @default(USER)
-  status    UserStatus @default(PENDING)
-  createdAt DateTime   @default(now()) @map("created_at")
-  updatedAt DateTime   @updatedAt @map("updated_at")
+  id          String     @id @db.Uuid
+  email       String     @unique
+  firstName   String?    @map("first_name")
+  lastName    String?    @map("last_name")
+  role        Role       @default(USER)
+  status      UserStatus @default(PENDING)
+  // Marks an account that no admin can ever demote via PATCH
+  // /api/users/:id?action=role — including itself, though self-role-change
+  // is already blocked separately for every account regardless of this
+  // flag. A protected admin can still freely demote any *other* admin;
+  // this only guards the protected account itself from being demoted.
+  isProtected Boolean    @default(false) @map("is_protected")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
 
   memberProfile      MemberProfile?
   eventRegistrations EventRegistration[]

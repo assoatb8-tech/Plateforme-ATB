@@ -314,6 +314,7 @@
         "changeStatus": "تغيير الحالة",
         "changeRole": "تغيير الدور",
         "cannotChangeOwnRole": "لا يمكنك تغيير دورك الخاص.",
+        "protectedAccount": "هذا الحساب محمي ولا يمكن تخفيض رتبته.",
         "banAction": "حظر",
         "banReason": "سبب الحظر",
         "banCancel": "إلغاء",

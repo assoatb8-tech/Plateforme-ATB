@@ -314,6 +314,7 @@
         "changeStatus": "Modifier le statut",
         "changeRole": "Modifier le rôle",
         "cannotChangeOwnRole": "Vous ne pouvez pas modifier votre propre rôle.",
+        "protectedAccount": "Ce compte est protégé et ne peut pas être rétrogradé.",
         "banAction": "Bannir",
         "banReason": "Motif du bannissement",
         "banCancel": "Annuler",

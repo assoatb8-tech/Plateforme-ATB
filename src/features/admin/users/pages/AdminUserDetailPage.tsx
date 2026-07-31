@@ -169,7 +169,7 @@ export function AdminUserDetailPage() {
             label={t('admin.users.detail.changeRole')}
             value={user.role}
             onChange={(event) => void handleRoleChange(event.target.value as Role)}
-            disabled={updateRole.isPending || user.id === currentAdmin?.id}
+            disabled={updateRole.isPending || user.id === currentAdmin?.id || user.isProtected}
             options={[
               { value: 'USER', label: t('admin.users.roles.USER') },
               { value: 'ADMIN', label: t('admin.users.roles.ADMIN') },
@@ -192,6 +192,9 @@ export function AdminUserDetailPage() {
         </div>
         {user.id === currentAdmin?.id && (
           <p className="text-xs text-slate-500">{t('admin.users.detail.cannotChangeOwnRole')}</p>
+        )}
+        {user.id !== currentAdmin?.id && user.isProtected && (
+          <p className="text-xs text-slate-500">{t('admin.users.detail.protectedAccount')}</p>
         )}
       </Card>
 

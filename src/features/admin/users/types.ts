@@ -58,6 +58,7 @@ export interface UserDetailDto {
   email: string
   role: Role
   status: UserStatus
+  isProtected: boolean
   createdAt: string
   updatedAt: string
   memberProfile: UserDetailMemberProfileDto | null

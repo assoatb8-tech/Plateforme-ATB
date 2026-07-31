@@ -271,6 +271,16 @@ async function handleRole(
     return
   }
 
+  // A protected account (currently just the platform's primary admin) can
+  // never be demoted by anyone else — it can still freely demote any
+  // *other* admin, that path is untouched. Only guards against being
+  // demoted (role !== 'ADMIN'); this is a no-op for a redundant
+  // ADMIN -> ADMIN "change" so there's nothing to block there.
+  if (existing.isProtected && parsed.data.role !== 'ADMIN') {
+    sendError(res, 'This account is protected and cannot be demoted', 403)
+    return
+  }
+
   const updated = await prisma.user.update({
     where: { id },
     data: { role: parsed.data.role },
