@@ -1,13 +1,19 @@
 import { apiRequest } from '@/services/apiClient'
-import type { EventDto, EventsListResponse, RegistrationDto } from '@/features/events/types'
+import type {
+  EventDto,
+  EventsListResponse,
+  EventTense,
+  RegistrationDto,
+} from '@/features/events/types'
 
 export async function fetchEvents(params: {
   page?: number
   search?: string
+  when?: EventTense
 }): Promise<EventsListResponse> {
   return apiRequest<EventsListResponse>('/api/events', {
     requireAuth: false,
-    query: { page: params.page, search: params.search },
+    query: { page: params.page, search: params.search, when: params.when },
   })
 }
 

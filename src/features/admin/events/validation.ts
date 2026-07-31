@@ -13,6 +13,11 @@ const eventFormSchemaBase = z.object({
   endDate: z.string().refine((val) => !Number.isNaN(Date.parse(val)), 'validation.invalidDate'),
   maxParticipants: z.coerce.number().int().positive('validation.required'),
   status: z.enum(['ACTIVE', 'CANCELLED']).optional(),
+  facebookPostUrl: z
+    .string()
+    .trim()
+    .optional()
+    .refine((val) => !val || z.string().url().safeParse(val).success, 'validation.invalidUrl'),
 })
 
 export const eventFormSchema = eventFormSchemaBase.refine(

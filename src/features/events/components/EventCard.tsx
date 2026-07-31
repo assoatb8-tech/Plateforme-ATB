@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Calendar, MapPin, Users } from 'lucide-react'
+import { Calendar, Facebook, MapPin, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import type { EventDto } from '@/features/events/types'
@@ -25,7 +25,18 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <Link to={`/evenements/${event.id}`} className="block h-full">
       <Card className="flex h-full flex-col gap-3 transition-shadow hover:shadow-md">
-        <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
+          {event.facebookPostUrl && (
+            <span
+              className="shrink-0 rounded-full bg-[#1877F2]/10 p-1.5 text-[#1877F2]"
+              aria-label={t('events.viewOnFacebook')}
+              title={t('events.viewOnFacebook')}
+            >
+              <Facebook size={14} />
+            </span>
+          )}
+        </div>
         <p className="line-clamp-2 flex-1 text-sm text-slate-600">{description}</p>
 
         <div className="flex flex-col gap-1.5 text-sm text-slate-500">

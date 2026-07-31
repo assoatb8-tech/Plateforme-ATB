@@ -1,5 +1,6 @@
 export type RegistrationStatus = 'REGISTERED' | 'CANCELLED' | 'WAITING_LIST'
 export type EventStatus = 'ACTIVE' | 'CANCELLED'
+export type EventTense = 'upcoming' | 'past'
 
 export interface EventDto {
   id: string
@@ -12,6 +13,7 @@ export interface EventDto {
   endDate: string
   maxParticipants: number
   status: EventStatus
+  facebookPostUrl: string | null
   createdAt: string
   registeredCount: number
   spotsLeft: number

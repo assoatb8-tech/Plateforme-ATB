@@ -82,6 +82,11 @@ const AdminPaymentsListPage = lazy(() =>
     default: m.AdminPaymentsListPage,
   })),
 )
+const AdminSponsorsListPage = lazy(() =>
+  import('@/features/admin/sponsors/pages/AdminSponsorsListPage').then((m) => ({
+    default: m.AdminSponsorsListPage,
+  })),
+)
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -127,6 +132,7 @@ function AppRoutes() {
             <Route path="evenements/nouveau" element={<AdminEventFormPage />} />
             <Route path="evenements/:id/modifier" element={<AdminEventFormPage />} />
             <Route path="cotisations" element={<AdminPaymentsListPage />} />
+            <Route path="sponsors" element={<AdminSponsorsListPage />} />
           </Route>
           <Route
             path="dossier-adhesion"

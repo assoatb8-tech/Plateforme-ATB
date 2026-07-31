@@ -10,6 +10,19 @@ import { stripHtmlTags } from '../utils/sanitize.js'
 // tag-inflated raw length.
 const sanitizedText = (min: number) => z.string().transform(stripHtmlTags).pipe(z.string().min(min))
 
+// Always resolves to `string | null`, never `undefined` — so both create
+// and update always explicitly set the column (including clearing it back
+// to null when the admin empties the field), rather than Prisma silently
+// leaving a previous value in place because the key looked "unset".
+const facebookPostUrl = z
+  .string()
+  .trim()
+  .optional()
+  .transform((val) => (val ? val : null))
+  .refine((val) => val === null || z.string().url().safeParse(val).success, {
+    message: 'facebookPostUrl must be a valid URL',
+  })
+
 const eventBaseSchema = z.object({
   titleFr: sanitizedText(2),
   titleAr: sanitizedText(2),
@@ -19,6 +32,7 @@ const eventBaseSchema = z.object({
   startDate: z.string().refine((val) => !Number.isNaN(Date.parse(val))),
   endDate: z.string().refine((val) => !Number.isNaN(Date.parse(val))),
   maxParticipants: z.number().int().positive(),
+  facebookPostUrl,
 })
 
 function withDateOrderCheck<T extends z.ZodTypeAny>(schema: T) {

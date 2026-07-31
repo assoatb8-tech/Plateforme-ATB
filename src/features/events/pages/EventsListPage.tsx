@@ -6,19 +6,27 @@ import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
 import { EventCard } from '@/features/events/components/EventCard'
 import { useEventsList } from '@/features/events/hooks/useEvents'
+import type { EventTense } from '@/features/events/types'
+import { cn } from '@/utils/cn'
 
 export function EventsListPage() {
   const { t } = useTranslation()
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
+  const [when, setWhen] = useState<EventTense>('upcoming')
 
-  const { data, isLoading, isError } = useEventsList(page, search)
+  const { data, isLoading, isError } = useEventsList(page, search, when)
 
   function handleSearchSubmit(event: React.FormEvent) {
     event.preventDefault()
     setPage(1)
     setSearch(searchInput.trim())
+  }
+
+  function handleTenseChange(tense: EventTense) {
+    setWhen(tense)
+    setPage(1)
   }
 
   return (
@@ -28,21 +36,54 @@ export function EventsListPage() {
         <p className="text-sm text-slate-500">{t('events.subtitle')}</p>
       </div>
 
-      <form onSubmit={handleSearchSubmit} className="mb-8 flex max-w-md gap-2">
-        <div className="min-w-0 flex-1">
-          <Input
-            type="search"
-            placeholder={t('events.searchPlaceholder')}
-            value={searchInput}
-            onChange={(event) => setSearchInput(event.target.value)}
-            aria-label={t('events.searchPlaceholder')}
-          />
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div
+          className="inline-flex w-fit rounded-xl bg-slate-100 p-1"
+          role="tablist"
+          aria-label={t('events.tenseToggleLabel')}
+        >
+          <button
+            type="button"
+            role="tab"
+            aria-selected={when === 'upcoming'}
+            onClick={() => handleTenseChange('upcoming')}
+            className={cn(
+              'rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
+              when === 'upcoming' ? 'bg-white text-primary shadow-sm' : 'text-slate-600',
+            )}
+          >
+            {t('events.tenseUpcoming')}
+          </button>
+          <button
+            type="button"
+            role="tab"
+            aria-selected={when === 'past'}
+            onClick={() => handleTenseChange('past')}
+            className={cn(
+              'rounded-lg px-4 py-1.5 text-sm font-medium transition-colors',
+              when === 'past' ? 'bg-white text-primary shadow-sm' : 'text-slate-600',
+            )}
+          >
+            {t('events.tensePast')}
+          </button>
         </div>
-        <Button type="submit" variant="secondary" className="shrink-0">
-          <Search size={16} />
-          {t('events.search')}
-        </Button>
-      </form>
+
+        <form onSubmit={handleSearchSubmit} className="flex max-w-md gap-2">
+          <div className="min-w-0 flex-1">
+            <Input
+              type="search"
+              placeholder={t('events.searchPlaceholder')}
+              value={searchInput}
+              onChange={(event) => setSearchInput(event.target.value)}
+              aria-label={t('events.searchPlaceholder')}
+            />
+          </div>
+          <Button type="submit" variant="secondary" className="shrink-0">
+            <Search size={16} />
+            {t('events.search')}
+          </Button>
+        </form>
+      </div>
 
       {isLoading && <Spinner label={t('events.loading')} />}
 
@@ -52,7 +93,11 @@ export function EventsListPage() {
         <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-200 py-20 text-center">
           <CalendarX size={40} className="text-slate-300" />
           <p className="text-sm text-slate-500">
-            {search ? t('events.noResults') : t('events.noEventsYet')}
+            {search
+              ? t('events.noResults')
+              : when === 'past'
+                ? t('events.noPastEventsYet')
+                : t('events.noEventsYet')}
           </p>
         </div>
       )}

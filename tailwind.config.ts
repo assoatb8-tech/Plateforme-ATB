@@ -33,6 +33,20 @@ export default {
       borderRadius: {
         xl: '1rem',
       },
+      keyframes: {
+        marquee: {
+          // Starts shifted left by one full copy of the (duplicated) track
+          // and animates back to 0 — reads as motion toward the right,
+          // matching the requested left-to-right direction. Track renders
+          // its content twice in a row (see SponsorMarquee), so exactly
+          // -50% is one full copy and the loop point is seamless.
+          '0%': { transform: 'translateX(-50%)' },
+          '100%': { transform: 'translateX(0)' },
+        },
+      },
+      animation: {
+        marquee: 'marquee 30s linear infinite',
+      },
     },
   },
   plugins: [],

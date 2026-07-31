@@ -178,6 +178,7 @@ model Event {
   endDate         DateTime    @map("end_date")
   maxParticipants Int         @map("max_participants")
   status          EventStatus @default(ACTIVE)
+  facebookPostUrl String?     @map("facebook_post_url")
   createdBy       String      @map("created_by") @db.Uuid
   creator         User        @relation("EventCreator", fields: [createdBy], references: [id])
   createdAt       DateTime    @default(now()) @map("created_at")
@@ -258,4 +259,17 @@ model AuditLog {
 
   @@index([adminId])
   @@map("audit_logs")
+}
+
+// Sponsor/partner logos shown on the homepage marquee. No edit/reorder —
+// admin can only create (name + logo) and delete; display order is
+// createdAt (see supabase/sql/005_sponsors.sql).
+model Sponsor {
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String
+  logoUrl   String   @map("logo_url")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([createdAt])
+  @@map("sponsors")
 }

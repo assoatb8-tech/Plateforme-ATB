@@ -1,9 +1,10 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { HeartHandshake, ShieldCheck, Users, Sparkles } from 'lucide-react'
+import { HeartHandshake, ShieldCheck, Users, Sparkles, Quote } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { useAuth } from '@/features/auth/hooks/useAuth'
+import { SponsorMarquee } from '@/features/sponsors/components/SponsorMarquee'
 
 const valueIcons = [HeartHandshake, ShieldCheck, Users, Sparkles] as const
 const valueKeys = ['solidarity', 'commitment', 'trust', 'community'] as const
@@ -33,6 +34,15 @@ export function HomePage() {
               <Button variant="ghost">{t('home.hero.ctaSecondary')}</Button>
             </Link>
           </div>
+        </div>
+      </section>
+
+      <section className="bg-primary/5 py-16">
+        <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
+          <Quote size={32} className="mx-auto mb-4 text-secondary" aria-hidden="true" />
+          <p className="whitespace-pre-line text-xl font-medium italic leading-relaxed text-slate-800 sm:text-2xl">
+            {t('home.motto.text')}
+          </p>
         </div>
       </section>
 
@@ -69,6 +79,8 @@ export function HomePage() {
         <h2 className="text-2xl font-semibold text-slate-900">{t('home.contact.title')}</h2>
         <p className="mt-4 text-base text-slate-600">{t('home.contact.text')}</p>
       </section>
+
+      <SponsorMarquee />
     </div>
   )
 }

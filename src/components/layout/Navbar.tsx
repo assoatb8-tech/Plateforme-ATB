@@ -1,48 +1,50 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Menu, X } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
 import { Button } from '@/components/ui/Button'
+import { cn } from '@/utils/cn'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import type { AppUser } from '@/features/auth/hooks/AuthContext'
 
 interface NavLinksProps {
   user: AppUser | null
   linkClassName: string
+  activeLinkClassName: string
   onNavigate?: () => void
 }
 
-function NavLinks({ user, linkClassName, onNavigate }: NavLinksProps) {
+// "Mes participations" was removed on purpose — it's already reachable
+// from the dashboard, and duplicating it here just added a sixth flat link.
+function NavLinks({ user, linkClassName, activeLinkClassName, onNavigate }: NavLinksProps) {
   const { t } = useTranslation()
+
+  const linkClass = ({ isActive }: { isActive: boolean }) =>
+    cn(linkClassName, isActive && activeLinkClassName)
 
   return (
     <>
-      <Link to="/" className={linkClassName} onClick={onNavigate}>
+      <NavLink to="/" end className={linkClass} onClick={onNavigate}>
         {t('nav.home')}
-      </Link>
-      <Link to="/evenements" className={linkClassName} onClick={onNavigate}>
+      </NavLink>
+      <NavLink to="/evenements" className={linkClass} onClick={onNavigate}>
         {t('nav.events')}
-      </Link>
+      </NavLink>
       {user && (
-        <Link to="/tableau-de-bord" className={linkClassName} onClick={onNavigate}>
+        <NavLink to="/tableau-de-bord" className={linkClass} onClick={onNavigate}>
           {t('nav.dashboard')}
-        </Link>
+        </NavLink>
       )}
       {user && (
-        <Link to="/mes-participations" className={linkClassName} onClick={onNavigate}>
-          {t('nav.participations')}
-        </Link>
-      )}
-      {user && (
-        <Link to="/mon-profil" className={linkClassName} onClick={onNavigate}>
+        <NavLink to="/mon-profil" className={linkClass} onClick={onNavigate}>
           {t('nav.profile')}
-        </Link>
+        </NavLink>
       )}
       {user?.role === 'ADMIN' && (
-        <Link to="/admin" className={linkClassName} onClick={onNavigate}>
+        <NavLink to="/admin" className={linkClass} onClick={onNavigate}>
           {t('nav.admin')}
-        </Link>
+        </NavLink>
       )}
     </>
   )
@@ -67,24 +69,35 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-surface/95 backdrop-blur">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
-        <Link to="/" className="flex items-center gap-2" onClick={() => setMobileOpen(false)}>
-          <img src="/logo.jpeg" alt={t('app.name')} className="h-12 w-12 rounded-full" />
+      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
+        <Link
+          to="/"
+          className="flex shrink-0 items-center gap-2.5"
+          onClick={() => setMobileOpen(false)}
+        >
+          <img src="/logo.jpeg" alt={t('app.name')} className="h-11 w-11 rounded-full" />
           <span className="hidden text-sm font-semibold text-slate-900 sm:block">
             {t('app.name')}
           </span>
         </Link>
 
-        <div className="hidden items-center gap-6 md:flex">
+        {/* Below 1024px this collapses into the hamburger drawer instead of
+            squeezing onto one row — tablet gets the same clean treatment as
+            mobile rather than a cramped horizontal nav. Left-clustered next
+            to the logo rather than centered — the link count varies by role
+            (2 for a guest, up to 5 for an admin), so centering would shift
+            the whole cluster around depending on who's looking. */}
+        <div className="hidden flex-1 items-center gap-8 lg:flex">
           <NavLinks
             user={user}
-            linkClassName="text-sm font-medium text-slate-700 hover:text-primary"
+            linkClassName="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
+            activeLinkClassName="text-primary"
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex shrink-0 items-center gap-3">
           <LanguageSwitcher />
-          <div className="hidden items-center gap-2 md:flex">
+          <div className="hidden items-center gap-3 lg:flex">
             {user ? (
               <Button variant="ghost" onClick={() => void handleLogout()}>
                 {t('nav.logout')}
@@ -102,7 +115,7 @@ export function Navbar() {
           </div>
           <button
             type="button"
-            className="rounded-lg p-2 text-slate-700 hover:bg-slate-100 md:hidden"
+            className="rounded-lg p-2 text-slate-700 hover:bg-slate-100 lg:hidden"
             aria-label={mobileOpen ? t('nav.closeMenu') : t('nav.openMenu')}
             aria-expanded={mobileOpen}
             aria-controls="mobile-nav-drawer"
@@ -116,12 +129,13 @@ export function Navbar() {
       {mobileOpen && (
         <div
           id="mobile-nav-drawer"
-          className="border-t border-slate-200 bg-surface px-4 py-4 md:hidden"
+          className="border-t border-slate-200 bg-surface px-4 py-4 lg:hidden"
         >
           <div className="flex flex-col gap-1">
             <NavLinks
               user={user}
               linkClassName="rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100 hover:text-primary"
+              activeLinkClassName="bg-primary/10 text-primary hover:bg-primary/10"
               onNavigate={() => setMobileOpen(false)}
             />
           </div>

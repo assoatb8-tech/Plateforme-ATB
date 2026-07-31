@@ -105,6 +105,16 @@ export function EventForm({
         )}
       </div>
 
+      <Input
+        type="url"
+        label={t('admin.events.form.facebookPostUrl')}
+        placeholder="https://facebook.com/..."
+        error={
+          errors.facebookPostUrl && t(errors.facebookPostUrl.message ?? 'validation.invalidUrl')
+        }
+        {...register('facebookPostUrl')}
+      />
+
       {formError && <p className="text-sm text-error">{formError}</p>}
 
       <Button type="submit" disabled={isSubmitting} loading={isSubmitting}>

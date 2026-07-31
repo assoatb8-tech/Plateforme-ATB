@@ -77,6 +77,7 @@ export function AdminEventFormPage() {
                   endDate: toDatetimeLocalValue(event.endDate),
                   maxParticipants: event.maxParticipants,
                   status: event.status,
+                  facebookPostUrl: event.facebookPostUrl ?? '',
                 }
               : undefined
           }

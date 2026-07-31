@@ -20,7 +20,6 @@
     "admin": "Administration",
     "logout": "Déconnexion",
     "memberForm": "Dossier d'adhésion",
-    "participations": "Mes participations",
     "profile": "Mon profil",
     "openMenu": "Ouvrir le menu",
     "closeMenu": "Fermer le menu"
@@ -37,6 +36,9 @@
       "cta": "Rejoindre l'association",
       "ctaDashboard": "Voir mon tableau de bord",
       "ctaSecondary": "Découvrir nos activités"
+    },
+    "motto": {
+      "text": "Nous ne recherchons pas n'importe qui dans cet univers, mais plutôt un citoyen ayant sa patrie dans le cœur."
     },
     "mission": {
       "title": "Notre mission",
@@ -56,6 +58,9 @@
     "contact": {
       "title": "Nous contacter",
       "text": "Une question ? Envie de nous rejoindre ? Notre équipe vous répond avec plaisir."
+    },
+    "sponsors": {
+      "title": "Nos partenaires"
     }
   },
   "footer": {
@@ -122,6 +127,7 @@
     "phoneInvalid": "Numéro de téléphone invalide (8 chiffres, +216 optionnel).",
     "cinInvalid": "Numéro de CIN invalide (8 chiffres).",
     "invalidDate": "Date invalide.",
+    "invalidUrl": "Lien invalide.",
     "declarationRequired": "Vous devez certifier l'exactitude des informations fournies."
   },
   "memberForm": {
@@ -134,12 +140,6 @@
     "successTitle": "Dossier envoyé",
     "successText": "Votre dossier d'adhésion a été transmis. Un administrateur va l'examiner prochainement.",
     "errorGeneric": "Une erreur est survenue lors de l'envoi. Merci de réessayer.",
-    "uploadLabel": "Diplômes et certificats (fichiers)",
-    "uploadHint": "Formats acceptés : PDF, JPG, PNG (5 Mo maximum).",
-    "uploadCta": "Ajouter un fichier",
-    "uploadError": "Le fichier n'a pas pu être envoyé. Merci de réessayer.",
-    "uploadInvalidType": "Format de fichier non autorisé (PDF, JPG, PNG uniquement).",
-    "uploadTooLarge": "Le fichier dépasse la taille maximale autorisée (5 Mo).",
     "steps": {
       "personalInfo": "Informations personnelles",
       "identity": "Naissance et identité",
@@ -147,7 +147,7 @@
       "family": "Situation familiale",
       "profession": "Profession",
       "experience": "Expérience associative et sportive",
-      "documents": "Secourisme et documents",
+      "documents": "Secourisme",
       "declaration": "Déclaration"
     },
     "fields": {
@@ -205,6 +205,10 @@
     "errorGeneric": "Impossible de charger les événements. Merci de réessayer.",
     "noResults": "Aucun événement ne correspond à votre recherche.",
     "noEventsYet": "Aucun événement n'est publié pour le moment. Revenez bientôt !",
+    "noPastEventsYet": "Aucun événement passé pour le moment.",
+    "tenseToggleLabel": "Filtrer par période",
+    "tenseUpcoming": "À venir",
+    "tensePast": "Précédents",
     "previousPage": "Précédent",
     "nextPage": "Suivant",
     "pageIndicator": "Page {{current}} / {{total}}",
@@ -224,6 +228,7 @@
     "register": "S'inscrire",
     "joinWaitingList": "Rejoindre la liste d'attente",
     "cancelRegistration": "Annuler mon inscription",
+    "viewOnFacebook": "Voir les photos sur Facebook",
     "status": {
       "registered": "Inscrit(e)",
       "waitingList": "Liste d'attente",
@@ -269,7 +274,8 @@
       "dashboard": "Tableau de bord",
       "members": "Membres",
       "events": "Événements",
-      "payments": "Cotisations"
+      "payments": "Cotisations",
+      "sponsors": "Sponsors"
     },
     "dashboard": {
       "title": "Tableau de bord administrateur",
@@ -359,6 +365,7 @@
         "endDate": "Date de fin",
         "maxParticipants": "Nombre de places",
         "status": "Statut",
+        "facebookPostUrl": "Lien Facebook (photos de l'événement)",
         "dateOrderError": "La date de fin doit être postérieure à la date de début.",
         "submit": "Créer l'événement",
         "save": "Enregistrer les modifications",
@@ -405,6 +412,29 @@
         "typeLabel": "Type",
         "cancel": "Annuler",
         "submit": "Enregistrer"
+      }
+    },
+    "sponsors": {
+      "title": "Gestion des sponsors",
+      "subtitle": "Ajouter ou retirer les sponsors affichés sur la page d'accueil.",
+      "noSponsorsYet": "Aucun sponsor pour le moment.",
+      "actionError": "Une erreur est survenue. Merci de réessayer.",
+      "deleteAction": "Supprimer",
+      "deleteConfirmTitle": "Supprimer ce sponsor",
+      "deleteConfirmText": "Cette action est irréversible. Le sponsor sera retiré de la page d'accueil.",
+      "deleteCancel": "Annuler",
+      "deleteConfirm": "Supprimer",
+      "uploadInvalidType": "Format non pris en charge (JPG, PNG, WEBP ou SVG uniquement).",
+      "uploadTooLarge": "Le fichier dépasse la taille maximale autorisée (2 Mo).",
+      "create": {
+        "action": "Ajouter un sponsor",
+        "title": "Ajouter un sponsor",
+        "nameLabel": "Nom du sponsor",
+        "logoLabel": "Logo",
+        "logoCta": "Choisir un logo",
+        "logoRequired": "Veuillez sélectionner un logo.",
+        "cancel": "Annuler",
+        "submit": "Ajouter"
       }
     }
   }

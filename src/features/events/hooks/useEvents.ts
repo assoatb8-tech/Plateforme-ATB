@@ -5,17 +5,19 @@ import {
   fetchEvents,
   registerForEvent,
 } from '@/features/events/services/eventsService'
+import type { EventTense } from '@/features/events/types'
 
 export const eventsKeys = {
   all: ['events'] as const,
-  list: (page: number, search: string) => ['events', 'list', page, search] as const,
+  list: (page: number, search: string, when: EventTense) =>
+    ['events', 'list', page, search, when] as const,
   detail: (id: string) => ['events', 'detail', id] as const,
 }
 
-export function useEventsList(page: number, search: string) {
+export function useEventsList(page: number, search: string, when: EventTense) {
   return useQuery({
-    queryKey: eventsKeys.list(page, search),
-    queryFn: () => fetchEvents({ page, search }),
+    queryKey: eventsKeys.list(page, search, when),
+    queryFn: () => fetchEvents({ page, search, when }),
     placeholderData: keepPreviousData,
   })
 }

@@ -1,6 +1,6 @@
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Calendar, MapPin, Users } from 'lucide-react'
+import { Calendar, Facebook, MapPin, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { StatusBadge } from '@/components/ui/StatusBadge'
@@ -57,6 +57,7 @@ export function EventDetailPage() {
 
   const isFull = event.spotsLeft <= 0
   const isCancelledEvent = event.status === 'CANCELLED'
+  const isPastEvent = new Date(event.endDate) < new Date()
   const isRegistered = event.myRegistrationStatus === 'REGISTERED'
   const isWaitingList = event.myRegistrationStatus === 'WAITING_LIST'
   const mutationError = registerMutation.error ?? cancelMutation.error
@@ -112,6 +113,18 @@ export function EventDetailPage() {
 
         <p className="whitespace-pre-line text-sm text-slate-700">{description}</p>
 
+        {event.facebookPostUrl && (
+          <a
+            href={event.facebookPostUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex w-fit items-center gap-2 rounded-xl bg-[#1877F2]/10 px-4 py-2.5 text-sm font-medium text-[#1877F2] transition-colors hover:bg-[#1877F2]/20"
+          >
+            <Facebook size={16} />
+            {t('events.viewOnFacebook')}
+          </a>
+        )}
+
         {(isRegistered || isWaitingList) && (
           <StatusBadge
             tone={
@@ -126,7 +139,7 @@ export function EventDetailPage() {
 
         {mutationErrorMessage && <p className="text-sm text-error">{mutationErrorMessage}</p>}
 
-        {!user && !isCancelledEvent && (
+        {!user && !isCancelledEvent && !isPastEvent && (
           <Link to="/connexion">
             <Button type="button">{t('events.loginToRegister')}</Button>
           </Link>
@@ -134,6 +147,7 @@ export function EventDetailPage() {
 
         {user &&
           !isCancelledEvent &&
+          !isPastEvent &&
           !isRegistered &&
           !isWaitingList &&
           registrationBlockedReason && (
@@ -142,6 +156,7 @@ export function EventDetailPage() {
 
         {user &&
           !isCancelledEvent &&
+          !isPastEvent &&
           !isRegistered &&
           !isWaitingList &&
           !registrationBlockedReason && (
@@ -155,7 +170,7 @@ export function EventDetailPage() {
             </Button>
           )}
 
-        {user && (isRegistered || isWaitingList) && (
+        {user && !isPastEvent && (isRegistered || isWaitingList) && (
           <Button
             type="button"
             variant="danger"

@@ -34,9 +34,22 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
   const pageParam = Array.isArray(req.query.page) ? req.query.page[0] : req.query.page
   const searchParam = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search
   const allParam = Array.isArray(req.query.all) ? req.query.all[0] : req.query.all
+  const whenParam = Array.isArray(req.query.when) ? req.query.when[0] : req.query.when
 
   const page = Math.max(1, Number(pageParam) || 1)
   const search = searchParam?.trim() ?? ''
+
+  // Only filters by time when the caller explicitly asks — the admin
+  // events list intentionally never sends `when` (it manages every event
+  // regardless of date), so leaving it unset preserves that unfiltered
+  // view exactly. The public events page always sends one or the other.
+  const now = new Date()
+  const timeWhere =
+    whenParam === 'past'
+      ? { endDate: { lt: now } }
+      : whenParam === 'upcoming'
+        ? { endDate: { gte: now } }
+        : {}
 
   const user = await getOptionalUser(req)
 
@@ -54,6 +67,7 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
 
   const where = {
     ...(includeAll ? {} : { status: 'ACTIVE' as const }),
+    ...timeWhere,
     ...(search
       ? {
           OR: [
@@ -65,10 +79,15 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
       : {}),
   }
 
+  // Soonest-first for upcoming (and the unfiltered admin view); most-recent-
+  // first for past, since that's what's actually useful when browsing an
+  // archive.
+  const orderBy = { startDate: whenParam === 'past' ? ('desc' as const) : ('asc' as const) }
+
   const [events, total] = await Promise.all([
     prisma.event.findMany({
       where,
-      orderBy: { startDate: 'asc' },
+      orderBy,
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
     }),
@@ -127,6 +146,7 @@ async function handleCreate(req: VercelRequest, res: VercelResponse, user: { id:
       startDate: new Date(parsed.data.startDate),
       endDate: new Date(parsed.data.endDate),
       maxParticipants: parsed.data.maxParticipants,
+      facebookPostUrl: parsed.data.facebookPostUrl,
       createdBy: user.id,
     },
   })

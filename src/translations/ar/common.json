@@ -20,7 +20,6 @@
     "admin": "الإدارة",
     "logout": "تسجيل الخروج",
     "memberForm": "ملف الانخراط",
-    "participations": "مشاركاتي",
     "profile": "ملفي الشخصي",
     "openMenu": "فتح القائمة",
     "closeMenu": "إغلاق القائمة"
@@ -37,6 +36,9 @@
       "cta": "انضم إلى الجمعية",
       "ctaDashboard": "لوحة التحكم الخاصة بي",
       "ctaSecondary": "اكتشف أنشطتنا"
+    },
+    "motto": {
+      "text": "نحن لا نبحث عن أي شخص في هذا الكون 🤍\nبل نبحث عن مواطن في قلبه وطن 🇹🇳"
     },
     "mission": {
       "title": "رسالتنا",
@@ -56,6 +58,9 @@
     "contact": {
       "title": "اتصل بنا",
       "text": "لديك سؤال؟ ترغب في الانضمام إلينا؟ فريقنا سعيد بالرد عليك."
+    },
+    "sponsors": {
+      "title": "شركاؤنا"
     }
   },
   "footer": {
@@ -122,6 +127,7 @@
     "phoneInvalid": "رقم هاتف غير صالح (8 أرقام، +216 اختياري).",
     "cinInvalid": "رقم بطاقة تعريف غير صالح (8 أرقام).",
     "invalidDate": "تاريخ غير صالح.",
+    "invalidUrl": "رابط غير صالح.",
     "declarationRequired": "يجب عليك الإشهاد بصحة المعطيات المقدمة."
   },
   "memberForm": {
@@ -134,12 +140,6 @@
     "successTitle": "تم إرسال الملف",
     "successText": "تم إرسال ملف انخراطك. سيقوم أحد المسؤولين بمراجعته قريبًا.",
     "errorGeneric": "حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.",
-    "uploadLabel": "الشهائد والدبلومات (ملفات)",
-    "uploadHint": "الصيغ المقبولة: PDF, JPG, PNG (بحد أقصى 5 ميغابايت).",
-    "uploadCta": "إضافة ملف",
-    "uploadError": "تعذّر إرسال الملف. يرجى المحاولة مرة أخرى.",
-    "uploadInvalidType": "صيغة ملف غير مسموح بها (PDF, JPG, PNG فقط).",
-    "uploadTooLarge": "حجم الملف يتجاوز الحد الأقصى المسموح به (5 ميغابايت).",
     "steps": {
       "personalInfo": "معلومات شخصية",
       "identity": "الولادة والهوية",
@@ -147,7 +147,7 @@
       "family": "الحالة العائلية",
       "profession": "المهنة",
       "experience": "التجربة الجمعياتية والرياضية",
-      "documents": "الإسعاف والوثائق",
+      "documents": "الإسعاف",
       "declaration": "الإشهاد"
     },
     "fields": {
@@ -205,6 +205,10 @@
     "errorGeneric": "تعذّر تحميل الأنشطة. يرجى المحاولة مرة أخرى.",
     "noResults": "لا يوجد نشاط يطابق بحثك.",
     "noEventsYet": "لا يوجد أي نشاط منشور حاليًا. عد قريبًا!",
+    "noPastEventsYet": "لا يوجد أي نشاط سابق حاليًا.",
+    "tenseToggleLabel": "التصفية حسب الفترة",
+    "tenseUpcoming": "قادمة",
+    "tensePast": "سابقة",
     "previousPage": "السابق",
     "nextPage": "التالي",
     "pageIndicator": "صفحة {{current}} / {{total}}",
@@ -224,6 +228,7 @@
     "register": "التسجيل",
     "joinWaitingList": "الانضمام إلى قائمة الانتظار",
     "cancelRegistration": "إلغاء تسجيلي",
+    "viewOnFacebook": "مشاهدة الصور على فيسبوك",
     "status": {
       "registered": "مسجَّل",
       "waitingList": "قائمة الانتظار",
@@ -269,7 +274,8 @@
       "dashboard": "لوحة التحكم",
       "members": "الأعضاء",
       "events": "الأنشطة",
-      "payments": "الاشتراكات"
+      "payments": "الاشتراكات",
+      "sponsors": "الرعاة"
     },
     "dashboard": {
       "title": "لوحة تحكم الإدارة",
@@ -359,6 +365,7 @@
         "endDate": "تاريخ النهاية",
         "maxParticipants": "عدد الأماكن",
         "status": "الحالة",
+        "facebookPostUrl": "رابط فيسبوك (صور النشاط)",
         "dateOrderError": "يجب أن يكون تاريخ النهاية بعد تاريخ البداية.",
         "submit": "إنشاء النشاط",
         "save": "حفظ التعديلات",
@@ -405,6 +412,29 @@
         "typeLabel": "النوع",
         "cancel": "إلغاء",
         "submit": "حفظ"
+      }
+    },
+    "sponsors": {
+      "title": "إدارة الرعاة",
+      "subtitle": "إضافة أو إزالة الرعاة المعروضين في الصفحة الرئيسية.",
+      "noSponsorsYet": "لا يوجد رعاة حاليًا.",
+      "actionError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+      "deleteAction": "حذف",
+      "deleteConfirmTitle": "حذف هذا الراعي",
+      "deleteConfirmText": "هذا الإجراء نهائي. سيتم إزالة الراعي من الصفحة الرئيسية.",
+      "deleteCancel": "إلغاء",
+      "deleteConfirm": "حذف",
+      "uploadInvalidType": "صيغة غير مدعومة (JPG أو PNG أو WEBP أو SVG فقط).",
+      "uploadTooLarge": "حجم الملف يتجاوز الحد الأقصى المسموح به (2 ميغابايت).",
+      "create": {
+        "action": "إضافة راعٍ",
+        "title": "إضافة راعٍ",
+        "nameLabel": "اسم الراعي",
+        "logoLabel": "الشعار",
+        "logoCta": "اختيار شعار",
+        "logoRequired": "يرجى اختيار شعار.",
+        "cancel": "إلغاء",
+        "submit": "إضافة"
       }
     }
   }
