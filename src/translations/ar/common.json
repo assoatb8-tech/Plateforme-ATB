@@ -303,11 +303,17 @@
         "status": "الحالة",
         "joined": "تاريخ التسجيل"
       },
+      "roles": {
+        "USER": "منخرط",
+        "ADMIN": "مسؤول"
+      },
       "detail": {
         "back": "العودة إلى المنخرطين",
         "role": "الدور",
         "status": "الحالة",
         "changeStatus": "تغيير الحالة",
+        "changeRole": "تغيير الدور",
+        "cannotChangeOwnRole": "لا يمكنك تغيير دورك الخاص.",
         "banAction": "حظر",
         "banReason": "سبب الحظر",
         "banCancel": "إلغاء",

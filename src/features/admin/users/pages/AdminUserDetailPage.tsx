@@ -15,10 +15,12 @@ import {
   useAdminUser,
   useBanUser,
   useDeleteUser,
+  useUpdateUserRole,
   useUpdateUserStatus,
 } from '@/features/admin/users/hooks/useAdminUsers'
 import { banFormSchema, type BanFormValues } from '@/features/admin/users/validation'
-import type { UserStatus } from '@/types/domain'
+import { useAuth } from '@/features/auth/hooks/useAuth'
+import type { Role, UserStatus } from '@/types/domain'
 import type { RegistrationStatus } from '@/features/events/types'
 
 const REGISTRATION_STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
@@ -36,8 +38,10 @@ export function AdminUserDetailPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false)
   const [actionError, setActionError] = useState<string | null>(null)
 
+  const { user: currentAdmin } = useAuth()
   const { data: user, isLoading, isError } = useAdminUser(id)
   const updateStatus = useUpdateUserStatus(id ?? '')
+  const updateRole = useUpdateUserRole(id ?? '')
   const banMutation = useBanUser(id ?? '')
   const deleteMutation = useDeleteUser()
 
@@ -52,6 +56,15 @@ export function AdminUserDetailPage() {
     setActionError(null)
     try {
       await updateStatus.mutateAsync(status)
+    } catch {
+      setActionError(t('admin.users.detail.actionError'))
+    }
+  }
+
+  async function handleRoleChange(role: Role) {
+    setActionError(null)
+    try {
+      await updateRole.mutateAsync(role)
     } catch {
       setActionError(t('admin.users.detail.actionError'))
     }
@@ -117,7 +130,7 @@ export function AdminUserDetailPage() {
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
               {t('admin.users.detail.role')}
             </p>
-            <p className="text-sm text-slate-800">{user.role}</p>
+            <p className="text-sm text-slate-800">{t(`admin.users.roles.${user.role}`)}</p>
           </div>
           <div>
             <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
@@ -151,6 +164,18 @@ export function AdminUserDetailPage() {
             ]}
             className="sm:max-w-[220px]"
           />
+          <Select
+            id="userRoleSelect"
+            label={t('admin.users.detail.changeRole')}
+            value={user.role}
+            onChange={(event) => void handleRoleChange(event.target.value as Role)}
+            disabled={updateRole.isPending || user.id === currentAdmin?.id}
+            options={[
+              { value: 'USER', label: t('admin.users.roles.USER') },
+              { value: 'ADMIN', label: t('admin.users.roles.ADMIN') },
+            ]}
+            className="sm:max-w-[220px]"
+          />
           <Button
             type="button"
             variant="danger"
@@ -165,6 +190,9 @@ export function AdminUserDetailPage() {
             {t('admin.users.detail.deleteAction')}
           </Button>
         </div>
+        {user.id === currentAdmin?.id && (
+          <p className="text-xs text-slate-500">{t('admin.users.detail.cannotChangeOwnRole')}</p>
+        )}
       </Card>
 
       <Card className="flex flex-col gap-3">

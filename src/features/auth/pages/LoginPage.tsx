@@ -34,10 +34,13 @@ export function LoginPage() {
     // bounced to /connexion (state.from) — honor it once signed in, but a
     // member with no membership file yet always goes to the form first,
     // matching FEATURES.md's required post-registration/login redirect.
+    // Admins are exempt — the membership file is for adherents, and an
+    // admin account has no reason to be forced through it on every login.
     const from = (location.state as { from?: Location } | null)?.from?.pathname
     try {
       const currentUser = await fetchCurrentUser()
-      navigate(currentUser.hasProfile ? (from ?? '/') : '/dossier-adhesion')
+      const skipMembershipForm = currentUser.role === 'ADMIN' || currentUser.hasProfile
+      navigate(skipMembershipForm ? (from ?? '/') : '/dossier-adhesion')
     } catch {
       navigate(from ?? '/')
     }

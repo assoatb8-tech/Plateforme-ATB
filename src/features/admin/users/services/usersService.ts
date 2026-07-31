@@ -1,6 +1,6 @@
 import { apiRequest } from '@/services/apiClient'
 import type { UserDetailDto, UserSummaryDto, UsersListResponse } from '@/features/admin/users/types'
-import type { UserStatus } from '@/types/domain'
+import type { Role, UserStatus } from '@/types/domain'
 
 export async function fetchUsers(params: {
   page?: number
@@ -21,6 +21,14 @@ export async function updateUserStatus(id: string, status: UserStatus): Promise<
     method: 'PATCH',
     query: { action: 'status' },
     body: { status },
+  })
+}
+
+export async function updateUserRole(id: string, role: Role): Promise<UserSummaryDto> {
+  return apiRequest<UserSummaryDto>(`/api/users/${id}`, {
+    method: 'PATCH',
+    query: { action: 'role' },
+    body: { role },
   })
 }
 

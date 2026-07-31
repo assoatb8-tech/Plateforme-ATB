@@ -7,9 +7,14 @@ export const userStatusUpdateSchema = z.object({
   status: z.enum(['ACTIVE', 'PENDING', 'BANNED']),
 })
 
+export const userRoleUpdateSchema = z.object({
+  role: z.enum(['USER', 'ADMIN']),
+})
+
 export const userBanSchema = z.object({
   reason: z.string().transform(stripHtmlTags).pipe(z.string().min(3)),
 })
 
 export type UserStatusUpdateInput = z.infer<typeof userStatusUpdateSchema>
 export type UserBanInput = z.infer<typeof userBanSchema>
+export type UserRoleUpdateInput = z.infer<typeof userRoleUpdateSchema>

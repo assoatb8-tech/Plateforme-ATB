@@ -303,11 +303,17 @@
         "status": "Statut",
         "joined": "Inscrit le"
       },
+      "roles": {
+        "USER": "Adhérent",
+        "ADMIN": "Administrateur"
+      },
       "detail": {
         "back": "Retour aux membres",
         "role": "Rôle",
         "status": "Statut",
         "changeStatus": "Modifier le statut",
+        "changeRole": "Modifier le rôle",
+        "cannotChangeOwnRole": "Vous ne pouvez pas modifier votre propre rôle.",
         "banAction": "Bannir",
         "banReason": "Motif du bannissement",
         "banCancel": "Annuler",

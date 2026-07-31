@@ -4,9 +4,10 @@ import {
   deleteUser,
   fetchUser,
   fetchUsers,
+  updateUserRole,
   updateUserStatus,
 } from '@/features/admin/users/services/usersService'
-import type { UserStatus } from '@/types/domain'
+import type { Role, UserStatus } from '@/types/domain'
 
 export const adminUsersKeys = {
   all: ['admin', 'users'] as const,
@@ -44,6 +45,14 @@ export function useUpdateUserStatus(id: string) {
   const invalidate = useInvalidateUserQueries(id)
   return useMutation({
     mutationFn: (status: UserStatus) => updateUserStatus(id, status),
+    onSuccess: invalidate,
+  })
+}
+
+export function useUpdateUserRole(id: string) {
+  const invalidate = useInvalidateUserQueries(id)
+  return useMutation({
+    mutationFn: (role: Role) => updateUserRole(id, role),
     onSuccess: invalidate,
   })
 }
