@@ -53,7 +53,13 @@ export function DashboardPage() {
             </StatusBadge>
           )}
 
-          {currentUser && !currentUser.hasProfile && (
+          {currentUser && !currentUser.hasProfile && currentUser.isProtected && (
+            <p className="mt-2 text-sm text-slate-600">
+              {t('profile.universalAdminNoProfileNeeded')}
+            </p>
+          )}
+
+          {currentUser && !currentUser.hasProfile && !currentUser.isProtected && (
             <div className="mt-2 flex flex-col gap-2">
               <p className="text-sm text-slate-600">{t('dashboard.noProfileYet')}</p>
               <Link to="/dossier-adhesion">

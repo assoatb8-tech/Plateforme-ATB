@@ -257,6 +257,7 @@
   "profile": {
     "title": "Mon profil",
     "noProfileYet": "Vous n'avez pas encore de dossier d'adhésion.",
+    "universalAdminNoProfileNeeded": "Ce compte administrateur universel n'a pas besoin de dossier d'adhésion.",
     "save": "Enregistrer les modifications",
     "saveSuccess": "Votre profil a été mis à jour.",
     "errorGeneric": "Une erreur est survenue. Merci de réessayer."

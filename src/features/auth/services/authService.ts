@@ -7,6 +7,7 @@ export interface CurrentUserDto {
   email: string
   role: Role
   status: UserStatus
+  isProtected: boolean
   hasProfile: boolean
 }
 

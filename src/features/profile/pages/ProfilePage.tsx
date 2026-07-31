@@ -7,6 +7,7 @@ import { useQuery } from '@tanstack/react-query'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Spinner } from '@/components/ui/Spinner'
+import { fetchCurrentUser } from '@/features/auth/services/authService'
 import {
   memberFormSchema,
   stepLabelKeys,
@@ -51,6 +52,9 @@ export function ProfilePage() {
     isLoading,
     isError,
   } = useQuery({ queryKey: ['profile'], queryFn: getMemberProfile })
+  // Same query key as Dashboard/Login's fetchCurrentUser() call — shares
+  // its cache instead of firing a second request, just to read isProtected.
+  const { data: currentUser } = useQuery({ queryKey: ['auth', 'me'], queryFn: fetchCurrentUser })
 
   const form = useForm<MemberFormValues>({
     resolver: zodResolver(memberFormSchema),
@@ -93,6 +97,19 @@ export function ProfilePage() {
   }
 
   if (!profile) {
+    // The universal admin account has no reason to fill a membership
+    // file — no "go complete it" nudge for this one account specifically,
+    // unlike any other admin or adherent without a profile yet.
+    if (currentUser?.isProtected) {
+      return (
+        <div className="mx-auto max-w-2xl px-4 py-16 text-center">
+          <Card>
+            <p className="text-sm text-slate-600">{t('profile.universalAdminNoProfileNeeded')}</p>
+          </Card>
+        </div>
+      )
+    }
+
     return (
       <div className="mx-auto max-w-2xl px-4 py-16 text-center">
         <Card className="flex flex-col items-center gap-4">

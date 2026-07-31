@@ -24,6 +24,7 @@ export default withAuth(async (req: VercelRequest, res: VercelResponse, user) =>
     email: dbUser.email,
     role: dbUser.role,
     status: dbUser.status,
+    isProtected: dbUser.isProtected,
     hasProfile: Boolean(dbUser.memberProfile),
   })
 })
