@@ -145,7 +145,7 @@ Les administrateurs disposent d'un tableau de bord permettant :
 
 - voir le nombre d'adhérents ;
 - voir les nouveaux inscrits ;
-- suivre les cotisations ;
+- valider les comptes en attente (statut d'adhésion) ;
 - gérer les comptes.
 
 

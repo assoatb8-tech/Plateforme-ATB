@@ -306,27 +306,27 @@ GET /api/events/:id/participants
 
 ---
 
-# Payment API
+# Sponsor API
 
 
-## Liste paiements
+## Liste sponsors (public)
+
+
+```
+GET /api/sponsors
+```
+
+
+---
+
+## Ajouter un sponsor
 
 
 ADMIN
 
 
 ```
-GET /api/payments
-```
-
-
----
-
-## Valider paiement
-
-
-```
-PATCH /api/payments/:id
+POST /api/sponsors
 ```
 
 
@@ -334,8 +334,22 @@ Body :
 
 ```json
 {
-"status":"VALIDATED"
+"name":"...",
+"logoUrl":"..."
 }
+```
+
+
+---
+
+## Supprimer un sponsor
+
+
+ADMIN
+
+
+```
+DELETE /api/sponsors?id=...
 ```
 
 

@@ -9,7 +9,6 @@ L'application permet de gérer entièrement l'Association Tunisienne de Bénévo
 - les adhérents ;
 - les événements ;
 - les inscriptions ;
-- les cotisations ;
 - les documents ;
 - l'administration.
 
@@ -226,8 +225,7 @@ Statistiques :
 - nombre total adhérents ;
 - nouveaux adhérents ;
 - événements actifs ;
-- inscriptions ;
-- cotisations.
+- inscriptions.
 
 
 ---
@@ -247,8 +245,7 @@ L'administrateur peut :
 Filtres :
 
 - statut ;
-- date inscription ;
-- cotisation.
+- date inscription.
 
 
 ---
@@ -308,15 +305,14 @@ Administrateur peut :
 
 ---
 
-# Gestion cotisations
+# Gestion des sponsors
 
 
 Fonctionnalités :
 
-- voir paiements ;
-- valider une cotisation ;
-- refuser une validation ;
-- historique.
+- ajouter un sponsor (nom + logo) ;
+- supprimer un sponsor ;
+- affichage automatique sur la page d'accueil (masqué s'il n'y en a aucun).
 
 
 ---

@@ -259,8 +259,7 @@ Charts
 Informations affichées :
 - nombre adhérents ;
 - événements actifs ;
-- inscriptions ;
-- cotisations.
+- inscriptions.
 
 ---
 
@@ -290,7 +289,7 @@ Informations affichées :
 - Dashboard
 - Membres
 - Événements
-- Cotisations
+- Sponsors
 - Paramètres
 
 ---

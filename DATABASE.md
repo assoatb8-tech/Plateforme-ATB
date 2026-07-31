@@ -17,7 +17,6 @@ L'objectif est de gérer :
 - les profils adhérents ;
 - les événements ;
 - les inscriptions ;
-- les cotisations ;
 - les documents ;
 - les permissions.
 
@@ -37,10 +36,6 @@ User
  |
  |
  +---- EventRegistration
-
- |
- |
- +---- Payment
 
 
 Event
@@ -242,43 +237,21 @@ WAITING_LIST
 
 ---
 
-# Table Payment
+# Table Sponsor
 
 
-Gestion des cotisations.
+Sponsors affichés sur la page d'accueil.
 
 
-## Payment
+## Sponsor
 
 
 | Champ | Type |
 |-|-|
 | id | UUID |
-| userId | UUID |
-| amount | Decimal |
-| paymentType | Enum |
-| status | Enum |
-| validatedBy | UUID |
-| validatedAt | DateTime |
+| name | String |
+| logoUrl | String |
 | createdAt | DateTime |
-
-
-PaymentType :
-
-```
-MEMBERSHIP
-DONATION
-OTHER
-```
-
-
-Status :
-
-```
-PENDING
-VALIDATED
-REJECTED
-```
 
 
 ---
@@ -361,7 +334,7 @@ USER_BANNED
 
 EVENT_CREATED
 
-PAYMENT_VALIDATED
+SPONSOR_CREATED
 ```
 
 

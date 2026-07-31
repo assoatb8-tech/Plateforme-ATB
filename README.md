@@ -9,7 +9,7 @@ Application web progressive destinée à digitaliser la gestion d'une associatio
 - Formulaire d'inscription complet
 - Gestion événements
 - Inscriptions activités
-- Gestion cotisations
+- Gestion des sponsors
 - Dashboard administration
 - Français / العربية
 
