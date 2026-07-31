@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
+import { Spinner } from '@/components/ui/Spinner'
 import { EventForm } from '@/features/admin/events/components/EventForm'
 import {
   useAdminEvent,
@@ -37,7 +38,7 @@ export function AdminEventFormPage() {
   }
 
   if (isEditMode && isLoading) {
-    return <p className="text-sm text-slate-500">{t('admin.loading')}</p>
+    return <Spinner label={t('admin.loading')} />
   }
 
   if (isEditMode && (isError || !event)) {
@@ -51,7 +52,7 @@ export function AdminEventFormPage() {
           to="/admin/evenements"
           className="mb-2 inline-flex items-center gap-1 text-sm text-primary hover:underline"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} className="rtl:-scale-x-100" />
           {t('admin.events.back')}
         </Link>
         <h1 className="text-2xl font-semibold text-slate-900">

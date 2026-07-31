@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { Spinner } from '@/components/ui/Spinner'
 import {
   memberFormSchema,
   stepLabelKeys,
@@ -77,8 +78,8 @@ export function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-2xl px-4 py-16 text-center text-sm text-slate-500">
-        {t('dashboard.loading')}
+      <div className="mx-auto flex max-w-2xl justify-center px-4 py-16">
+        <Spinner label={t('dashboard.loading')} />
       </div>
     )
   }
@@ -121,7 +122,11 @@ export function ProfilePage() {
         {saveError && <p className="text-sm text-error">{saveError}</p>}
         {saveSuccess && <p className="text-sm text-success">{t('profile.saveSuccess')}</p>}
 
-        <Button type="submit" disabled={form.formState.isSubmitting}>
+        <Button
+          type="submit"
+          disabled={form.formState.isSubmitting}
+          loading={form.formState.isSubmitting}
+        >
           {t('profile.save')}
         </Button>
       </form>

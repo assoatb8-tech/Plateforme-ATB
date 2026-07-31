@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { Modal } from '@/components/ui/Modal'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { Spinner } from '@/components/ui/Spinner'
 import {
   useAdminUser,
   useBanUser,
@@ -18,7 +19,18 @@ import {
 } from '@/features/admin/users/hooks/useAdminUsers'
 import { banFormSchema, type BanFormValues } from '@/features/admin/users/validation'
 import type { UserStatus } from '@/types/domain'
-import { USER_STATUS_TONE, PAYMENT_STATUS_TONE } from '@/utils/statusTones'
+import type { RegistrationStatus } from '@/features/events/types'
+
+const REGISTRATION_STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
+  REGISTERED: 'events.status.registered',
+  WAITING_LIST: 'events.status.waitingList',
+  CANCELLED: 'events.status.cancelled',
+}
+import {
+  USER_STATUS_TONE,
+  PAYMENT_STATUS_TONE,
+  REGISTRATION_STATUS_TONE,
+} from '@/utils/statusTones'
 
 export function AdminUserDetailPage() {
   const { t } = useTranslation()
@@ -73,7 +85,7 @@ export function AdminUserDetailPage() {
   }
 
   if (isLoading) {
-    return <p className="text-sm text-slate-500">{t('admin.loading')}</p>
+    return <Spinner label={t('admin.loading')} />
   }
 
   if (isError || !user) {
@@ -87,7 +99,7 @@ export function AdminUserDetailPage() {
           to="/admin/membres"
           className="mb-2 inline-flex items-center gap-1 text-sm text-primary hover:underline"
         >
-          <ArrowLeft size={16} />
+          <ArrowLeft size={16} className="rtl:-scale-x-100" />
           {t('admin.users.detail.back')}
         </Link>
         <h1 className="text-2xl font-semibold text-slate-900">
@@ -234,10 +246,15 @@ export function AdminUserDetailPage() {
         ) : (
           <ul className="flex flex-col gap-2">
             {user.eventRegistrations.map((registration) => (
-              <li key={registration.id} className="flex items-center justify-between text-sm">
+              <li key={registration.id} className="flex items-center justify-between gap-3 text-sm">
                 <span className="text-slate-800">{registration.event.titleFr}</span>
-                <span className="text-slate-500">
-                  {new Date(registration.event.startDate).toLocaleDateString()}
+                <span className="flex items-center gap-3">
+                  <StatusBadge tone={REGISTRATION_STATUS_TONE[registration.status]}>
+                    {t(REGISTRATION_STATUS_LABEL_KEY[registration.status])}
+                  </StatusBadge>
+                  <span className="text-slate-500">
+                    {new Date(registration.event.startDate).toLocaleDateString()}
+                  </span>
                 </span>
               </li>
             ))}
@@ -278,7 +295,7 @@ export function AdminUserDetailPage() {
             <Button type="button" variant="ghost" onClick={() => setBanModalOpen(false)}>
               {t('admin.users.detail.banCancel')}
             </Button>
-            <Button type="submit" variant="danger" disabled={isSubmitting}>
+            <Button type="submit" variant="danger" disabled={isSubmitting} loading={isSubmitting}>
               {t('admin.users.detail.banConfirm')}
             </Button>
           </div>
@@ -299,6 +316,7 @@ export function AdminUserDetailPage() {
             type="button"
             variant="danger"
             disabled={deleteMutation.isPending}
+            loading={deleteMutation.isPending}
             onClick={() => void handleDeleteConfirm()}
           >
             {t('admin.users.detail.deleteConfirm')}

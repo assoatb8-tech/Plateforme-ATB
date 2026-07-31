@@ -7,6 +7,7 @@ import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { Spinner } from '@/components/ui/Spinner'
 import { useAdminUsersList } from '@/features/admin/users/hooks/useAdminUsers'
 import { USER_STATUS_TONE } from '@/utils/statusTones'
 
@@ -64,7 +65,7 @@ export function AdminUsersListPage() {
         </Button>
       </form>
 
-      {isLoading && <p className="text-sm text-slate-500">{t('admin.loading')}</p>}
+      {isLoading && <Spinner label={t('admin.loading')} />}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
       {!isLoading && !isError && data && data.users.length === 0 && (

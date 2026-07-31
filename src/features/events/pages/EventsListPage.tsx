@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { CalendarX, Search } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { Spinner } from '@/components/ui/Spinner'
 import { EventCard } from '@/features/events/components/EventCard'
 import { useEventsList } from '@/features/events/hooks/useEvents'
 
@@ -30,18 +31,19 @@ export function EventsListPage() {
       <form onSubmit={handleSearchSubmit} className="mb-8 flex max-w-md gap-2">
         <Input
           type="search"
+          className="min-w-0 flex-1"
           placeholder={t('events.searchPlaceholder')}
           value={searchInput}
           onChange={(event) => setSearchInput(event.target.value)}
           aria-label={t('events.searchPlaceholder')}
         />
-        <Button type="submit" variant="secondary">
+        <Button type="submit" variant="secondary" className="shrink-0">
           <Search size={16} />
           {t('events.search')}
         </Button>
       </form>
 
-      {isLoading && <p className="text-sm text-slate-500">{t('events.loading')}</p>}
+      {isLoading && <Spinner label={t('events.loading')} />}
 
       {isError && <p className="text-sm text-error">{t('events.errorGeneric')}</p>}
 

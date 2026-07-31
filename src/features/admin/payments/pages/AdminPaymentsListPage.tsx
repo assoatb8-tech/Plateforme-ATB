@@ -10,6 +10,7 @@ import { Select } from '@/components/ui/Select'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { Spinner } from '@/components/ui/Spinner'
 import {
   useAdminPaymentsList,
   useCreatePayment,
@@ -136,7 +137,7 @@ export function AdminPaymentsListPage() {
 
       {actionError && <p className="text-sm text-error">{actionError}</p>}
 
-      {isLoading && <p className="text-sm text-slate-500">{t('admin.loading')}</p>}
+      {isLoading && <Spinner label={t('admin.loading')} />}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
       {!isLoading && !isError && data && data.payments.length === 0 && (
@@ -199,6 +200,10 @@ export function AdminPaymentsListPage() {
                           >
                             <X size={16} className="text-error" />
                           </Button>
+                          {/* No loading spinner on these two — they're compact icon-only
+                              buttons and updateStatusMutation is shared across every row,
+                              so a spinner would show on rows the admin didn't click. The
+                              existing disabled state already prevents double-submission. */}
                         </div>
                       )}
                     </td>
@@ -299,7 +304,7 @@ export function AdminPaymentsListPage() {
             <Button type="button" variant="ghost" onClick={closeCreateModal}>
               {t('admin.payments.create.cancel')}
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="submit" disabled={isSubmitting} loading={isSubmitting}>
               {t('admin.payments.create.submit')}
             </Button>
           </div>

@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Modal } from '@/components/ui/Modal'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { Spinner } from '@/components/ui/Spinner'
 import { useAdminEventsList, useDeleteEvent } from '@/features/admin/events/hooks/useAdminEvents'
 import { EVENT_STATUS_TONE } from '@/utils/statusTones'
 
@@ -56,12 +57,13 @@ export function AdminEventsListPage() {
       <form onSubmit={handleSearchSubmit} className="flex max-w-md gap-2">
         <Input
           type="search"
+          className="min-w-0 flex-1"
           placeholder={t('events.searchPlaceholder')}
           value={searchInput}
           onChange={(event) => setSearchInput(event.target.value)}
           aria-label={t('events.searchPlaceholder')}
         />
-        <Button type="submit" variant="secondary">
+        <Button type="submit" variant="secondary" className="shrink-0">
           <Search size={16} />
           {t('events.search')}
         </Button>
@@ -69,7 +71,7 @@ export function AdminEventsListPage() {
 
       {actionError && <p className="text-sm text-error">{actionError}</p>}
 
-      {isLoading && <p className="text-sm text-slate-500">{t('admin.loading')}</p>}
+      {isLoading && <Spinner label={t('admin.loading')} />}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
       {!isLoading && !isError && data && data.events.length === 0 && (
@@ -172,6 +174,7 @@ export function AdminEventsListPage() {
             type="button"
             variant="danger"
             disabled={deleteMutation.isPending}
+            loading={deleteMutation.isPending}
             onClick={() => void handleDeleteConfirm()}
           >
             {t('admin.events.deleteConfirm')}

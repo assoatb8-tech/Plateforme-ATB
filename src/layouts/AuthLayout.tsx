@@ -29,9 +29,9 @@ export function AuthLayout() {
         <span className="text-sm font-semibold text-slate-900">{t('app.name')}</span>
       </Link>
 
-      <div className="w-full max-w-md">
+      <main className="w-full max-w-md">
         <Outlet />
-      </div>
+      </main>
     </div>
   )
 }

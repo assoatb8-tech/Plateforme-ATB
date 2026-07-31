@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CalendarX } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { Spinner } from '@/components/ui/Spinner'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useMyRegistrations } from '@/features/dashboard/hooks/useDashboard'
 import { cancelEventRegistration } from '@/features/events/services/eventsService'
@@ -69,6 +70,7 @@ export function ParticipationsPage() {
             variant="danger"
             onClick={() => cancelMutation.mutate(registration.event.id)}
             disabled={cancelMutation.isPending}
+            loading={cancelMutation.isPending}
           >
             {t('events.cancelRegistration')}
           </Button>
@@ -81,7 +83,7 @@ export function ParticipationsPage() {
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
       <h1 className="mb-8 text-2xl font-semibold text-slate-900">{t('participations.title')}</h1>
 
-      {isLoading && <p className="text-sm text-slate-500">{t('dashboard.loading')}</p>}
+      {isLoading && <Spinner label={t('dashboard.loading')} />}
       {isError && <p className="text-sm text-error">{t('events.errorGeneric')}</p>}
 
       {!isLoading && !isError && (registrations ?? []).length === 0 && (

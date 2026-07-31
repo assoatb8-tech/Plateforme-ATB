@@ -56,8 +56,13 @@ export function Navbar() {
 
   async function handleLogout() {
     setMobileOpen(false)
-    await signOut()
+    // Navigate away from whatever page we're on BEFORE signing out, not
+    // after — signOut() flips the auth state that ProtectedRoute watches,
+    // and if we're still on a protected route when that happens,
+    // ProtectedRoute's own redirect-to-/connexion races this one and wins,
+    // landing the user on the login page instead of home.
     navigate('/')
+    await signOut()
   }
 
   return (

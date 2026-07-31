@@ -1,10 +1,13 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
+import { Loader2 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
+  /** Shows a spinner and disables the button — for an in-flight submit/mutation. */
+  loading?: boolean
   children: ReactNode
 }
 
@@ -15,7 +18,14 @@ const variantStyles: Record<ButtonVariant, string> = {
   ghost: 'bg-transparent text-primary hover:bg-primary/10 focus-visible:ring-primary',
 }
 
-export function Button({ variant = 'primary', className, children, ...props }: ButtonProps) {
+export function Button({
+  variant = 'primary',
+  loading = false,
+  className,
+  children,
+  disabled,
+  ...props
+}: ButtonProps) {
   return (
     <button
       className={cn(
@@ -25,8 +35,11 @@ export function Button({ variant = 'primary', className, children, ...props }: B
         variantStyles[variant],
         className,
       )}
+      disabled={disabled || loading}
+      aria-busy={loading || undefined}
       {...props}
     >
+      {loading && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}
       {children}
     </button>
   )

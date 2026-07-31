@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react'
+import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
@@ -14,6 +15,7 @@ const FOCUSABLE_SELECTOR =
   'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
 export function Modal({ open, onClose, title, children, className }: ModalProps) {
+  const { t } = useTranslation()
   const panelRef = useRef<HTMLDivElement>(null)
   const previouslyFocused = useRef<HTMLElement | null>(null)
   // Kept in a ref (not the effect's dependency array) so a parent passing
@@ -75,7 +77,10 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
       <div
         ref={panelRef}
         tabIndex={-1}
-        className={cn('w-full max-w-lg rounded-xl bg-surface p-6 shadow-lg', className)}
+        className={cn(
+          'max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-xl bg-surface p-6 shadow-lg',
+          className,
+        )}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
@@ -83,10 +88,10 @@ export function Modal({ open, onClose, title, children, className }: ModalProps)
           <button
             type="button"
             onClick={onClose}
-            aria-label="Fermer"
-            className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            aria-label={t('common.close')}
+            className="rounded-full p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
         {children}

@@ -8,9 +8,11 @@
     "message": "حدث خطأ من جانبنا. حاول إعادة تحميل الصفحة، وإذا استمرت المشكلة يرجى التواصل معنا.",
     "reload": "إعادة تحميل الصفحة"
   },
+  "common": {
+    "close": "إغلاق"
+  },
   "nav": {
     "home": "الرئيسية",
-    "about": "من نحن",
     "events": "الأنشطة",
     "login": "تسجيل الدخول",
     "register": "انضم كمتطوع",
@@ -50,12 +52,6 @@
       "trustText": "إدارة شفافة ومهنية في خدمة منخرطينا.",
       "community": "المجتمع",
       "communityText": "مجتمع وطني موحّد حول قيم التشارك المشتركة."
-    },
-    "stats": {
-      "title": "الجمعية بالأرقام",
-      "members": "منخرط نشيط",
-      "events": "نشاط منظّم",
-      "years": "سنوات من الالتزام"
     },
     "contact": {
       "title": "اتصل بنا",
@@ -105,7 +101,10 @@
       "passwordLabel": "كلمة المرور الجديدة",
       "confirmPasswordLabel": "تأكيد كلمة المرور",
       "submit": "حفظ",
-      "errorGeneric": "حدث خطأ. ربما تكون صلاحية الرابط قد انتهت."
+      "errorGeneric": "حدث خطأ. ربما تكون صلاحية الرابط قد انتهت.",
+      "invalidLinkTitle": "رابط غير صالح أو منتهي الصلاحية",
+      "invalidLinkMessage": "رابط إعادة التعيين هذا لم يعد صالحًا. اطلب رابطًا جديدًا أدناه.",
+      "invalidLinkCta": "طلب رابط جديد"
     }
   },
   "pwa": {
@@ -217,13 +216,18 @@
     "dateRange": "من {{start}} إلى {{end}}",
     "capacity": "{{registered}} / {{max}} مشارك",
     "actionError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+    "actionErrorAlreadyRegistered": "أنت مسجَّل بالفعل في هذا النشاط.",
+    "actionErrorRateLimited": "محاولات كثيرة جدًا. يرجى الانتظار قليلاً قبل إعادة المحاولة.",
     "loginToRegister": "تسجيل الدخول للتسجيل في النشاط",
+    "registrationBlockedPending": "حسابك في انتظار التحقق. يمكنك التسجيل في الأنشطة بعد مصادقة الإدارة على ملفك.",
+    "registrationBlockedBanned": "تم تعليق حسابك. يرجى التواصل مع الجمعية لمزيد من المعلومات.",
     "register": "التسجيل",
     "joinWaitingList": "الانضمام إلى قائمة الانتظار",
     "cancelRegistration": "إلغاء تسجيلي",
     "status": {
       "registered": "مسجَّل",
-      "waitingList": "قائمة الانتظار"
+      "waitingList": "قائمة الانتظار",
+      "cancelled": "ملغاة"
     }
   },
   "dashboard": {

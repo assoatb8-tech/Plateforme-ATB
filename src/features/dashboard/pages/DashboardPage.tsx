@@ -4,6 +4,7 @@ import { CalendarCheck, ClipboardList, UserRound } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { Spinner } from '@/components/ui/Spinner'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useCurrentUserProfile, useMyRegistrations } from '@/features/dashboard/hooks/useDashboard'
 import { RegistrationCard } from '@/features/events/components/RegistrationCard'
@@ -42,7 +43,7 @@ export function DashboardPage() {
             </h2>
           </div>
 
-          {isLoadingUser && <p className="text-sm text-slate-500">{t('dashboard.loading')}</p>}
+          {isLoadingUser && <Spinner label={t('dashboard.loading')} />}
 
           {isUserError && <p className="text-sm text-error">{t('dashboard.errorGeneric')}</p>}
 
@@ -85,9 +86,7 @@ export function DashboardPage() {
             </Link>
           </div>
 
-          {isLoadingRegistrations && (
-            <p className="text-sm text-slate-500">{t('dashboard.loading')}</p>
-          )}
+          {isLoadingRegistrations && <Spinner label={t('dashboard.loading')} />}
 
           {isRegistrationsError && (
             <p className="text-sm text-error">{t('dashboard.errorGeneric')}</p>

@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from 'react'
 import { Navigate, useLocation } from 'react-router-dom'
 import { useAuth } from '@/features/auth/hooks/useAuth'
+import { RouteLoader } from '@/components/ui/RouteLoader'
 import type { Role } from '@/types/domain'
 
 interface ProtectedRouteProps {
@@ -22,7 +23,7 @@ export function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) 
     }
   }, [user, signOut])
 
-  if (loading) return null
+  if (loading) return <RouteLoader />
 
   if (!session || !user || user.status === 'BANNED') {
     return <Navigate to="/connexion" state={{ from: location }} replace />

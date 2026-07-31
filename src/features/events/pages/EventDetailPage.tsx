@@ -4,6 +4,8 @@ import { Calendar, MapPin, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { StatusBadge } from '@/components/ui/StatusBadge'
+import { Spinner } from '@/components/ui/Spinner'
+import { ApiError } from '@/services/apiClient'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import {
   useCancelEventRegistration,
@@ -23,8 +25,8 @@ export function EventDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto max-w-3xl px-4 py-16 text-sm text-slate-500">
-        {t('events.loading')}
+      <div className="mx-auto max-w-3xl px-4 py-16">
+        <Spinner label={t('events.loading')} />
       </div>
     )
   }
@@ -58,6 +60,21 @@ export function EventDetailPage() {
   const isRegistered = event.myRegistrationStatus === 'REGISTERED'
   const isWaitingList = event.myRegistrationStatus === 'WAITING_LIST'
   const mutationError = registerMutation.error ?? cancelMutation.error
+  const mutationErrorMessage = mutationError
+    ? t(
+        mutationError instanceof ApiError && mutationError.status === 409
+          ? 'events.actionErrorAlreadyRegistered'
+          : mutationError instanceof ApiError && mutationError.status === 429
+            ? 'events.actionErrorRateLimited'
+            : 'events.actionError',
+      )
+    : null
+  const registrationBlockedReason =
+    user && user.status === 'PENDING'
+      ? 'events.registrationBlockedPending'
+      : user && user.status === 'BANNED'
+        ? 'events.registrationBlockedBanned'
+        : null
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -77,15 +94,15 @@ export function EventDetailPage() {
 
         <div className="flex flex-col gap-2 text-sm text-slate-600">
           <span className="flex items-center gap-2">
-            <Calendar size={18} className="shrink-0" />
+            <Calendar size={16} className="shrink-0" />
             {t('events.dateRange', { start: startDate, end: endDate })}
           </span>
           <span className="flex items-center gap-2">
-            <MapPin size={18} className="shrink-0" />
+            <MapPin size={16} className="shrink-0" />
             {event.location}
           </span>
           <span className="flex items-center gap-2">
-            <Users size={18} className="shrink-0" />
+            <Users size={16} className="shrink-0" />
             {t('events.capacity', {
               registered: event.registeredCount,
               max: event.maxParticipants,
@@ -107,7 +124,7 @@ export function EventDetailPage() {
           </StatusBadge>
         )}
 
-        {mutationError && <p className="text-sm text-error">{t('events.actionError')}</p>}
+        {mutationErrorMessage && <p className="text-sm text-error">{mutationErrorMessage}</p>}
 
         {!user && !isCancelledEvent && (
           <Link to="/connexion">
@@ -115,15 +132,28 @@ export function EventDetailPage() {
           </Link>
         )}
 
-        {user && !isCancelledEvent && !isRegistered && !isWaitingList && (
-          <Button
-            type="button"
-            onClick={() => registerMutation.mutate()}
-            disabled={registerMutation.isPending}
-          >
-            {isFull ? t('events.joinWaitingList') : t('events.register')}
-          </Button>
-        )}
+        {user &&
+          !isCancelledEvent &&
+          !isRegistered &&
+          !isWaitingList &&
+          registrationBlockedReason && (
+            <p className="text-sm text-slate-500">{t(registrationBlockedReason)}</p>
+          )}
+
+        {user &&
+          !isCancelledEvent &&
+          !isRegistered &&
+          !isWaitingList &&
+          !registrationBlockedReason && (
+            <Button
+              type="button"
+              onClick={() => registerMutation.mutate()}
+              disabled={registerMutation.isPending}
+              loading={registerMutation.isPending}
+            >
+              {isFull ? t('events.joinWaitingList') : t('events.register')}
+            </Button>
+          )}
 
         {user && (isRegistered || isWaitingList) && (
           <Button
@@ -131,6 +161,7 @@ export function EventDetailPage() {
             variant="danger"
             onClick={() => cancelMutation.mutate()}
             disabled={cancelMutation.isPending}
+            loading={cancelMutation.isPending}
           >
             {t('events.cancelRegistration')}
           </Button>

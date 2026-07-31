@@ -1,7 +1,6 @@
 import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { Loader2 } from 'lucide-react'
 import { PublicLayout } from '@/layouts/PublicLayout'
 import { AuthLayout } from '@/layouts/AuthLayout'
 import { AdminLayout } from '@/layouts/AdminLayout'
@@ -10,6 +9,7 @@ import { ProtectedRoute } from '@/routes/ProtectedRoute'
 import { useDirection } from '@/hooks/useDirection'
 import { PwaPrompts } from '@/pwa/PwaPrompts'
 import { ErrorBoundary } from '@/components/ErrorBoundary'
+import { RouteLoader } from '@/components/ui/RouteLoader'
 
 const HomePage = lazy(() => import('@/pages/HomePage').then((m) => ({ default: m.HomePage })))
 const LoginPage = lazy(() =>
@@ -82,14 +82,6 @@ const AdminPaymentsListPage = lazy(() =>
     default: m.AdminPaymentsListPage,
   })),
 )
-
-function RouteLoader() {
-  return (
-    <div className="flex min-h-[50vh] items-center justify-center">
-      <Loader2 size={28} className="animate-spin text-primary" />
-    </div>
-  )
-}
 
 const queryClient = new QueryClient({
   defaultOptions: {

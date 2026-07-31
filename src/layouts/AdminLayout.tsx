@@ -16,7 +16,7 @@ export function AdminLayout() {
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-8 sm:px-6 md:flex-row">
       <aside className="shrink-0 md:w-56">
-        <h1 className="mb-4 text-lg font-semibold text-slate-900">{t('admin.title')}</h1>
+        <h2 className="mb-4 text-lg font-semibold text-slate-900">{t('admin.title')}</h2>
         <div className="relative md:static">
           <nav
             aria-label={t('admin.title')}

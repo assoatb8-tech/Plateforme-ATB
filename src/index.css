@@ -9,5 +9,10 @@
 
   body {
     font-family: 'Inter', system-ui, sans-serif;
+    /* Reserved by PwaPrompts (src/pwa/PwaPrompts.tsx) so its fixed-position
+       install/update banners don't sit on top of the page's last visible
+       content — set to the banner stack's real height only while at least
+       one banner is showing, 0 otherwise. */
+    padding-bottom: var(--pwa-prompt-space, 0px);
   }
 }

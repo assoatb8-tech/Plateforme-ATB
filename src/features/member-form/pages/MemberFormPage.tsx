@@ -124,7 +124,11 @@ export function MemberFormPage() {
                 {t('memberForm.next')}
               </Button>
             ) : (
-              <Button type="submit" disabled={form.formState.isSubmitting}>
+              <Button
+                type="submit"
+                disabled={form.formState.isSubmitting}
+                loading={form.formState.isSubmitting}
+              >
                 {t('memberForm.submit')}
               </Button>
             )}

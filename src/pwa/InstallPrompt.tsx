@@ -20,7 +20,7 @@ export function InstallPrompt() {
         type="button"
         onClick={dismiss}
         aria-label={t('pwa.dismiss')}
-        className="rounded-full p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+        className="rounded-full p-2.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
       >
         <X size={18} />
       </button>

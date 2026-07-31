@@ -68,7 +68,7 @@ export function LoginPage() {
 
         {formError && <p className="text-sm text-error">{formError}</p>}
 
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} loading={isSubmitting}>
           {t('auth.login.submit')}
         </Button>
       </form>

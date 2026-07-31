@@ -8,9 +8,11 @@
     "message": "Quelque chose s'est mal passé de notre côté. Essayez de recharger la page ; si le problème persiste, contactez-nous.",
     "reload": "Recharger la page"
   },
+  "common": {
+    "close": "Fermer"
+  },
   "nav": {
     "home": "Accueil",
-    "about": "À propos",
     "events": "Événements",
     "login": "Connexion",
     "register": "Devenir bénévole",
@@ -50,12 +52,6 @@
       "trustText": "Une gestion transparente et professionnelle au service de nos adhérents.",
       "community": "Communauté",
       "communityText": "Une communauté nationale unie autour de valeurs communes de partage."
-    },
-    "stats": {
-      "title": "L'association en chiffres",
-      "members": "Adhérents actifs",
-      "events": "Événements organisés",
-      "years": "Années d'engagement"
     },
     "contact": {
       "title": "Nous contacter",
@@ -105,7 +101,10 @@
       "passwordLabel": "Nouveau mot de passe",
       "confirmPasswordLabel": "Confirmer le mot de passe",
       "submit": "Enregistrer",
-      "errorGeneric": "Une erreur est survenue. Le lien a peut-être expiré."
+      "errorGeneric": "Une erreur est survenue. Le lien a peut-être expiré.",
+      "invalidLinkTitle": "Lien invalide ou expiré",
+      "invalidLinkMessage": "Ce lien de réinitialisation n'est plus valide. Demandez-en un nouveau ci-dessous.",
+      "invalidLinkCta": "Demander un nouveau lien"
     }
   },
   "pwa": {
@@ -217,13 +216,18 @@
     "dateRange": "Du {{start}} au {{end}}",
     "capacity": "{{registered}} / {{max}} participants",
     "actionError": "Une erreur est survenue. Merci de réessayer.",
+    "actionErrorAlreadyRegistered": "Vous êtes déjà inscrit(e) à cet événement.",
+    "actionErrorRateLimited": "Trop de tentatives. Merci de patienter un instant avant de réessayer.",
     "loginToRegister": "Se connecter pour s'inscrire",
+    "registrationBlockedPending": "Votre compte est en attente de validation. Vous pourrez vous inscrire aux événements une fois votre dossier validé par un administrateur.",
+    "registrationBlockedBanned": "Votre compte a été suspendu. Contactez l'association pour plus d'informations.",
     "register": "S'inscrire",
     "joinWaitingList": "Rejoindre la liste d'attente",
     "cancelRegistration": "Annuler mon inscription",
     "status": {
       "registered": "Inscrit(e)",
-      "waitingList": "Liste d'attente"
+      "waitingList": "Liste d'attente",
+      "cancelled": "Annulée"
     }
   },
   "dashboard": {
