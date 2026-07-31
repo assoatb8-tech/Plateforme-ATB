@@ -1,13 +1,12 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LayoutDashboard, Users, CalendarDays, Wallet, Building2 } from 'lucide-react'
+import { LayoutDashboard, Users, CalendarDays, Building2 } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
 const NAV_ITEMS = [
   { to: '/admin', end: true, icon: LayoutDashboard, labelKey: 'admin.nav.dashboard' },
   { to: '/admin/membres', end: false, icon: Users, labelKey: 'admin.nav.members' },
   { to: '/admin/evenements', end: false, icon: CalendarDays, labelKey: 'admin.nav.events' },
-  { to: '/admin/cotisations', end: false, icon: Wallet, labelKey: 'admin.nav.payments' },
   { to: '/admin/sponsors', end: false, icon: Building2, labelKey: 'admin.nav.sponsors' },
 ] as const
 

@@ -26,11 +26,7 @@ const REGISTRATION_STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
   WAITING_LIST: 'events.status.waitingList',
   CANCELLED: 'events.status.cancelled',
 }
-import {
-  USER_STATUS_TONE,
-  PAYMENT_STATUS_TONE,
-  REGISTRATION_STATUS_TONE,
-} from '@/utils/statusTones'
+import { USER_STATUS_TONE, REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
 
 export function AdminUserDetailPage() {
   const { t } = useTranslation()
@@ -193,46 +189,6 @@ export function AdminUserDetailPage() {
               label={t('memberForm.fields.profession')}
               value={user.memberProfile.profession}
             />
-          </div>
-        )}
-      </Card>
-
-      <Card className="flex flex-col gap-3">
-        <h2 className="text-base font-semibold text-slate-800">
-          {t('admin.users.detail.paymentsTitle')}
-        </h2>
-        {user.payments.length === 0 ? (
-          <p className="text-sm text-slate-500">{t('admin.users.detail.noPayments')}</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[420px] text-start text-sm">
-              <thead className="border-b border-slate-200 text-xs font-semibold uppercase tracking-wide text-slate-500">
-                <tr>
-                  <th className="py-2 pe-4">{t('admin.payments.columns.amount')}</th>
-                  <th className="py-2 pe-4">{t('admin.payments.columns.type')}</th>
-                  <th className="py-2 pe-4">{t('admin.payments.columns.status')}</th>
-                  <th className="py-2 pe-4">{t('admin.payments.columns.date')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {user.payments.map((payment) => (
-                  <tr key={payment.id} className="border-b border-slate-100 last:border-0">
-                    <td className="py-2 pe-4 text-slate-800">{payment.amount}</td>
-                    <td className="py-2 pe-4 text-slate-600">
-                      {t(`admin.payments.type.${payment.paymentType}`)}
-                    </td>
-                    <td className="py-2 pe-4">
-                      <StatusBadge tone={PAYMENT_STATUS_TONE[payment.status]}>
-                        {t(`admin.payments.status.${payment.status}`)}
-                      </StatusBadge>
-                    </td>
-                    <td className="py-2 pe-4 text-slate-500">
-                      {new Date(payment.createdAt).toLocaleDateString()}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
           </div>
         )}
       </Card>

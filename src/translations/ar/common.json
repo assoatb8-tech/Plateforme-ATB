@@ -82,13 +82,14 @@
     "register": {
       "title": "إنشاء حساب",
       "subtitle": "انضم إلى مجتمع متطوعي الجمعية التونسية للتطوع.",
+      "firstNameLabel": "الاسم الأول",
+      "lastNameLabel": "اللقب",
       "emailLabel": "البريد الإلكتروني",
       "passwordLabel": "كلمة المرور",
       "confirmPasswordLabel": "تأكيد كلمة المرور",
       "submit": "إنشاء حسابي",
       "hasAccount": "لديك حساب بالفعل؟",
       "loginLink": "تسجيل الدخول",
-      "success": "تم إنشاء الحساب! تحقق من بريدك الإلكتروني لتأكيد التسجيل.",
       "errorGeneric": "حدث خطأ. يرجى المحاولة مرة أخرى."
     },
     "forgotPassword": {
@@ -274,7 +275,6 @@
       "dashboard": "لوحة التحكم",
       "members": "الأعضاء",
       "events": "الأنشطة",
-      "payments": "الاشتراكات",
       "sponsors": "الرعاة"
     },
     "dashboard": {
@@ -284,8 +284,7 @@
         "totalMembers": "إجمالي المنخرطين",
         "newMembers": "منخرطون جدد (30 يومًا)",
         "activeEvents": "الأنشطة النشطة",
-        "totalRegistrations": "التسجيلات في الأنشطة",
-        "pendingPayments": "اشتراكات في الانتظار"
+        "totalRegistrations": "التسجيلات في الأنشطة"
       }
     },
     "users": {
@@ -322,8 +321,6 @@
         "actionError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
         "profileTitle": "معلومات الملف",
         "noProfile": "لم يتم تقديم ملف انخراط.",
-        "paymentsTitle": "سجل الاشتراكات",
-        "noPayments": "لا توجد اشتراكات مسجلة.",
         "registrationsTitle": "التسجيلات في الأنشطة",
         "noRegistrations": "لا يوجد أي تسجيل.",
         "bansTitle": "سجل الحظر"
@@ -370,48 +367,6 @@
         "submit": "إنشاء النشاط",
         "save": "حفظ التعديلات",
         "errorGeneric": "حدث خطأ. يرجى المحاولة مرة أخرى."
-      }
-    },
-    "payments": {
-      "title": "إدارة الاشتراكات",
-      "subtitle": "متابعة الاشتراكات وإنشاؤها والمصادقة عليها.",
-      "filterStatusLabel": "التصفية حسب الحالة",
-      "filterStatusAll": "كل الحالات",
-      "filterTypeLabel": "التصفية حسب النوع",
-      "filterTypeAll": "كل الأنواع",
-      "noPaymentsYet": "لا توجد أي اشتراكات مسجلة حاليًا.",
-      "actionError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
-      "validate": "مصادقة",
-      "reject": "رفض",
-      "columns": {
-        "member": "المنخرط",
-        "amount": "المبلغ",
-        "type": "النوع",
-        "status": "الحالة",
-        "date": "التاريخ",
-        "actions": "إجراءات"
-      },
-      "status": {
-        "PENDING": "في الانتظار",
-        "VALIDATED": "مصادق عليها",
-        "REJECTED": "مرفوضة"
-      },
-      "type": {
-        "MEMBERSHIP": "اشتراك",
-        "DONATION": "تبرع",
-        "OTHER": "أخرى"
-      },
-      "create": {
-        "action": "اشتراك جديد",
-        "title": "تسجيل اشتراك",
-        "memberSearchLabel": "المنخرط",
-        "memberSearchPlaceholder": "البحث بالبريد الإلكتروني أو الاسم...",
-        "noMembersFound": "لم يتم العثور على أي منخرط.",
-        "memberRequired": "يرجى اختيار منخرط.",
-        "amountLabel": "المبلغ (د.ت)",
-        "typeLabel": "النوع",
-        "cancel": "إلغاء",
-        "submit": "حفظ"
       }
     },
     "sponsors": {

@@ -62,18 +62,6 @@ enum RegistrationStatus {
   WAITING_LIST
 }
 
-enum PaymentType {
-  MEMBERSHIP
-  DONATION
-  OTHER
-}
-
-enum PaymentStatus {
-  PENDING
-  VALIDATED
-  REJECTED
-}
-
 enum DocumentType {
   PROFILE_IMAGE
   CIN_COPY
@@ -87,6 +75,8 @@ enum DocumentType {
 model User {
   id        String     @id @db.Uuid
   email     String     @unique
+  firstName String?    @map("first_name")
+  lastName  String?    @map("last_name")
   role      Role       @default(USER)
   status    UserStatus @default(PENDING)
   createdAt DateTime   @default(now()) @map("created_at")
@@ -94,8 +84,6 @@ model User {
 
   memberProfile      MemberProfile?
   eventRegistrations EventRegistration[]
-  payments           Payment[]           @relation("PaymentPayer")
-  validatedPayments  Payment[]           @relation("PaymentValidator")
   documents          Document[]
   bans               Ban[]               @relation("BannedUser")
   bansIssued         Ban[]               @relation("BanIssuer")
@@ -204,23 +192,6 @@ model EventRegistration {
   @@index([eventId])
   @@index([userId])
   @@map("event_registrations")
-}
-
-model Payment {
-  id          String        @id @default(uuid()) @db.Uuid
-  userId      String        @map("user_id") @db.Uuid
-  user        User          @relation("PaymentPayer", fields: [userId], references: [id], onDelete: Cascade)
-  amount      Decimal       @db.Decimal(10, 2)
-  paymentType PaymentType   @map("payment_type")
-  status      PaymentStatus @default(PENDING)
-  validatedBy String?       @map("validated_by") @db.Uuid
-  validator   User?         @relation("PaymentValidator", fields: [validatedBy], references: [id])
-  validatedAt DateTime?     @map("validated_at")
-  createdAt   DateTime      @default(now()) @map("created_at")
-
-  @@index([userId])
-  @@index([validatedBy])
-  @@map("payments")
 }
 
 model Document {

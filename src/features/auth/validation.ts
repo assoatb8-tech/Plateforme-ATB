@@ -11,6 +11,8 @@ export type LoginFormValues = z.infer<typeof loginSchema>
 
 export const registerSchema = z
   .object({
+    firstName: z.string().min(2, 'validation.required'),
+    lastName: z.string().min(2, 'validation.required'),
     email: z.string().email('validation.emailInvalid'),
     password: z.string().min(8, 'validation.passwordMin'),
     confirmPassword: z.string().min(8, 'validation.passwordMin'),

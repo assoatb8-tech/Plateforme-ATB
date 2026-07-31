@@ -41,6 +41,8 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
           OR: [
             { email: { contains: search, mode: 'insensitive' as const } },
             { memberProfile: { fullName: { contains: search, mode: 'insensitive' as const } } },
+            { firstName: { contains: search, mode: 'insensitive' as const } },
+            { lastName: { contains: search, mode: 'insensitive' as const } },
           ],
         }
       : {}),
@@ -55,6 +57,8 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
       select: {
         id: true,
         email: true,
+        firstName: true,
+        lastName: true,
         role: true,
         status: true,
         createdAt: true,
@@ -71,7 +75,8 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
       role: u.role,
       status: u.status,
       createdAt: u.createdAt,
-      fullName: u.memberProfile?.fullName ?? null,
+      fullName:
+        u.memberProfile?.fullName ?? ([u.firstName, u.lastName].filter(Boolean).join(' ') || null),
       phoneMobile: u.memberProfile?.phoneMobile ?? null,
     })),
     page,

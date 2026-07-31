@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next'
-import { Users, UserPlus, CalendarCheck, ClipboardList, Wallet } from 'lucide-react'
+import { Users, UserPlus, CalendarCheck, ClipboardList } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Spinner } from '@/components/ui/Spinner'
 import { useAdminStats } from '@/features/admin/dashboard/hooks/useAdminStats'
@@ -10,7 +10,6 @@ const STAT_ITEMS: Array<{ key: keyof AdminStatsDto; icon: typeof Users }> = [
   { key: 'newMembers', icon: UserPlus },
   { key: 'activeEvents', icon: CalendarCheck },
   { key: 'totalRegistrations', icon: ClipboardList },
-  { key: 'pendingPayments', icon: Wallet },
 ]
 
 export function AdminDashboardPage() {

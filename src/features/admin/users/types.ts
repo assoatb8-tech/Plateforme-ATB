@@ -1,4 +1,4 @@
-import type { PaymentStatus, PaymentType, Role, UserStatus } from '@/types/domain'
+import type { Role, UserStatus } from '@/types/domain'
 import type { RegistrationStatus } from '@/features/events/types'
 
 export interface UserListItemDto {
@@ -40,15 +40,6 @@ export interface UserDetailMemberProfileDto {
   profession: string | null
 }
 
-export interface UserDetailPaymentDto {
-  id: string
-  amount: string
-  paymentType: PaymentType
-  status: PaymentStatus
-  createdAt: string
-  validatedAt: string | null
-}
-
 export interface UserDetailRegistrationDto {
   id: string
   status: RegistrationStatus
@@ -70,7 +61,6 @@ export interface UserDetailDto {
   createdAt: string
   updatedAt: string
   memberProfile: UserDetailMemberProfileDto | null
-  payments: UserDetailPaymentDto[]
   eventRegistrations: UserDetailRegistrationDto[]
   bans: UserDetailBanDto[]
 }

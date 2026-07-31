@@ -14,9 +14,18 @@ export async function fetchCurrentUser(): Promise<CurrentUserDto> {
   return apiRequest<CurrentUserDto>('/api/auth/me')
 }
 
-export async function signUp(email: string, password: string): Promise<void> {
+export async function signUp(
+  email: string,
+  password: string,
+  firstName: string,
+  lastName: string,
+): Promise<void> {
   const supabase = await getSupabaseClient()
-  const { error } = await supabase.auth.signUp({ email, password })
+  const { error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { first_name: firstName, last_name: lastName } },
+  })
   if (error) throw error
 }
 

@@ -70,15 +70,14 @@ export default withRole(['ADMIN'], async (req, res, user) => {
 
 // --- /api/users/:id ------------------------------------------------------------
 
-// GET /api/users/:id — full detail: user + member profile + payment
-// history + registrations (+ ban history, useful context next to the
-// ban/status actions on the same admin page).
+// GET /api/users/:id — full detail: user + member profile + registrations
+// (+ ban history, useful context next to the ban/status actions on the
+// same admin page).
 async function handleGet(id: string, res: VercelResponse): Promise<void> {
   const user = await prisma.user.findUnique({
     where: { id },
     include: {
       memberProfile: true,
-      payments: { orderBy: { createdAt: 'desc' } },
       eventRegistrations: { include: { event: true }, orderBy: { registeredAt: 'desc' } },
       bans: { orderBy: { createdAt: 'desc' } },
     },

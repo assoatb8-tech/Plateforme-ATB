@@ -77,11 +77,6 @@ const AdminEventFormPage = lazy(() =>
     default: m.AdminEventFormPage,
   })),
 )
-const AdminPaymentsListPage = lazy(() =>
-  import('@/features/admin/payments/pages/AdminPaymentsListPage').then((m) => ({
-    default: m.AdminPaymentsListPage,
-  })),
-)
 const AdminSponsorsListPage = lazy(() =>
   import('@/features/admin/sponsors/pages/AdminSponsorsListPage').then((m) => ({
     default: m.AdminSponsorsListPage,
@@ -131,7 +126,6 @@ function AppRoutes() {
             <Route path="evenements" element={<AdminEventsListPage />} />
             <Route path="evenements/nouveau" element={<AdminEventFormPage />} />
             <Route path="evenements/:id/modifier" element={<AdminEventFormPage />} />
-            <Route path="cotisations" element={<AdminPaymentsListPage />} />
             <Route path="sponsors" element={<AdminSponsorsListPage />} />
           </Route>
           <Route

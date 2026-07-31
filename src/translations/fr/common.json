@@ -82,13 +82,14 @@
     "register": {
       "title": "Créer un compte",
       "subtitle": "Rejoignez la communauté des bénévoles de l'ATB.",
+      "firstNameLabel": "Prénom",
+      "lastNameLabel": "Nom",
       "emailLabel": "Adresse email",
       "passwordLabel": "Mot de passe",
       "confirmPasswordLabel": "Confirmer le mot de passe",
       "submit": "Créer mon compte",
       "hasAccount": "Déjà un compte ?",
       "loginLink": "Se connecter",
-      "success": "Compte créé ! Vérifiez votre boîte email pour confirmer votre inscription.",
       "errorGeneric": "Une erreur est survenue. Merci de réessayer."
     },
     "forgotPassword": {
@@ -274,7 +275,6 @@
       "dashboard": "Tableau de bord",
       "members": "Membres",
       "events": "Événements",
-      "payments": "Cotisations",
       "sponsors": "Sponsors"
     },
     "dashboard": {
@@ -284,8 +284,7 @@
         "totalMembers": "Adhérents au total",
         "newMembers": "Nouveaux adhérents (30 jours)",
         "activeEvents": "Événements actifs",
-        "totalRegistrations": "Inscriptions aux événements",
-        "pendingPayments": "Cotisations en attente"
+        "totalRegistrations": "Inscriptions aux événements"
       }
     },
     "users": {
@@ -322,8 +321,6 @@
         "actionError": "Une erreur est survenue. Merci de réessayer.",
         "profileTitle": "Informations du dossier",
         "noProfile": "Aucun dossier d'adhésion soumis.",
-        "paymentsTitle": "Historique des cotisations",
-        "noPayments": "Aucune cotisation enregistrée.",
         "registrationsTitle": "Inscriptions aux événements",
         "noRegistrations": "Aucune inscription.",
         "bansTitle": "Historique des bannissements"
@@ -370,48 +367,6 @@
         "submit": "Créer l'événement",
         "save": "Enregistrer les modifications",
         "errorGeneric": "Une erreur est survenue. Merci de réessayer."
-      }
-    },
-    "payments": {
-      "title": "Gestion des cotisations",
-      "subtitle": "Suivre, créer et valider les cotisations des adhérents.",
-      "filterStatusLabel": "Filtrer par statut",
-      "filterStatusAll": "Tous les statuts",
-      "filterTypeLabel": "Filtrer par type",
-      "filterTypeAll": "Tous les types",
-      "noPaymentsYet": "Aucune cotisation enregistrée pour le moment.",
-      "actionError": "Une erreur est survenue. Merci de réessayer.",
-      "validate": "Valider",
-      "reject": "Refuser",
-      "columns": {
-        "member": "Adhérent",
-        "amount": "Montant",
-        "type": "Type",
-        "status": "Statut",
-        "date": "Date",
-        "actions": "Actions"
-      },
-      "status": {
-        "PENDING": "En attente",
-        "VALIDATED": "Validée",
-        "REJECTED": "Refusée"
-      },
-      "type": {
-        "MEMBERSHIP": "Cotisation",
-        "DONATION": "Don",
-        "OTHER": "Autre"
-      },
-      "create": {
-        "action": "Nouvelle cotisation",
-        "title": "Enregistrer une cotisation",
-        "memberSearchLabel": "Adhérent",
-        "memberSearchPlaceholder": "Rechercher par email ou nom...",
-        "noMembersFound": "Aucun adhérent trouvé.",
-        "memberRequired": "Veuillez sélectionner un adhérent.",
-        "amountLabel": "Montant (TND)",
-        "typeLabel": "Type",
-        "cancel": "Annuler",
-        "submit": "Enregistrer"
       }
     },
     "sponsors": {

@@ -69,10 +69,10 @@ export function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200 bg-surface/95 backdrop-blur">
-      <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
+      <nav className="mx-auto grid h-16 max-w-6xl grid-cols-[1fr_auto_1fr] items-center gap-4 px-4 sm:px-6">
         <Link
           to="/"
-          className="flex shrink-0 items-center gap-2.5"
+          className="flex shrink-0 items-center gap-2.5 justify-self-start"
           onClick={() => setMobileOpen(false)}
         >
           <img src="/logo.jpeg" alt={t('app.name')} className="h-11 w-11 rounded-full" />
@@ -83,19 +83,20 @@ export function Navbar() {
 
         {/* Below 1024px this collapses into the hamburger drawer instead of
             squeezing onto one row — tablet gets the same clean treatment as
-            mobile rather than a cramped horizontal nav. Left-clustered next
-            to the logo rather than centered — the link count varies by role
-            (2 for a guest, up to 5 for an admin), so centering would shift
-            the whole cluster around depending on who's looking. */}
-        <div className="hidden flex-1 items-center gap-8 lg:flex">
+            mobile rather than a cramped horizontal nav. The center grid
+            column hugs its own content and sits at the true middle of the
+            bar regardless of how many links it holds (2 for a guest, up to
+            5 for an admin) — the two 1fr side columns absorb the width
+            difference instead of the links shifting around. */}
+        <div className="hidden items-center gap-8 lg:flex">
           <NavLinks
             user={user}
-            linkClassName="text-sm font-medium text-slate-600 transition-colors hover:text-primary"
+            linkClassName="whitespace-nowrap text-sm font-medium text-slate-600 transition-colors hover:text-primary"
             activeLinkClassName="text-primary"
           />
         </div>
 
-        <div className="flex shrink-0 items-center gap-3">
+        <div className="flex shrink-0 items-center gap-3 justify-self-end">
           <LanguageSwitcher />
           <div className="hidden items-center gap-3 lg:flex">
             {user ? (

@@ -2,17 +2,17 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Card } from '@/components/ui/Card'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { registerSchema, type RegisterFormValues } from '@/features/auth/validation'
-import { signUp } from '@/features/auth/services/authService'
+import { signUp, fetchCurrentUser } from '@/features/auth/services/authService'
 
 export function RegisterPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [formError, setFormError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
 
   const {
     register,
@@ -23,26 +23,22 @@ export function RegisterPage() {
   async function onSubmit(values: RegisterFormValues) {
     setFormError(null)
     try {
-      await signUp(values.email, values.password)
-      setSuccess(true)
+      await signUp(values.email, values.password, values.firstName, values.lastName)
     } catch {
       setFormError(t('auth.register.errorGeneric'))
+      return
     }
-  }
 
-  if (success) {
-    return (
-      <Card className="text-center">
-        <h1 className="text-2xl font-semibold text-slate-900">{t('auth.register.title')}</h1>
-        <p className="mt-4 text-sm text-slate-600">{t('auth.register.success')}</p>
-        <Link
-          to="/connexion"
-          className="mt-6 inline-block text-sm font-medium text-primary hover:underline"
-        >
-          {t('auth.login.title')}
-        </Link>
-      </Card>
-    )
+    // No email confirmation step — signUp() returns an already-active
+    // session, so continue straight into onboarding like LoginPage does.
+    // A brand-new account never has a profile yet, but reuse the same
+    // hasProfile check for consistency and the same failure fallback.
+    try {
+      const currentUser = await fetchCurrentUser()
+      navigate(currentUser.hasProfile ? '/' : '/dossier-adhesion')
+    } catch {
+      navigate('/dossier-adhesion')
+    }
   }
 
   return (
@@ -51,6 +47,22 @@ export function RegisterPage() {
       <p className="mt-1 text-sm text-slate-500">{t('auth.register.subtitle')}</p>
 
       <form onSubmit={handleSubmit(onSubmit)} className="mt-6 flex flex-col gap-4" noValidate>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Input
+            autoComplete="given-name"
+            required
+            label={t('auth.register.firstNameLabel')}
+            error={errors.firstName && t(errors.firstName.message ?? 'validation.required')}
+            {...register('firstName')}
+          />
+          <Input
+            autoComplete="family-name"
+            required
+            label={t('auth.register.lastNameLabel')}
+            error={errors.lastName && t(errors.lastName.message ?? 'validation.required')}
+            {...register('lastName')}
+          />
+        </div>
         <Input
           type="email"
           autoComplete="email"
