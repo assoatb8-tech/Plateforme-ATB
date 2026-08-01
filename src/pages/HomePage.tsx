@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { HeartHandshake, ShieldCheck, Users, Sparkles, Quote } from 'lucide-react'
+import { HeartHandshake, ShieldCheck, Users, Sparkles } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { useAuth } from '@/features/auth/hooks/useAuth'
@@ -18,7 +18,9 @@ export function HomePage() {
       <section className="bg-gradient-to-b from-primary/5 to-background">
         <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 py-20 text-center sm:px-6">
           <img src="/logo.jpeg" alt={t('app.name')} className="h-24 w-24 rounded-full shadow-sm" />
-          <h1 className="text-4xl font-bold text-slate-900 sm:text-5xl">{t('home.hero.title')}</h1>
+          <h1 className="whitespace-pre-line text-4xl font-bold text-slate-900 sm:text-5xl">
+            {t('home.motto.text')}
+          </h1>
           <p className="max-w-2xl text-base text-slate-600 sm:text-lg">{t('home.hero.subtitle')}</p>
           <div className="flex flex-wrap items-center justify-center gap-3">
             {user ? (
@@ -34,15 +36,6 @@ export function HomePage() {
               <Button variant="ghost">{t('home.hero.ctaSecondary')}</Button>
             </Link>
           </div>
-        </div>
-      </section>
-
-      <section className="bg-primary/5 py-16">
-        <div className="mx-auto max-w-2xl px-4 text-center sm:px-6">
-          <Quote size={32} className="mx-auto mb-4 text-secondary" aria-hidden="true" />
-          <p className="whitespace-pre-line text-xl font-medium italic leading-relaxed text-slate-800 sm:text-2xl">
-            {t('home.motto.text')}
-          </p>
         </div>
       </section>
 
