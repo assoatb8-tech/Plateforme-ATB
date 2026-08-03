@@ -2,9 +2,10 @@
 
 Ce guide accompagne l'audit QA du 2026-07-31, mis à jour le 2026-08-03
 après l'ajout de la page Bureau, de la liste des participants par
-événement et de la nouvelle animation de chargement. Les identifiants
-des deux comptes permanents sont dans `PRODUCTION_CREDENTIALS.md` (non
-versionné, à la racine du projet).
+événement, des chargements en squelette (skeleton loaders), de la photo
+de profil obligatoire et des noms bilingues (français/arabe). Les
+identifiants des deux comptes permanents sont dans
+`PRODUCTION_CREDENTIALS.md` (non versionné, à la racine du projet).
 
 URL de production : https://plateforme-atb.vercel.app
 
@@ -61,9 +62,10 @@ URL de production : https://plateforme-atb.vercel.app
 
 ### 6bis. Gestion du Bureau (الهيئة المديرة)
 - **Action** : aller sur `/admin/bureau`, cliquer "Ajouter un membre".
-- **Remplir** : prénom, nom, téléphone, email, lien Facebook (URL complète, ex. `https://facebook.com/...`).
-- **Résultat attendu** : le membre apparaît dans la grille admin, avec un bouton de suppression.
-- **Vérifier** : le membre apparaît immédiatement sur la page publique `/bureau`, avec ses liens téléphone (`tel:`), email (`mailto:`) et Facebook fonctionnels.
+- **Remplir** : photo (obligatoire, JPG/PNG/WEBP, max 2 Mo), prénom, nom, téléphone, email, lien Facebook (URL complète, ex. `https://facebook.com/...`).
+- **Vérifier** : impossible de soumettre sans avoir choisi une photo (message d'erreur affiché).
+- **Résultat attendu** : le membre apparaît dans la grille admin avec sa photo, avec un bouton de suppression.
+- **Vérifier** : le membre apparaît immédiatement sur la page publique `/bureau` avec sa photo, ses liens téléphone (`tel:`), email (`mailto:`) et Facebook fonctionnels.
 - **Action** : supprimer le membre depuis `/admin/bureau`.
 - **Résultat attendu** : confirmation demandée, puis disparition immédiate de la grille admin et de `/bureau`.
 - **Vérifier l'état vide** : sans aucun membre, `/bureau` affiche un message clair plutôt qu'une page cassée.
@@ -86,8 +88,10 @@ URL de production : https://plateforme-atb.vercel.app
 - **Résultat attendu** : compte créé, connexion automatique immédiate (pas d'email de confirmation à attendre), redirection vers `/dossier-adhesion`.
 
 ### 2. Dossier d'adhésion
-- **Action** : remplir les 8 étapes du formulaire (nom et prénom, adresse, téléphone mobile, et la case de déclaration sont obligatoires — le reste est optionnel).
-- **Résultat attendu** : à chaque étape, "Suivant" avance si les champs obligatoires sont remplis, sinon un message d'erreur apparaît sous le champ concerné.
+- **Action** : à l'étape 1, essayer d'avancer sans choisir de photo de profil.
+- **Résultat attendu** : message d'erreur "La photo de profil est obligatoire.", impossible de passer à l'étape suivante.
+- **Action** : choisir une photo (JPG ou PNG), puis remplir les 8 étapes du formulaire — photo, prénom et nom **en français**, prénom et nom **en arabe**, adresse, téléphone mobile, et la case de déclaration sont obligatoires ; le reste est optionnel.
+- **Résultat attendu** : à chaque étape, "Suivant" avance si les champs obligatoires sont remplis, sinon un message d'erreur apparaît sous le champ concerné. Un aperçu circulaire de la photo s'affiche après le téléversement.
 - **Action** : soumettre à la dernière étape ("Envoyer mon dossier").
 - **Résultat attendu** : page de confirmation "Dossier envoyé", statut du compte reste "En attente de validation" jusqu'à validation par un administrateur.
 
@@ -104,8 +108,9 @@ URL de production : https://plateforme-atb.vercel.app
 
 ### 5. Mon profil
 - **Action** : aller sur `/mon-profil`.
-- **Résultat attendu** : toutes les informations soumises dans le dossier d'adhésion sont pré-remplies et modifiables. Bouton "Enregistrer les modifications" fonctionnel.
+- **Résultat attendu** : toutes les informations soumises dans le dossier d'adhésion sont pré-remplies et modifiables, y compris la photo (aperçu affiché) et les 4 champs de nom (FR/AR). Bouton "Enregistrer les modifications" fonctionnel.
 - **Vérifier** : aucune section de téléversement de certificat n'apparaît (le champ "Diplômes et certificats de secourisme" est un champ texte libre, pas un envoi de fichier).
+- **Vérifier les chargements** : au premier affichage de `/mon-profil`, `/evenements`, `/admin/membres`, etc., un placeholder gris animé (skeleton) apparaît brièvement à la place du contenu, plutôt que les trois points animés — ces derniers n'apparaissent plus que lors d'un changement de route ou d'un clic sur un bouton d'action (ex. "Enregistrer").
 
 ### 6. Mes participations
 - **Action** : depuis le tableau de bord, cliquer "Toutes mes participations".
@@ -134,5 +139,15 @@ via `/admin/bureau`), liste des participants par événement pour les
 admins, nouvelle animation de chargement ("shadows"), renommage du
 projet en "Association Tunisienne Bénévolat", et lien "Nous contacter"
 du footer redirigé vers `/bureau`.
+
+Mise à jour du 2026-08-03 (suite) : chargements en squelette (skeleton
+loaders) pour les listes/tableaux, photo de profil obligatoire pour le
+dossier d'adhésion (stockée de façon privée, visible par l'adhérent et
+les admins uniquement), nom et prénom désormais saisis séparément en
+français ET en arabe, photo obligatoire pour les membres du Bureau
+(publique, visible sur `/bureau`). Les 5 profils membres existants ont
+été répartis automatiquement entre les champs FR/AR selon l'écriture
+détectée — les administrateurs sont invités à vérifier/compléter la
+langue manquante sur `/admin/membres/:id` au besoin.
 
 Aucun problème connu à ce jour.
