@@ -10,6 +10,7 @@ export const bureauMemberCreateSchema = z.object({
   phone: z.string().regex(phoneRegex),
   email: z.string().email(),
   facebookUrl: z.string().url(),
+  photoUrl: z.string().url(),
 })
 
 export type BureauMemberCreateInput = z.infer<typeof bureauMemberCreateSchema>

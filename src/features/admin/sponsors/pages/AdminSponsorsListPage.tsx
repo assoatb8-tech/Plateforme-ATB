@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { useSponsors } from '@/features/sponsors/hooks/useSponsors'
 import {
   useCreateSponsor,
@@ -104,7 +104,7 @@ export function AdminSponsorsListPage() {
 
       {actionError && <p className="text-sm text-error">{actionError}</p>}
 
-      {isLoading && <Spinner label={t('admin.loading')} />}
+      {isLoading && <SkeletonCards count={3} />}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
       {!isLoading && !isError && sponsors && sponsors.length === 0 && (

@@ -7,12 +7,13 @@ import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { useAdminUsersList } from '@/features/admin/users/hooks/useAdminUsers'
 import { USER_STATUS_TONE } from '@/utils/statusTones'
+import { resolveMemberDisplayName } from '@/utils/displayName'
 
 export function AdminUsersListPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
@@ -65,7 +66,11 @@ export function AdminUsersListPage() {
         </Button>
       </form>
 
-      {isLoading && <Spinner label={t('admin.loading')} />}
+      {isLoading && (
+        <Card className="p-4">
+          <SkeletonRows count={5} />
+        </Card>
+      )}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
       {!isLoading && !isError && data && data.users.length === 0 && (
@@ -97,7 +102,7 @@ export function AdminUsersListPage() {
                         to={`/admin/membres/${user.id}`}
                         className="font-medium text-primary hover:underline"
                       >
-                        {user.fullName ?? t('admin.users.noName')}
+                        {resolveMemberDisplayName(user, i18n.language) || t('admin.users.noName')}
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-slate-600">{user.email}</td>

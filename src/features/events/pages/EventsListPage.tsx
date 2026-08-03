@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { CalendarX, Search } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { EventCard } from '@/features/events/components/EventCard'
 import { useEventsList } from '@/features/events/hooks/useEvents'
 import type { EventTense } from '@/features/events/types'
@@ -85,7 +85,7 @@ export function EventsListPage() {
         </form>
       </div>
 
-      {isLoading && <Spinner label={t('events.loading')} />}
+      {isLoading && <SkeletonCards count={6} />}
 
       {isError && <p className="text-sm text-error">{t('events.errorGeneric')}</p>}
 

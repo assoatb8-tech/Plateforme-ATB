@@ -4,7 +4,7 @@ import { Calendar, Facebook, MapPin, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { ApiError } from '@/services/apiClient'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import {
@@ -26,7 +26,7 @@ export function EventDetailPage() {
   if (isLoading) {
     return (
       <div className="mx-auto max-w-3xl px-4 py-16">
-        <Spinner label={t('events.loading')} />
+        <SkeletonRows count={6} />
       </div>
     )
   }

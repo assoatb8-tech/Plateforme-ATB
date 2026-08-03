@@ -24,8 +24,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 }
 
 // GET /api/users — ADMIN. Paginated list, searchable by email or member
-// full name, filterable by status. Joins MemberProfile for display purposes
-// only (fullName/phoneMobile) — full detail lives behind GET /api/users/:id.
+// name (either language), filterable by status. Joins MemberProfile for
+// display purposes only (name fields/phoneMobile) — full detail lives
+// behind GET /api/users/:id.
 async function handleList(req: VercelRequest, res: VercelResponse): Promise<void> {
   const page = Math.max(1, Number(firstParam(req.query.page)) || 1)
   const search = firstParam(req.query.search)?.trim() ?? ''
@@ -40,7 +41,10 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
       ? {
           OR: [
             { email: { contains: search, mode: 'insensitive' as const } },
-            { memberProfile: { fullName: { contains: search, mode: 'insensitive' as const } } },
+            { memberProfile: { firstNameFr: { contains: search, mode: 'insensitive' as const } } },
+            { memberProfile: { lastNameFr: { contains: search, mode: 'insensitive' as const } } },
+            { memberProfile: { firstNameAr: { contains: search, mode: 'insensitive' as const } } },
+            { memberProfile: { lastNameAr: { contains: search, mode: 'insensitive' as const } } },
             { firstName: { contains: search, mode: 'insensitive' as const } },
             { lastName: { contains: search, mode: 'insensitive' as const } },
           ],
@@ -62,7 +66,15 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
         role: true,
         status: true,
         createdAt: true,
-        memberProfile: { select: { fullName: true, phoneMobile: true } },
+        memberProfile: {
+          select: {
+            firstNameFr: true,
+            lastNameFr: true,
+            firstNameAr: true,
+            lastNameAr: true,
+            phoneMobile: true,
+          },
+        },
       },
     }),
     prisma.user.count({ where }),
@@ -75,8 +87,10 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
       role: u.role,
       status: u.status,
       createdAt: u.createdAt,
-      fullName:
-        u.memberProfile?.fullName ?? ([u.firstName, u.lastName].filter(Boolean).join(' ') || null),
+      firstNameFr: u.memberProfile?.firstNameFr || u.firstName || null,
+      lastNameFr: u.memberProfile?.lastNameFr || u.lastName || null,
+      firstNameAr: u.memberProfile?.firstNameAr || u.firstName || null,
+      lastNameAr: u.memberProfile?.lastNameAr || u.lastName || null,
       phoneMobile: u.memberProfile?.phoneMobile ?? null,
     })),
     page,

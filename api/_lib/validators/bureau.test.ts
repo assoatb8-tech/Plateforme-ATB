@@ -7,6 +7,7 @@ const validMember = {
   phone: '21234567',
   email: 'amine@example.com',
   facebookUrl: 'https://facebook.com/amine.bensalah',
+  photoUrl: 'https://example.supabase.co/storage/v1/object/public/bureau-photos/photo.jpg',
 }
 
 describe('bureauMemberCreateSchema', () => {
@@ -53,5 +54,10 @@ describe('bureauMemberCreateSchema', () => {
   it('rejects a missing field', () => {
     const { email: _omit, ...withoutEmail } = validMember
     expect(bureauMemberCreateSchema.safeParse(withoutEmail).success).toBe(false)
+  })
+
+  it('rejects a non-URL photoUrl', () => {
+    const result = bureauMemberCreateSchema.safeParse({ ...validMember, photoUrl: 'not-a-url' })
+    expect(result.success).toBe(false)
   })
 })

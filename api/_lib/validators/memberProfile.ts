@@ -33,7 +33,11 @@ function optionalEnum<const T extends [string, ...string[]]>(values: T) {
 }
 
 export const memberProfileInputSchema = z.object({
-  fullName: sanitizedText(2),
+  firstNameFr: sanitizedText(2),
+  lastNameFr: sanitizedText(2),
+  firstNameAr: sanitizedText(2),
+  lastNameAr: sanitizedText(2),
+  photoUrl: z.string().min(1),
   gender: optionalEnum(['MALE', 'FEMALE']),
   fatherName: optionalSanitizedText,
   grandfatherName: optionalSanitizedText,

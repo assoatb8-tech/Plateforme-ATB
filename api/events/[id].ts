@@ -295,7 +295,15 @@ async function handleParticipants(eventId: string, res: VercelResponse): Promise
         select: {
           id: true,
           email: true,
-          memberProfile: { select: { fullName: true, phoneMobile: true } },
+          memberProfile: {
+            select: {
+              firstNameFr: true,
+              lastNameFr: true,
+              firstNameAr: true,
+              lastNameAr: true,
+              phoneMobile: true,
+            },
+          },
         },
       },
     },

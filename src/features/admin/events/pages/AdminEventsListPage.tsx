@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Modal } from '@/components/ui/Modal'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { useAdminEventsList, useDeleteEvent } from '@/features/admin/events/hooks/useAdminEvents'
 import { EVENT_STATUS_TONE } from '@/utils/statusTones'
 
@@ -72,7 +72,11 @@ export function AdminEventsListPage() {
 
       {actionError && <p className="text-sm text-error">{actionError}</p>}
 
-      {isLoading && <Spinner label={t('admin.loading')} />}
+      {isLoading && (
+        <Card className="p-4">
+          <SkeletonRows count={5} />
+        </Card>
+      )}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
       {!isLoading && !isError && data && data.events.length === 0 && (

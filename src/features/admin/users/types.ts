@@ -7,7 +7,10 @@ export interface UserListItemDto {
   role: Role
   status: UserStatus
   createdAt: string
-  fullName: string | null
+  firstNameFr: string | null
+  lastNameFr: string | null
+  firstNameAr: string | null
+  lastNameAr: string | null
   phoneMobile: string | null
 }
 
@@ -32,7 +35,11 @@ export interface UserSummaryDto {
 // API response includes every column (api/users/[id].ts does `memberProfile:
 // true`), this type only declares what the page actually renders.
 export interface UserDetailMemberProfileDto {
-  fullName: string
+  firstNameFr: string
+  lastNameFr: string
+  firstNameAr: string
+  lastNameAr: string
+  photoUrl: string | null
   phoneMobile: string
   contactEmail: string | null
   cinNumber: string | null

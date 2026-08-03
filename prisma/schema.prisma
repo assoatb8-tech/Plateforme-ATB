@@ -105,7 +105,11 @@ model MemberProfile {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Section 1 — Informations personnelles (MEMBER_FORM.md)
-  fullName        String  @map("full_name")
+  firstNameFr     String  @map("first_name_fr")
+  lastNameFr      String  @map("last_name_fr")
+  firstNameAr     String  @map("first_name_ar")
+  lastNameAr      String  @map("last_name_ar")
+  photoUrl        String? @map("photo_url")
   gender          Gender?
   fatherName      String? @map("father_name")
   grandfatherName String? @map("grandfather_name")
@@ -258,6 +262,7 @@ model BureauMember {
   phone       String
   email       String
   facebookUrl String   @map("facebook_url")
+  photoUrl    String   @map("photo_url")
   createdAt   DateTime @default(now()) @map("created_at")
 
   @@index([createdAt])

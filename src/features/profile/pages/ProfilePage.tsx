@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next'
 import { useQuery } from '@tanstack/react-query'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { fetchCurrentUser } from '@/features/auth/services/authService'
 import {
   memberFormSchema,
@@ -82,8 +82,8 @@ export function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="mx-auto flex max-w-2xl justify-center px-4 py-16">
-        <Spinner label={t('dashboard.loading')} />
+      <div className="mx-auto max-w-2xl px-4 py-16">
+        <SkeletonRows count={6} />
       </div>
     )
   }

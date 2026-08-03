@@ -1,9 +1,10 @@
 # Guide de test manuel — ATB
 
-Ce guide accompagne l'audit QA du 2026-07-31 (mis à jour le même jour
-après l'ajout de la promotion administrateur et la correction de deux
-bugs mineurs). Les identifiants des deux comptes permanents sont dans
-`PRODUCTION_CREDENTIALS.md` (non versionné, à la racine du projet).
+Ce guide accompagne l'audit QA du 2026-07-31, mis à jour le 2026-08-03
+après l'ajout de la page Bureau, de la liste des participants par
+événement et de la nouvelle animation de chargement. Les identifiants
+des deux comptes permanents sont dans `PRODUCTION_CREDENTIALS.md` (non
+versionné, à la racine du projet).
 
 URL de production : https://plateforme-atb.vercel.app
 
@@ -45,6 +46,11 @@ URL de production : https://plateforme-atb.vercel.app
 - **Action** : modifier l'événement, changer une date pour le passé.
 - **Résultat attendu** : l'événement bascule automatiquement dans l'onglet "Précédents" côté public, et les boutons d'inscription disparaissent sur sa page détail.
 
+### 5bis. Participants d'un événement
+- **Action** : sur `/admin/evenements`, cliquer le bouton "Participants" (icône personnes) d'un événement qui a au moins une inscription.
+- **Résultat attendu** : page avec le titre de l'événement et un tableau des inscrits (Nom, Téléphone, Email, Statut, Date d'inscription).
+- **Vérifier** : un événement sans inscription affiche un état vide clair plutôt qu'un tableau cassé ; le lien "Retour" ramène à `/admin/evenements`.
+
 ### 6. Gestion des sponsors
 - **Action** : aller sur `/admin/sponsors`, cliquer "Ajouter un sponsor".
 - **Remplir** : nom + sélectionner un fichier image (PNG/JPEG/WEBP/SVG, max 2 Mo) — pas de champ URL, uniquement un vrai sélecteur de fichier.
@@ -52,6 +58,16 @@ URL de production : https://plateforme-atb.vercel.app
 - **Vérifier** : le sponsor apparaît sur la page d'accueil publique, dans un bandeau défilant "Nos partenaires" (section entièrement masquée s'il n'y a aucun sponsor).
 - **Action** : supprimer le sponsor.
 - **Résultat attendu** : confirmation demandée, puis disparition immédiate de la liste et de la page d'accueil.
+
+### 6bis. Gestion du Bureau (الهيئة المديرة)
+- **Action** : aller sur `/admin/bureau`, cliquer "Ajouter un membre".
+- **Remplir** : prénom, nom, téléphone, email, lien Facebook (URL complète, ex. `https://facebook.com/...`).
+- **Résultat attendu** : le membre apparaît dans la grille admin, avec un bouton de suppression.
+- **Vérifier** : le membre apparaît immédiatement sur la page publique `/bureau`, avec ses liens téléphone (`tel:`), email (`mailto:`) et Facebook fonctionnels.
+- **Action** : supprimer le membre depuis `/admin/bureau`.
+- **Résultat attendu** : confirmation demandée, puis disparition immédiate de la grille admin et de `/bureau`.
+- **Vérifier l'état vide** : sans aucun membre, `/bureau` affiche un message clair plutôt qu'une page cassée.
+- **Vérifier le lien du footer** : sur n'importe quelle page publique, le lien "Nous contacter" du pied de page redirige vers `/bureau`.
 
 ### 7. Vérification des permissions
 - **Action** : se déconnecter, se connecter avec le compte adhérent, essayer d'accéder directement à `/admin`.
@@ -112,5 +128,11 @@ jour et sont couverts par des tests automatisés (`npm test`) :
 - La redirection systématique d'un compte Administrateur vers le dossier
   d'adhésion — corrigé (un compte ADMIN n'est plus jamais redirigé vers
   ce formulaire).
+
+Mise à jour du 2026-08-03 : nouvelle page publique Bureau (gestion admin
+via `/admin/bureau`), liste des participants par événement pour les
+admins, nouvelle animation de chargement ("shadows"), renommage du
+projet en "Association Tunisienne Bénévolat", et lien "Nous contacter"
+du footer redirigé vers `/bureau`.
 
 Aucun problème connu à ce jour.

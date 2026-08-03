@@ -10,7 +10,7 @@ import { Select } from '@/components/ui/Select'
 import { Textarea } from '@/components/ui/Textarea'
 import { Modal } from '@/components/ui/Modal'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import {
   useAdminUser,
   useBanUser,
@@ -29,9 +29,10 @@ const REGISTRATION_STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
   CANCELLED: 'events.status.cancelled',
 }
 import { USER_STATUS_TONE, REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
+import { resolveMemberDisplayName } from '@/utils/displayName'
 
 export function AdminUserDetailPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const [banModalOpen, setBanModalOpen] = useState(false)
@@ -94,7 +95,7 @@ export function AdminUserDetailPage() {
   }
 
   if (isLoading) {
-    return <Spinner label={t('admin.loading')} />
+    return <SkeletonRows count={8} className="flex flex-col gap-4" />
   }
 
   if (isError || !user) {
@@ -112,7 +113,8 @@ export function AdminUserDetailPage() {
           {t('admin.users.detail.back')}
         </Link>
         <h1 className="text-2xl font-semibold text-slate-900">
-          {user.memberProfile?.fullName ?? user.email}
+          {(user.memberProfile && resolveMemberDisplayName(user.memberProfile, i18n.language)) ||
+            user.email}
         </h1>
       </div>
 

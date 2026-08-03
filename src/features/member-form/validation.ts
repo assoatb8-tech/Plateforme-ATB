@@ -27,12 +27,17 @@ function optionalEnum<const T extends [string, ...string[]]>(values: T) {
   return z.preprocess(emptyToUndefined, z.enum(values).optional())
 }
 
-// Field order mirrors MEMBER_FORM.md's 10 sections exactly — only fullName,
-// address, phoneMobile and declarationAccepted are marked "Obligatoire" in
-// the doc, everything else is optional.
+// Field order mirrors MEMBER_FORM.md's 10 sections exactly — firstNameFr,
+// lastNameFr, firstNameAr, lastNameAr, photoUrl, address, phoneMobile and
+// declarationAccepted are marked "Obligatoire" in the doc, everything else
+// is optional.
 export const memberFormSchema = z.object({
   // Section 1 — Informations personnelles
-  fullName: z.string().min(2, 'validation.required'),
+  firstNameFr: z.string().min(2, 'validation.required'),
+  lastNameFr: z.string().min(2, 'validation.required'),
+  firstNameAr: z.string().min(2, 'validation.required'),
+  lastNameAr: z.string().min(2, 'validation.required'),
+  photoUrl: z.string().min(1, 'validation.photoRequired'),
   gender: optionalEnum(['MALE', 'FEMALE']),
   fatherName: z.string().optional(),
   grandfatherName: z.string().optional(),
@@ -105,7 +110,11 @@ export const memberFormSchema = z.object({
 export type MemberFormValues = z.infer<typeof memberFormSchema>
 
 export const memberFormDefaultValues: MemberFormValues = {
-  fullName: '',
+  firstNameFr: '',
+  lastNameFr: '',
+  firstNameAr: '',
+  lastNameAr: '',
+  photoUrl: '',
   gender: undefined,
   fatherName: '',
   grandfatherName: '',
@@ -155,7 +164,17 @@ export const stepLabelKeys = [
 ] as const
 
 export const stepFields: Record<number, (keyof MemberFormValues)[]> = {
-  1: ['fullName', 'gender', 'fatherName', 'grandfatherName', 'motherFullName'],
+  1: [
+    'firstNameFr',
+    'lastNameFr',
+    'firstNameAr',
+    'lastNameAr',
+    'photoUrl',
+    'gender',
+    'fatherName',
+    'grandfatherName',
+    'motherFullName',
+  ],
   2: ['birthDate', 'birthPlace', 'cinNumber', 'cinIssuedPlace', 'cinIssueDate'],
   3: ['address', 'phoneHome', 'phoneMobile', 'contactEmail'],
   4: ['maritalStatus', 'childrenCount', 'bloodType', 'educationLevel'],

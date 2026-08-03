@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Facebook, Mail, Phone, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { useBureauMembers } from '@/features/bureau/hooks/useBureau'
 
 export function BureauPage() {
@@ -15,11 +15,7 @@ export function BureauPage() {
         <p className="mt-1 text-sm text-slate-500">{t('bureau.subtitle')}</p>
       </div>
 
-      {isLoading && (
-        <div className="flex justify-center">
-          <Spinner label={t('bureau.loading')} />
-        </div>
-      )}
+      {isLoading && <SkeletonCards count={3} />}
       {isError && <p className="text-center text-sm text-error">{t('bureau.errorGeneric')}</p>}
 
       {!isLoading && !isError && members && members.length === 0 && (
@@ -33,6 +29,7 @@ export function BureauPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {members.map((member) => (
             <Card key={member.id} className="flex flex-col items-center gap-2 text-center">
+              <img src={member.photoUrl} alt="" className="h-20 w-20 rounded-full object-cover" />
               <h2 className="text-base font-semibold text-slate-900">
                 {member.firstName} {member.lastName}
               </h2>

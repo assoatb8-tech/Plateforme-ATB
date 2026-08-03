@@ -8,7 +8,11 @@ import type { MemberFormValues } from '@/features/member-form/validation'
 export interface MemberProfileDto {
   id: string
   userId: string
-  fullName: string
+  firstNameFr: string
+  lastNameFr: string
+  firstNameAr: string
+  lastNameAr: string
+  photoUrl: string | null
   gender: 'MALE' | 'FEMALE' | null
   fatherName: string | null
   grandfatherName: string | null
@@ -60,7 +64,11 @@ function toDateInputValue(value: string | null): string {
 
 export function profileToFormValues(profile: MemberProfileDto): MemberFormValues {
   return {
-    fullName: profile.fullName,
+    firstNameFr: profile.firstNameFr,
+    lastNameFr: profile.lastNameFr,
+    firstNameAr: profile.firstNameAr,
+    lastNameAr: profile.lastNameAr,
+    photoUrl: profile.photoUrl ?? '',
     gender: profile.gender ?? undefined,
     fatherName: profile.fatherName ?? '',
     grandfatherName: profile.grandfatherName ?? '',

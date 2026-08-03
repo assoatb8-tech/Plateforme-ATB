@@ -9,7 +9,13 @@ export interface EventParticipantDto {
   user: {
     id: string
     email: string
-    memberProfile: { fullName: string; phoneMobile: string } | null
+    memberProfile: {
+      firstNameFr: string
+      lastNameFr: string
+      firstNameAr: string
+      lastNameAr: string
+      phoneMobile: string
+    } | null
   }
 }
 

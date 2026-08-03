@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { EventForm } from '@/features/admin/events/components/EventForm'
 import {
   useAdminEvent,
@@ -38,7 +38,7 @@ export function AdminEventFormPage() {
   }
 
   if (isEditMode && isLoading) {
-    return <Spinner label={t('admin.loading')} />
+    return <SkeletonRows count={6} className="flex flex-col gap-4" />
   }
 
   if (isEditMode && (isError || !event)) {

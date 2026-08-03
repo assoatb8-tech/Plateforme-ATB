@@ -136,7 +136,8 @@
     "cinInvalid": "Numéro de CIN invalide (8 chiffres).",
     "invalidDate": "Date invalide.",
     "invalidUrl": "Lien invalide.",
-    "declarationRequired": "Vous devez certifier l'exactitude des informations fournies."
+    "declarationRequired": "Vous devez certifier l'exactitude des informations fournies.",
+    "photoRequired": "La photo de profil est obligatoire."
   },
   "memberForm": {
     "title": "Dossier d'adhésion",
@@ -159,7 +160,11 @@
       "declaration": "Déclaration"
     },
     "fields": {
-      "fullName": "Nom et prénom",
+      "photo": "Photo de profil",
+      "firstNameFr": "Prénom (français)",
+      "lastNameFr": "Nom (français)",
+      "firstNameAr": "Prénom (arabe)",
+      "lastNameAr": "Nom (arabe)",
       "gender": "Sexe",
       "fatherName": "Nom du père",
       "grandfatherName": "Nom du grand-père",
@@ -267,7 +272,11 @@
     "universalAdminNoProfileNeeded": "Ce compte administrateur universel n'a pas besoin de dossier d'adhésion.",
     "save": "Enregistrer les modifications",
     "saveSuccess": "Votre profil a été mis à jour.",
-    "errorGeneric": "Une erreur est survenue. Merci de réessayer."
+    "errorGeneric": "Une erreur est survenue. Merci de réessayer.",
+    "photoUploading": "Téléversement de la photo...",
+    "photoUploadError": "Échec du téléversement de la photo. Merci de réessayer.",
+    "photoInvalidType": "Format non pris en charge (JPG ou PNG uniquement).",
+    "photoTooLarge": "Le fichier dépasse la taille maximale autorisée (5 Mo)."
   },
   "participations": {
     "title": "Mes participations",
@@ -430,9 +439,14 @@
       "deleteConfirmText": "Cette action est irréversible. Le membre sera retiré de la page Bureau.",
       "deleteCancel": "Annuler",
       "deleteConfirm": "Supprimer",
+      "uploadInvalidType": "Format non pris en charge (JPG, PNG ou WEBP uniquement).",
+      "uploadTooLarge": "Le fichier dépasse la taille maximale autorisée (2 Mo).",
       "create": {
         "action": "Ajouter un membre",
         "title": "Ajouter un membre du bureau",
+        "photoLabel": "Photo",
+        "photoCta": "Choisir une photo",
+        "photoRequired": "Veuillez sélectionner une photo.",
         "firstNameLabel": "Prénom",
         "lastNameLabel": "Nom",
         "phoneLabel": "Téléphone",

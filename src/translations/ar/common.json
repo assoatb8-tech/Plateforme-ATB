@@ -89,7 +89,7 @@
     "register": {
       "title": "إنشاء حساب",
       "subtitle": "انضم إلى مجتمع متطوعي الجمعية التونسية للتطوع.",
-      "firstNameLabel": "الاسم الأول",
+      "firstNameLabel": "الاسم",
       "lastNameLabel": "اللقب",
       "emailLabel": "البريد الإلكتروني",
       "passwordLabel": "كلمة المرور",
@@ -136,7 +136,8 @@
     "cinInvalid": "رقم بطاقة تعريف غير صالح (8 أرقام).",
     "invalidDate": "تاريخ غير صالح.",
     "invalidUrl": "رابط غير صالح.",
-    "declarationRequired": "يجب عليك الإشهاد بصحة المعطيات المقدمة."
+    "declarationRequired": "يجب عليك الإشهاد بصحة المعطيات المقدمة.",
+    "photoRequired": "الصورة الشخصية إلزامية."
   },
   "memberForm": {
     "title": "ملف الانخراط",
@@ -159,7 +160,11 @@
       "declaration": "الإشهاد"
     },
     "fields": {
-      "fullName": "الإسم واللقب",
+      "photo": "الصورة الشخصية",
+      "firstNameFr": "الاسم (بالفرنسية)",
+      "lastNameFr": "اللقب (بالفرنسية)",
+      "firstNameAr": "الاسم (بالعربية)",
+      "lastNameAr": "اللقب (بالعربية)",
       "gender": "الجنس",
       "fatherName": "إسم الأب",
       "grandfatherName": "إسم الجد",
@@ -267,7 +272,11 @@
     "universalAdminNoProfileNeeded": "هذا الحساب هو حساب إداري عام ولا يحتاج إلى ملف انخراط.",
     "save": "حفظ التعديلات",
     "saveSuccess": "تم تحديث ملفك الشخصي.",
-    "errorGeneric": "حدث خطأ. يرجى المحاولة مرة أخرى."
+    "errorGeneric": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+    "photoUploading": "جارٍ تحميل الصورة...",
+    "photoUploadError": "فشل تحميل الصورة. يرجى المحاولة مرة أخرى.",
+    "photoInvalidType": "صيغة غير مدعومة (JPG أو PNG فقط).",
+    "photoTooLarge": "حجم الملف يتجاوز الحد الأقصى المسموح به (5 ميغابايت)."
   },
   "participations": {
     "title": "مشاركاتي",
@@ -430,10 +439,15 @@
       "deleteConfirmText": "هذا الإجراء نهائي. سيتم إزالة العضو من صفحة الهيئة المديرة.",
       "deleteCancel": "إلغاء",
       "deleteConfirm": "حذف",
+      "uploadInvalidType": "صيغة غير مدعومة (JPG أو PNG أو WEBP فقط).",
+      "uploadTooLarge": "حجم الملف يتجاوز الحد الأقصى المسموح به (2 ميغابايت).",
       "create": {
         "action": "إضافة عضو",
         "title": "إضافة عضو في الهيئة المديرة",
-        "firstNameLabel": "الاسم الأول",
+        "photoLabel": "الصورة",
+        "photoCta": "اختيار صورة",
+        "photoRequired": "يرجى اختيار صورة.",
+        "firstNameLabel": "الاسم",
         "lastNameLabel": "اللقب",
         "phoneLabel": "الهاتف",
         "emailLabel": "البريد الإلكتروني",

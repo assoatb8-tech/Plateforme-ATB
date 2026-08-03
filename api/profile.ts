@@ -9,7 +9,11 @@ import {
 
 function toProfileData(input: MemberProfileInput) {
   return {
-    fullName: input.fullName,
+    firstNameFr: input.firstNameFr,
+    lastNameFr: input.lastNameFr,
+    firstNameAr: input.firstNameAr,
+    lastNameAr: input.lastNameAr,
+    photoUrl: input.photoUrl,
     gender: input.gender,
     fatherName: input.fatherName || null,
     grandfatherName: input.grandfatherName || null,

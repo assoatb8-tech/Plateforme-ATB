@@ -2,10 +2,11 @@ import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { ArrowLeft, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useAdminEvent, useEventParticipants } from '@/features/admin/events/hooks/useAdminEvents'
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
+import { resolveMemberDisplayName } from '@/utils/displayName'
 import type { RegistrationStatus } from '@/features/events/types'
 
 const STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
@@ -15,7 +16,7 @@ const STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
 }
 
 export function AdminEventParticipantsPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { id } = useParams<{ id: string }>()
   const { data: event } = useAdminEvent(id)
   const { data: participants, isLoading, isError } = useEventParticipants(id)
@@ -36,7 +37,11 @@ export function AdminEventParticipantsPage() {
         {event && <p className="text-sm text-slate-500">{event.titleFr}</p>}
       </div>
 
-      {isLoading && <Spinner label={t('admin.loading')} />}
+      {isLoading && (
+        <Card className="p-4">
+          <SkeletonRows count={5} />
+        </Card>
+      )}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
       {!isLoading && !isError && participants && participants.length === 0 && (
@@ -62,7 +67,9 @@ export function AdminEventParticipantsPage() {
               {participants.map((participant) => (
                 <tr key={participant.id} className="border-b border-slate-100 last:border-0">
                   <td className="px-4 py-3 font-medium text-slate-800">
-                    {participant.user.memberProfile?.fullName ?? t('admin.users.noName')}
+                    {(participant.user.memberProfile &&
+                      resolveMemberDisplayName(participant.user.memberProfile, i18n.language)) ||
+                      t('admin.users.noName')}
                   </td>
                   <td className="px-4 py-3 text-slate-500">
                     {participant.user.memberProfile?.phoneMobile ?? '—'}

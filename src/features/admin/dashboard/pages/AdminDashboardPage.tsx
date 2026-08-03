@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Users, UserPlus, CalendarCheck, ClipboardList } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { useAdminStats } from '@/features/admin/dashboard/hooks/useAdminStats'
 import type { AdminStatsDto } from '@/features/admin/dashboard/types'
 
@@ -23,7 +23,7 @@ export function AdminDashboardPage() {
         <p className="text-sm text-slate-500">{t('admin.dashboard.subtitle')}</p>
       </div>
 
-      {isLoading && <Spinner label={t('admin.loading')} />}
+      {isLoading && <SkeletonCards count={4} />}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
       {data && (

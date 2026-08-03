@@ -1,13 +1,13 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { Plus, Trash2, Users } from 'lucide-react'
+import { Plus, Trash2, UserRound, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
-import { Spinner } from '@/components/ui/Spinner'
+import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { useBureauMembers } from '@/features/bureau/hooks/useBureau'
 import {
   useCreateBureauMember,
@@ -17,12 +17,19 @@ import {
   bureauMemberFormSchema,
   type BureauMemberFormValues,
 } from '@/features/admin/bureau/validation'
+import {
+  uploadBureauPhoto,
+  validateBureauPhotoFile,
+} from '@/features/admin/bureau/services/adminBureauService'
 
 export function AdminBureauListPage() {
   const { t } = useTranslation()
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoError, setPhotoError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { data: members, isLoading, isError } = useBureauMembers()
   const createMutation = useCreateBureauMember()
@@ -37,13 +44,35 @@ export function AdminBureauListPage() {
 
   function closeCreateModal() {
     setCreateModalOpen(false)
+    setPhotoFile(null)
+    setPhotoError(null)
     reset()
   }
 
+  function handleFileChange(file: File | undefined) {
+    setPhotoError(null)
+    if (!file) {
+      setPhotoFile(null)
+      return
+    }
+    const validationError = validateBureauPhotoFile(file)
+    if (validationError) {
+      setPhotoError(t(validationError))
+      setPhotoFile(null)
+      return
+    }
+    setPhotoFile(file)
+  }
+
   async function onCreateSubmit(values: BureauMemberFormValues) {
+    if (!photoFile) {
+      setPhotoError(t('admin.bureau.create.photoRequired'))
+      return
+    }
     setActionError(null)
     try {
-      await createMutation.mutateAsync(values)
+      const photoUrl = await uploadBureauPhoto(photoFile)
+      await createMutation.mutateAsync({ ...values, photoUrl })
       closeCreateModal()
     } catch {
       setActionError(t('admin.bureau.actionError'))
@@ -76,7 +105,7 @@ export function AdminBureauListPage() {
 
       {actionError && <p className="text-sm text-error">{actionError}</p>}
 
-      {isLoading && <Spinner label={t('admin.loading')} />}
+      {isLoading && <SkeletonCards count={3} />}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
       {!isLoading && !isError && members && members.length === 0 && (
@@ -90,6 +119,11 @@ export function AdminBureauListPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {members.map((member) => (
             <Card key={member.id} className="flex items-center gap-4">
+              <img
+                src={member.photoUrl}
+                alt=""
+                className="h-12 w-12 shrink-0 rounded-full object-cover"
+              />
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-slate-800">
                   {member.firstName} {member.lastName}
@@ -116,6 +150,32 @@ export function AdminBureauListPage() {
         title={t('admin.bureau.create.title')}
       >
         <form onSubmit={handleSubmit(onCreateSubmit)} noValidate className="flex flex-col gap-4">
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-slate-700">
+              {t('admin.bureau.create.photoLabel')}
+              <span className="text-error" aria-hidden="true">
+                {' '}
+                *
+              </span>
+            </label>
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-500 hover:border-primary hover:text-primary"
+            >
+              <UserRound size={18} />
+              {photoFile ? photoFile.name : t('admin.bureau.create.photoCta')}
+            </button>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              className="hidden"
+              onChange={(event) => handleFileChange(event.target.files?.[0])}
+            />
+            {photoError && <p className="text-sm text-error">{photoError}</p>}
+          </div>
+
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Input
               required

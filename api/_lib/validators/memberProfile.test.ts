@@ -2,7 +2,11 @@ import { describe, expect, it } from 'vitest'
 import { memberProfileInputSchema } from './memberProfile.js'
 
 const validProfile = {
-  fullName: 'Adherent Test QA',
+  firstNameFr: 'Adherent',
+  lastNameFr: 'Test QA',
+  firstNameAr: 'عضو',
+  lastNameAr: 'اختبار',
+  photoUrl: 'user-id/profile/123.jpg',
   address: '12 Rue de la Liberté, Tunis',
   phoneMobile: '21234567',
   bloodType: undefined,
@@ -33,8 +37,14 @@ describe('memberProfileInputSchema', () => {
     expect(result.success).toBe(false)
   })
 
-  it('rejects a fullName shorter than the minimum', () => {
-    const result = memberProfileInputSchema.safeParse({ ...validProfile, fullName: 'A' })
+  it('rejects a firstNameFr shorter than the minimum', () => {
+    const result = memberProfileInputSchema.safeParse({ ...validProfile, firstNameFr: 'A' })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a missing photoUrl', () => {
+    const { photoUrl: _omit, ...withoutPhoto } = validProfile
+    const result = memberProfileInputSchema.safeParse(withoutPhoto)
     expect(result.success).toBe(false)
   })
 
@@ -60,12 +70,12 @@ describe('memberProfileInputSchema', () => {
   it('strips HTML tags from sanitized text fields', () => {
     const result = memberProfileInputSchema.safeParse({
       ...validProfile,
-      fullName: '<script>alert(1)</script>Real Name',
+      firstNameFr: '<script>alert(1)</script>Real Name',
       fatherName: '<b>Father</b>',
     })
     expect(result.success).toBe(true)
     if (result.success) {
-      expect(result.data.fullName).toBe('alert(1)Real Name')
+      expect(result.data.firstNameFr).toBe('alert(1)Real Name')
       expect(result.data.fatherName).toBe('Father')
     }
   })

@@ -5,5 +5,6 @@ export interface BureauMemberDto {
   phone: string
   email: string
   facebookUrl: string
+  photoUrl: string
   createdAt: string
 }
