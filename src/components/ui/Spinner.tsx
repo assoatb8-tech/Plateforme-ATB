@@ -1,5 +1,5 @@
-import { Loader2 } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { ShadowDotsLoader } from '@/components/ui/ShadowDotsLoader'
 
 interface SpinnerProps {
   label: string
@@ -12,7 +12,7 @@ interface SpinnerProps {
 export function Spinner({ label, className }: SpinnerProps) {
   return (
     <p className={cn('flex items-center gap-2 text-sm text-slate-500', className)}>
-      <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+      <ShadowDotsLoader />
       {label}
     </p>
   )

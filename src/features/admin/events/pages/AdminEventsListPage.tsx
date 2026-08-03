@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { CalendarX, Pencil, Plus, Search, Trash2 } from 'lucide-react'
+import { CalendarX, Pencil, Plus, Search, Trash2, Users } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -114,6 +114,15 @@ export function AdminEventsListPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex justify-end gap-2">
+                        <Link to={`/admin/evenements/${event.id}/participants`}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            aria-label={t('admin.events.participants.action')}
+                          >
+                            <Users size={16} />
+                          </Button>
+                        </Link>
                         <Link to={`/admin/evenements/${event.id}/modifier`}>
                           <Button type="button" variant="ghost" aria-label={t('admin.events.edit')}>
                             <Pencil size={16} />

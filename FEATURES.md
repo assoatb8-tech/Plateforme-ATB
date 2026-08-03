@@ -4,7 +4,7 @@
 
 ## Vue générale
 
-L'application permet de gérer entièrement l'Association Tunisienne de Bénévolat :
+L'application permet de gérer entièrement l'Association Tunisienne Bénévolat :
 
 - les adhérents ;
 - les événements ;

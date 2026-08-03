@@ -1,4 +1,4 @@
-# Association Tunisienne de Bénévolat
+# Association Tunisienne Bénévolat
 
 Application web progressive destinée à digitaliser la gestion d'une association de bénévolat.
 
@@ -152,4 +152,4 @@ Respecter :
 # Licence
 
 
-Projet destiné à l'Association Tunisienne de Bénévolat.
+Projet destiné à l'Association Tunisienne Bénévolat.

@@ -41,6 +41,9 @@ const EventDetailPage = lazy(() =>
     default: m.EventDetailPage,
   })),
 )
+const BureauPage = lazy(() =>
+  import('@/features/bureau/pages/BureauPage').then((m) => ({ default: m.BureauPage })),
+)
 const DashboardPage = lazy(() =>
   import('@/features/dashboard/pages/DashboardPage').then((m) => ({ default: m.DashboardPage })),
 )
@@ -77,9 +80,19 @@ const AdminEventFormPage = lazy(() =>
     default: m.AdminEventFormPage,
   })),
 )
+const AdminEventParticipantsPage = lazy(() =>
+  import('@/features/admin/events/pages/AdminEventParticipantsPage').then((m) => ({
+    default: m.AdminEventParticipantsPage,
+  })),
+)
 const AdminSponsorsListPage = lazy(() =>
   import('@/features/admin/sponsors/pages/AdminSponsorsListPage').then((m) => ({
     default: m.AdminSponsorsListPage,
+  })),
+)
+const AdminBureauListPage = lazy(() =>
+  import('@/features/admin/bureau/pages/AdminBureauListPage').then((m) => ({
+    default: m.AdminBureauListPage,
   })),
 )
 
@@ -104,6 +117,7 @@ function AppRoutes() {
           <Route index element={<HomePage />} />
           <Route path="evenements" element={<EventsListPage />} />
           <Route path="evenements/:id" element={<EventDetailPage />} />
+          <Route path="bureau" element={<BureauPage />} />
           <Route
             path="tableau-de-bord"
             element={
@@ -126,7 +140,9 @@ function AppRoutes() {
             <Route path="evenements" element={<AdminEventsListPage />} />
             <Route path="evenements/nouveau" element={<AdminEventFormPage />} />
             <Route path="evenements/:id/modifier" element={<AdminEventFormPage />} />
+            <Route path="evenements/:id/participants" element={<AdminEventParticipantsPage />} />
             <Route path="sponsors" element={<AdminSponsorsListPage />} />
+            <Route path="bureau" element={<AdminBureauListPage />} />
           </Route>
           <Route
             path="dossier-adhesion"

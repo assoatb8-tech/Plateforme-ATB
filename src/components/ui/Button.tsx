@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react'
-import { Loader2 } from 'lucide-react'
 import { cn } from '@/utils/cn'
+import { ShadowDotsLoader } from '@/components/ui/ShadowDotsLoader'
 
 type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
 
@@ -39,7 +39,7 @@ export function Button({
       aria-busy={loading || undefined}
       {...props}
     >
-      {loading && <Loader2 size={16} className="animate-spin" aria-hidden="true" />}
+      {loading && <ShadowDotsLoader />}
       {children}
     </button>
   )

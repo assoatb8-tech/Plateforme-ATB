@@ -1,0 +1,87 @@
+import { Link, useParams } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
+import { ArrowLeft, Users } from 'lucide-react'
+import { Card } from '@/components/ui/Card'
+import { Spinner } from '@/components/ui/Spinner'
+import { StatusBadge } from '@/components/ui/StatusBadge'
+import { useAdminEvent, useEventParticipants } from '@/features/admin/events/hooks/useAdminEvents'
+import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
+import type { RegistrationStatus } from '@/features/events/types'
+
+const STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
+  REGISTERED: 'events.status.registered',
+  WAITING_LIST: 'events.status.waitingList',
+  CANCELLED: 'events.status.cancelled',
+}
+
+export function AdminEventParticipantsPage() {
+  const { t } = useTranslation()
+  const { id } = useParams<{ id: string }>()
+  const { data: event } = useAdminEvent(id)
+  const { data: participants, isLoading, isError } = useEventParticipants(id)
+
+  return (
+    <div className="flex flex-col gap-6">
+      <div>
+        <Link
+          to="/admin/evenements"
+          className="mb-2 inline-flex items-center gap-1 text-sm text-primary hover:underline"
+        >
+          <ArrowLeft size={16} className="rtl:-scale-x-100" />
+          {t('admin.events.back')}
+        </Link>
+        <h1 className="text-2xl font-semibold text-slate-900">
+          {t('admin.events.participants.title')}
+        </h1>
+        {event && <p className="text-sm text-slate-500">{event.titleFr}</p>}
+      </div>
+
+      {isLoading && <Spinner label={t('admin.loading')} />}
+      {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
+
+      {!isLoading && !isError && participants && participants.length === 0 && (
+        <div className="flex flex-col items-center gap-3 rounded-xl border border-dashed border-slate-200 py-20 text-center">
+          <Users size={40} className="text-slate-300" />
+          <p className="text-sm text-slate-500">{t('admin.events.participants.noneYet')}</p>
+        </div>
+      )}
+
+      {!isLoading && participants && participants.length > 0 && (
+        <Card className="overflow-x-auto p-0">
+          <table className="w-full min-w-[560px] text-start text-sm">
+            <thead className="border-b border-slate-200 text-xs font-semibold uppercase tracking-wide text-slate-500">
+              <tr>
+                <th className="px-4 py-3">{t('admin.events.participants.columns.name')}</th>
+                <th className="px-4 py-3">{t('admin.events.participants.columns.phone')}</th>
+                <th className="px-4 py-3">{t('admin.events.participants.columns.email')}</th>
+                <th className="px-4 py-3">{t('admin.events.participants.columns.status')}</th>
+                <th className="px-4 py-3">{t('admin.events.participants.columns.date')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {participants.map((participant) => (
+                <tr key={participant.id} className="border-b border-slate-100 last:border-0">
+                  <td className="px-4 py-3 font-medium text-slate-800">
+                    {participant.user.memberProfile?.fullName ?? t('admin.users.noName')}
+                  </td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {participant.user.memberProfile?.phoneMobile ?? '—'}
+                  </td>
+                  <td className="px-4 py-3 text-slate-500">{participant.user.email}</td>
+                  <td className="px-4 py-3">
+                    <StatusBadge tone={REGISTRATION_STATUS_TONE[participant.status]}>
+                      {t(STATUS_LABEL_KEY[participant.status])}
+                    </StatusBadge>
+                  </td>
+                  <td className="px-4 py-3 text-slate-500">
+                    {new Date(participant.registeredAt).toLocaleDateString()}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </Card>
+      )}
+    </div>
+  )
+}

@@ -1,10 +1,10 @@
 # PROJECT.md
 
-# Association Tunisienne de Bénévolat
+# Association Tunisienne Bénévolat
 
 ## Présentation
 
-Cette application est une plateforme numérique interactive permettant de moderniser la gestion de l'Association Tunisienne de Bénévolat.
+Cette application est une plateforme numérique interactive permettant de moderniser la gestion de l'Association Tunisienne Bénévolat.
 
 Elle permet aux bénévoles de rejoindre facilement les activités de l'association et donne aux responsables les outils nécessaires pour gérer la communauté.
 

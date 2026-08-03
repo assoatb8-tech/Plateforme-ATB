@@ -1,6 +1,17 @@
 import { apiRequest } from '@/services/apiClient'
-import type { EventDto, EventsListResponse } from '@/features/events/types'
+import type { EventDto, EventsListResponse, RegistrationStatus } from '@/features/events/types'
 import type { EventFormValues } from '@/features/admin/events/validation'
+
+export interface EventParticipantDto {
+  id: string
+  status: RegistrationStatus
+  registeredAt: string
+  user: {
+    id: string
+    email: string
+    memberProfile: { fullName: string; phoneMobile: string } | null
+  }
+}
 
 // `all: 'true'` is honored by GET /api/events only for authenticated ADMIN
 // callers (checked server-side) — see api/events.ts. Without it, cancelled
@@ -28,4 +39,10 @@ export async function updateEvent(id: string, values: EventFormValues): Promise<
 
 export async function deleteEvent(id: string): Promise<void> {
   await apiRequest(`/api/events/${id}`, { method: 'DELETE' })
+}
+
+export async function fetchEventParticipants(id: string): Promise<EventParticipantDto[]> {
+  return apiRequest<EventParticipantDto[]>(`/api/events/${id}`, {
+    query: { action: 'participants' },
+  })
 }

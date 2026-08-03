@@ -1,6 +1,6 @@
 {
   "app": {
-    "name": "Association Tunisienne de Bénévolat",
+    "name": "Association Tunisienne Bénévolat",
     "shortName": "ATB"
   },
   "errorBoundary": {
@@ -37,11 +37,11 @@
       "ctaSecondary": "Découvrir nos activités"
     },
     "motto": {
-      "text": "Nous ne recherchons pas n'importe qui dans cet univers, mais plutôt un citoyen ayant sa patrie dans le cœur."
+      "text": "Nous recherchons des citoyens ayant la patrie dans le cœur."
     },
     "mission": {
       "title": "Notre mission",
-      "text": "L'Association Tunisienne de Bénévolat fédère des volontaires autour de projets solidaires, éducatifs et environnementaux, pour un impact durable dans les communautés locales."
+      "text": "L'Association Tunisienne Bénévolat fédère des volontaires autour de projets solidaires, éducatifs et environnementaux, pour un impact durable dans les communautés locales."
     },
     "values": {
       "title": "Nos valeurs",
@@ -62,9 +62,17 @@
       "title": "Nos partenaires"
     }
   },
+  "bureau": {
+    "title": "Bureau",
+    "subtitle": "L'équipe qui dirige l'association.",
+    "loading": "Chargement...",
+    "errorGeneric": "Une erreur est survenue. Merci de réessayer.",
+    "noneYet": "Aucun membre du bureau pour le moment.",
+    "viewOnFacebook": "Voir sur Facebook"
+  },
   "footer": {
     "rights": "Tous droits réservés.",
-    "tagline": "Association Tunisienne de Bénévolat"
+    "tagline": "Association Tunisienne Bénévolat"
   },
   "auth": {
     "login": {
@@ -275,7 +283,8 @@
       "dashboard": "Tableau de bord",
       "members": "Membres",
       "events": "Événements",
-      "sponsors": "Sponsors"
+      "sponsors": "Sponsors",
+      "bureau": "Bureau"
     },
     "dashboard": {
       "title": "Tableau de bord administrateur",
@@ -357,6 +366,18 @@
         "ACTIVE": "Actif",
         "CANCELLED": "Annulé"
       },
+      "participants": {
+        "action": "Voir les participants",
+        "title": "Participants",
+        "noneYet": "Aucun participant pour le moment.",
+        "columns": {
+          "name": "Nom",
+          "phone": "Téléphone",
+          "email": "Email",
+          "status": "Statut",
+          "date": "Date d'inscription"
+        }
+      },
       "form": {
         "createTitle": "Créer un événement",
         "editTitle": "Modifier l'événement",
@@ -395,6 +416,28 @@
         "logoLabel": "Logo",
         "logoCta": "Choisir un logo",
         "logoRequired": "Veuillez sélectionner un logo.",
+        "cancel": "Annuler",
+        "submit": "Ajouter"
+      }
+    },
+    "bureau": {
+      "title": "Gestion du bureau",
+      "subtitle": "Ajouter ou retirer les membres affichés sur la page Bureau.",
+      "noneYet": "Aucun membre du bureau pour le moment.",
+      "actionError": "Une erreur est survenue. Merci de réessayer.",
+      "deleteAction": "Supprimer",
+      "deleteConfirmTitle": "Supprimer ce membre",
+      "deleteConfirmText": "Cette action est irréversible. Le membre sera retiré de la page Bureau.",
+      "deleteCancel": "Annuler",
+      "deleteConfirm": "Supprimer",
+      "create": {
+        "action": "Ajouter un membre",
+        "title": "Ajouter un membre du bureau",
+        "firstNameLabel": "Prénom",
+        "lastNameLabel": "Nom",
+        "phoneLabel": "Téléphone",
+        "emailLabel": "Email",
+        "facebookLabel": "Lien Facebook",
         "cancel": "Annuler",
         "submit": "Ajouter"
       }

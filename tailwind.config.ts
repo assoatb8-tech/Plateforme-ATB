@@ -43,9 +43,24 @@ export default {
           '0%': { transform: 'translateX(-50%)' },
           '100%': { transform: 'translateX(0)' },
         },
+        // Dot lifts while its shadow beneath shrinks and fades — the pair
+        // is what reads as a "shadow" loader rather than a plain bounce.
+        'shadow-bounce': {
+          '0%, 100%': { transform: 'translateY(0)' },
+          '50%': { transform: 'translateY(-130%)' },
+        },
+        'shadow-fade': {
+          '0%, 100%': { transform: 'scaleX(1)', opacity: '0.35' },
+          '50%': { transform: 'scaleX(0.55)', opacity: '0.12' },
+        },
       },
       animation: {
         marquee: 'marquee 30s linear infinite',
+        // 0.7s — noticeably snappier than the old spin icon's implied 1s+
+        // cadence, so the loading state itself feels faster even though
+        // actual fetch time is unchanged.
+        'shadow-bounce': 'shadow-bounce 0.7s ease-in-out infinite',
+        'shadow-fade': 'shadow-fade 0.7s ease-in-out infinite',
       },
     },
   },

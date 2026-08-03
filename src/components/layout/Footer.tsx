@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 export function Footer() {
@@ -14,6 +15,9 @@ export function Footer() {
           className="h-14 w-14 rounded-full"
         />
         <p className="text-sm font-medium text-slate-700">{t('footer.tagline')}</p>
+        <Link to="/bureau" className="text-sm text-primary hover:underline">
+          {t('home.contact.title')}
+        </Link>
         <p className="text-xs text-slate-400">
           © {year} {t('app.shortName')} — {t('footer.rights')}
         </p>

@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { LayoutDashboard, Users, CalendarDays, Building2 } from 'lucide-react'
+import { LayoutDashboard, Users, CalendarDays, Building2, Landmark } from 'lucide-react'
 import { cn } from '@/utils/cn'
 
 const NAV_ITEMS = [
@@ -8,6 +8,7 @@ const NAV_ITEMS = [
   { to: '/admin/membres', end: false, icon: Users, labelKey: 'admin.nav.members' },
   { to: '/admin/evenements', end: false, icon: CalendarDays, labelKey: 'admin.nav.events' },
   { to: '/admin/sponsors', end: false, icon: Building2, labelKey: 'admin.nav.sponsors' },
+  { to: '/admin/bureau', end: false, icon: Landmark, labelKey: 'admin.nav.bureau' },
 ] as const
 
 export function AdminLayout() {

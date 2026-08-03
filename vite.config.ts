@@ -17,10 +17,10 @@ export default defineConfig({
       includeAssets: ['icons/apple-touch-icon.png'],
       manifest: {
         id: '/',
-        name: 'Association Tunisienne de Bénévolat',
+        name: 'Association Tunisienne Bénévolat',
         short_name: 'ATB',
         description:
-          "Plateforme de gestion des adhérents, événements et cotisations de l'Association Tunisienne de Bénévolat.",
+          "Plateforme de gestion des adhérents, événements et cotisations de l'Association Tunisienne Bénévolat.",
         lang: 'fr',
         dir: 'ltr',
         start_url: '/',
