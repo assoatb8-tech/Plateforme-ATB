@@ -11,7 +11,7 @@ export default withAuth(async (req: VercelRequest, res: VercelResponse, user) =>
 
   const dbUser = await prisma.user.findUnique({
     where: { id: user.id },
-    include: { memberProfile: { select: { id: true } } },
+    include: { memberProfile: { select: { id: true, photoUrl: true } } },
   })
 
   if (!dbUser) {
@@ -26,5 +26,6 @@ export default withAuth(async (req: VercelRequest, res: VercelResponse, user) =>
     status: dbUser.status,
     isProtected: dbUser.isProtected,
     hasProfile: Boolean(dbUser.memberProfile),
+    hasPhoto: Boolean(dbUser.memberProfile?.photoUrl),
   })
 })

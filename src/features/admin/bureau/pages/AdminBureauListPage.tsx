@@ -1,8 +1,8 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { Plus, Trash2, UserRound, Users } from 'lucide-react'
+import { Plus, Search, Trash2, UserRound, Users, X } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -17,23 +17,28 @@ import {
   bureauMemberFormSchema,
   type BureauMemberFormValues,
 } from '@/features/admin/bureau/validation'
-import {
-  uploadBureauPhoto,
-  validateBureauPhotoFile,
-} from '@/features/admin/bureau/services/adminBureauService'
+import { useAdminUsersList } from '@/features/admin/users/hooks/useAdminUsers'
+import type { UserListItemDto } from '@/features/admin/users/types'
+import { resolveMemberDisplayName } from '@/utils/displayName'
 
 export function AdminBureauListPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [createModalOpen, setCreateModalOpen] = useState(false)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
-  const [photoFile, setPhotoFile] = useState<File | null>(null)
-  const [photoError, setPhotoError] = useState<string | null>(null)
+  const [memberSearchInput, setMemberSearchInput] = useState('')
+  const [memberSearch, setMemberSearch] = useState('')
+  const [selectedMember, setSelectedMember] = useState<UserListItemDto | null>(null)
+  const [memberError, setMemberError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { data: members, isLoading, isError } = useBureauMembers()
   const createMutation = useCreateBureauMember()
   const deleteMutation = useDeleteBureauMember()
+  const { data: memberResults, isFetching: isSearchingMembers } = useAdminUsersList(
+    1,
+    memberSearch,
+    '',
+  )
 
   const {
     register,
@@ -44,35 +49,29 @@ export function AdminBureauListPage() {
 
   function closeCreateModal() {
     setCreateModalOpen(false)
-    setPhotoFile(null)
-    setPhotoError(null)
+    setMemberSearchInput('')
+    setMemberSearch('')
+    setSelectedMember(null)
+    setMemberError(null)
     reset()
   }
 
-  function handleFileChange(file: File | undefined) {
-    setPhotoError(null)
-    if (!file) {
-      setPhotoFile(null)
-      return
-    }
-    const validationError = validateBureauPhotoFile(file)
-    if (validationError) {
-      setPhotoError(t(validationError))
-      setPhotoFile(null)
-      return
-    }
-    setPhotoFile(file)
+  function handleMemberSearchSubmit(event: React.FormEvent) {
+    event.preventDefault()
+    setMemberSearch(memberSearchInput.trim())
   }
 
   async function onCreateSubmit(values: BureauMemberFormValues) {
-    if (!photoFile) {
-      setPhotoError(t('admin.bureau.create.photoRequired'))
+    if (!selectedMember) {
+      setMemberError(t('admin.bureau.create.memberRequired'))
       return
     }
     setActionError(null)
     try {
-      const photoUrl = await uploadBureauPhoto(photoFile)
-      await createMutation.mutateAsync({ ...values, photoUrl })
+      await createMutation.mutateAsync({
+        userId: selectedMember.id,
+        facebookUrl: values.facebookUrl,
+      })
       closeCreateModal()
     } catch {
       setActionError(t('admin.bureau.actionError'))
@@ -119,14 +118,20 @@ export function AdminBureauListPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {members.map((member) => (
             <Card key={member.id} className="flex items-center gap-4">
-              <img
-                src={member.photoUrl}
-                alt=""
-                className="h-12 w-12 shrink-0 rounded-full object-cover"
-              />
+              {member.photoUrl ? (
+                <img
+                  src={member.photoUrl}
+                  alt=""
+                  className="h-12 w-12 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-300">
+                  <UserRound size={20} />
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <p className="truncate text-sm font-medium text-slate-800">
-                  {member.firstName} {member.lastName}
+                  {resolveMemberDisplayName(member, i18n.language)}
                 </p>
                 <p className="truncate text-xs text-slate-500">{member.phone}</p>
                 <p className="truncate text-xs text-slate-500">{member.email}</p>
@@ -152,58 +157,74 @@ export function AdminBureauListPage() {
         <form onSubmit={handleSubmit(onCreateSubmit)} noValidate className="flex flex-col gap-4">
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-slate-700">
-              {t('admin.bureau.create.photoLabel')}
+              {t('admin.bureau.create.memberLabel')}
               <span className="text-error" aria-hidden="true">
                 {' '}
                 *
               </span>
             </label>
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 px-4 py-6 text-sm text-slate-500 hover:border-primary hover:text-primary"
-            >
-              <UserRound size={18} />
-              {photoFile ? photoFile.name : t('admin.bureau.create.photoCta')}
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="hidden"
-              onChange={(event) => handleFileChange(event.target.files?.[0])}
-            />
-            {photoError && <p className="text-sm text-error">{photoError}</p>}
+
+            {selectedMember ? (
+              <div className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-2.5">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-slate-800">
+                    {resolveMemberDisplayName(selectedMember, i18n.language) ||
+                      selectedMember.email}
+                  </p>
+                  <p className="truncate text-xs text-slate-500">{selectedMember.email}</p>
+                </div>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  aria-label={t('admin.bureau.create.changeSelection')}
+                  onClick={() => setSelectedMember(null)}
+                >
+                  <X size={16} />
+                </Button>
+              </div>
+            ) : (
+              <>
+                <form onSubmit={handleMemberSearchSubmit} className="flex gap-2">
+                  <Input
+                    type="search"
+                    placeholder={t('admin.bureau.create.searchPlaceholder')}
+                    value={memberSearchInput}
+                    onChange={(event) => setMemberSearchInput(event.target.value)}
+                    aria-label={t('admin.bureau.create.searchPlaceholder')}
+                    className="min-w-0 flex-1"
+                  />
+                  <Button type="submit" variant="secondary" className="shrink-0">
+                    <Search size={16} />
+                  </Button>
+                </form>
+                <div className="flex max-h-48 flex-col gap-1 overflow-y-auto">
+                  {isSearchingMembers && (
+                    <p className="p-2 text-sm text-slate-500">{t('admin.loading')}</p>
+                  )}
+                  {!isSearchingMembers && memberResults?.users.length === 0 && (
+                    <p className="p-2 text-sm text-slate-500">
+                      {t('admin.bureau.create.noResults')}
+                    </p>
+                  )}
+                  {memberResults?.users.map((candidate) => (
+                    <button
+                      key={candidate.id}
+                      type="button"
+                      onClick={() => setSelectedMember(candidate)}
+                      className="flex flex-col items-start rounded-lg px-3 py-2 text-start hover:bg-slate-50"
+                    >
+                      <span className="text-sm font-medium text-slate-800">
+                        {resolveMemberDisplayName(candidate, i18n.language) || candidate.email}
+                      </span>
+                      <span className="text-xs text-slate-500">{candidate.email}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+            {memberError && <p className="text-sm text-error">{memberError}</p>}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Input
-              required
-              label={t('admin.bureau.create.firstNameLabel')}
-              error={errors.firstName && t(errors.firstName.message ?? 'validation.required')}
-              {...register('firstName')}
-            />
-            <Input
-              required
-              label={t('admin.bureau.create.lastNameLabel')}
-              error={errors.lastName && t(errors.lastName.message ?? 'validation.required')}
-              {...register('lastName')}
-            />
-          </div>
-          <Input
-            type="tel"
-            required
-            label={t('admin.bureau.create.phoneLabel')}
-            error={errors.phone && t(errors.phone.message ?? 'validation.required')}
-            {...register('phone')}
-          />
-          <Input
-            type="email"
-            required
-            label={t('admin.bureau.create.emailLabel')}
-            error={errors.email && t(errors.email.message ?? 'validation.required')}
-            {...register('email')}
-          />
           <Input
             type="url"
             required

@@ -95,6 +95,7 @@ model User {
   bansIssued         Ban[]               @relation("BanIssuer")
   eventsCreated      Event[]             @relation("EventCreator")
   auditLogs          AuditLog[]
+  bureauMembership   BureauMember?
 
   @@map("users")
 }
@@ -257,12 +258,9 @@ model Sponsor {
 
 model BureauMember {
   id          String   @id @default(uuid()) @db.Uuid
-  firstName   String   @map("first_name")
-  lastName    String   @map("last_name")
-  phone       String
-  email       String
+  userId      String   @unique @map("user_id") @db.Uuid
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   facebookUrl String   @map("facebook_url")
-  photoUrl    String   @map("photo_url")
   createdAt   DateTime @default(now()) @map("created_at")
 
   @@index([createdAt])

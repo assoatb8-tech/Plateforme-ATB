@@ -1,10 +1,12 @@
 export interface BureauMemberDto {
   id: string
-  firstName: string
-  lastName: string
+  firstNameFr: string
+  lastNameFr: string
+  firstNameAr: string
+  lastNameAr: string
   phone: string
   email: string
   facebookUrl: string
-  photoUrl: string
+  photoUrl: string | null
   createdAt: string
 }

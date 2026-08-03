@@ -9,6 +9,7 @@ export interface CurrentUserDto {
   status: UserStatus
   isProtected: boolean
   hasProfile: boolean
+  hasPhoto: boolean
 }
 
 export async function fetchCurrentUser(): Promise<CurrentUserDto> {

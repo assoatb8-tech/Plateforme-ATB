@@ -1,11 +1,12 @@
 import { useTranslation } from 'react-i18next'
-import { Facebook, Mail, Phone, Users } from 'lucide-react'
+import { Facebook, Mail, Phone, UserRound, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { useBureauMembers } from '@/features/bureau/hooks/useBureau'
+import { resolveMemberDisplayName } from '@/utils/displayName'
 
 export function BureauPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { data: members, isLoading, isError } = useBureauMembers()
 
   return (
@@ -29,9 +30,15 @@ export function BureauPage() {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {members.map((member) => (
             <Card key={member.id} className="flex flex-col items-center gap-2 text-center">
-              <img src={member.photoUrl} alt="" className="h-20 w-20 rounded-full object-cover" />
+              {member.photoUrl ? (
+                <img src={member.photoUrl} alt="" className="h-20 w-20 rounded-full object-cover" />
+              ) : (
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-slate-100 text-slate-300">
+                  <UserRound size={32} />
+                </div>
+              )}
               <h2 className="text-base font-semibold text-slate-900">
-                {member.firstName} {member.lastName}
+                {resolveMemberDisplayName(member, i18n.language)}
               </h2>
               <a
                 href={`tel:${member.phone}`}

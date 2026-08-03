@@ -74,6 +74,17 @@ export function DashboardPage() {
               {t('dashboard.viewProfile')}
             </Link>
           )}
+
+          {currentUser?.hasProfile && !currentUser.hasPhoto && (
+            <div className="mt-2 flex flex-col gap-2 rounded-xl bg-amber-50 p-3">
+              <p className="text-sm text-amber-800">{t('dashboard.missingPhoto')}</p>
+              <Link to="/mon-profil">
+                <Button type="button" variant="secondary">
+                  {t('dashboard.addPhotoCta')}
+                </Button>
+              </Link>
+            </div>
+          )}
         </Card>
 
         <Card className="flex flex-col gap-3 md:col-span-2">
