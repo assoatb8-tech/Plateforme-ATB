@@ -62,13 +62,22 @@ URL de production : https://plateforme-atb.vercel.app
 
 ### 6bis. Gestion du Bureau (الهيئة المديرة)
 - **Action** : aller sur `/admin/bureau`, cliquer "Ajouter un membre".
-- **Remplir** : photo (obligatoire, JPG/PNG/WEBP, max 2 Mo), prénom, nom, téléphone, email, lien Facebook (URL complète, ex. `https://facebook.com/...`).
-- **Vérifier** : impossible de soumettre sans avoir choisi une photo (message d'erreur affiché).
-- **Résultat attendu** : le membre apparaît dans la grille admin avec sa photo, avec un bouton de suppression.
-- **Vérifier** : le membre apparaît immédiatement sur la page publique `/bureau` avec sa photo, ses liens téléphone (`tel:`), email (`mailto:`) et Facebook fonctionnels.
+- **Résultat attendu** : un champ de recherche (au lieu de champs texte libres) permet de chercher un adhérent existant par nom ou email ; cliquer sur un résultat le sélectionne.
+- **Vérifier** : impossible de soumettre sans avoir sélectionné un membre (message d'erreur affiché).
+- **Action** : sélectionner un membre qui n'a pas encore de photo de profil, puis remplir le lien Facebook et soumettre.
+- **Résultat attendu** : erreur claire ("ce membre n'a pas encore de photo de profil"), car chaque membre du Bureau doit avoir une photo de profil.
+- **Action** : sélectionner un membre qui a déjà une photo de profil, remplir le lien Facebook, soumettre.
+- **Résultat attendu** : le membre apparaît dans la grille admin avec sa photo de profil (celle de son dossier d'adhésion, pas une photo distincte), avec un bouton de suppression.
+- **Vérifier** : le membre apparaît immédiatement sur la page publique `/bureau` avec sa photo, ses liens téléphone (`tel:`), email (`mailto:`) et Facebook fonctionnels ; le nom affiché correspond à la langue active de l'interface (français ou arabe).
 - **Action** : supprimer le membre depuis `/admin/bureau`.
-- **Résultat attendu** : confirmation demandée, puis disparition immédiate de la grille admin et de `/bureau`.
+- **Résultat attendu** : confirmation demandée, puis disparition immédiate de la grille admin et de `/bureau` (le compte du membre lui-même n'est pas affecté).
 - **Vérifier l'état vide** : sans aucun membre, `/bureau` affiche un message clair plutôt qu'une page cassée.
+
+### 6ter. Photo de profil obligatoire pour tous les membres
+- **Action** : se connecter avec un compte adhérent dont le profil n'a pas encore de photo, aller sur `/tableau-de-bord`.
+- **Résultat attendu** : un encart orange invite à ajouter une photo de profil, avec un lien vers `/mon-profil`.
+- **Action** : depuis `/mon-profil`, essayer d'enregistrer une modification sans avoir ajouté de photo.
+- **Résultat attendu** : impossible d'enregistrer tant qu'aucune photo n'est sélectionnée.
 - **Vérifier le lien du footer** : sur n'importe quelle page publique, le lien "Nous contacter" du pied de page redirige vers `/bureau`.
 
 ### 7. Vérification des permissions
@@ -144,10 +153,18 @@ Mise à jour du 2026-08-03 (suite) : chargements en squelette (skeleton
 loaders) pour les listes/tableaux, photo de profil obligatoire pour le
 dossier d'adhésion (stockée de façon privée, visible par l'adhérent et
 les admins uniquement), nom et prénom désormais saisis séparément en
-français ET en arabe, photo obligatoire pour les membres du Bureau
-(publique, visible sur `/bureau`). Les 5 profils membres existants ont
-été répartis automatiquement entre les champs FR/AR selon l'écriture
-détectée — les administrateurs sont invités à vérifier/compléter la
-langue manquante sur `/admin/membres/:id` au besoin.
+français ET en arabe. Les 5 profils membres existants ont été répartis
+automatiquement entre les champs FR/AR selon l'écriture détectée — les
+administrateurs sont invités à vérifier/compléter la langue manquante
+sur `/admin/membres/:id` au besoin.
+
+Mise à jour du 2026-08-03 (suite 2) : la gestion du Bureau ne prend plus
+de nom/téléphone/email/photo saisis à la main — l'admin sélectionne un
+adhérent existant, et sa photo de profil réelle est affichée sur
+`/bureau` (exception délibérée à la règle de confidentialité pour les
+membres explicitement publiés par un admin). Ajouter un membre au Bureau
+est bloqué tant que ce membre n'a pas lui-même de photo de profil. Un
+encart sur le tableau de bord invite les adhérents dont le profil n'a
+pas encore de photo à en ajouter une.
 
 Aucun problème connu à ce jour.
