@@ -8,6 +8,7 @@ import { useAuth } from '@/features/auth/hooks/useAuth'
 import type { MemberFormValues } from '@/features/member-form/validation'
 import {
   getSignedProfilePhotoUrl,
+  PhotoDecodeError,
   uploadProfilePhoto,
   validateProfilePhotoFile,
 } from '@/services/storageService'
@@ -55,8 +56,14 @@ export function Step1PersonalInfo({ form }: { form: UseFormReturn<MemberFormValu
     try {
       const path = await uploadProfilePhoto(user.id, file)
       setValue('photoUrl', path, { shouldValidate: true, shouldDirty: true })
-    } catch {
-      setUploadError(t('profile.photoUploadError'))
+    } catch (error) {
+      setUploadError(
+        t(
+          error instanceof PhotoDecodeError
+            ? 'profile.photoDecodeError'
+            : 'profile.photoUploadError',
+        ),
+      )
     } finally {
       setUploading(false)
     }
@@ -81,7 +88,7 @@ export function Step1PersonalInfo({ form }: { form: UseFormReturn<MemberFormValu
           <div className="flex flex-col gap-1">
             <input
               type="file"
-              accept="image/jpeg,image/png"
+              accept="image/*"
               onChange={(event) => void handleFileChange(event)}
               disabled={uploading}
               className="text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/20"

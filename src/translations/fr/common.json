@@ -277,8 +277,9 @@
     "errorGeneric": "Une erreur est survenue. Merci de réessayer.",
     "photoUploading": "Téléversement de la photo...",
     "photoUploadError": "Échec du téléversement de la photo. Merci de réessayer.",
-    "photoInvalidType": "Format non pris en charge (JPG ou PNG uniquement).",
-    "photoTooLarge": "Le fichier dépasse la taille maximale autorisée (5 Mo)."
+    "photoDecodeError": "Cette photo n'a pas pu être lue. Merci d'essayer une autre photo.",
+    "photoInvalidType": "Le fichier sélectionné n'est pas une image.",
+    "photoTooLarge": "Le fichier dépasse la taille maximale autorisée (20 Mo)."
   },
   "participations": {
     "title": "Mes participations",
