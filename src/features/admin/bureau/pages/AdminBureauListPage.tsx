@@ -90,8 +90,12 @@ export function AdminBureauListPage() {
     setMemberSearch('')
     setSelectedMember(null)
     setMemberError(null)
+    // reset() first (to blank, not back to whatever draft seeded
+    // defaultValues) — its own change fires the autosave `watch`
+    // subscription, so clearFormDraft must run after or it'd immediately
+    // get overwritten with the just-reset (stale) values.
+    reset({ positionFr: '', positionAr: '', facebookUrl: '' })
     clearFormDraft(FORM_DRAFT_KEY)
-    reset()
   }
 
   function handleMemberSearchSubmit(event: React.FormEvent) {
