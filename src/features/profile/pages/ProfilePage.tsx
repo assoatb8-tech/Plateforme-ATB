@@ -26,6 +26,7 @@ import { Step5Profession } from '@/features/member-form/components/Step5Professi
 import { Step6Experience } from '@/features/member-form/components/Step6Experience'
 import { Step7Documents } from '@/features/member-form/components/Step7Documents'
 import { Step8Declaration } from '@/features/member-form/components/Step8Declaration'
+import { clearFormDraft, loadFormDraft, useAutosaveFormDraft } from '@/hooks/useFormDraft'
 
 // Same 8 sections as MemberFormPage's wizard, rendered as one scrollable
 // page instead — editing an existing profile doesn't need step-by-step
@@ -60,20 +61,29 @@ export function ProfilePage() {
     resolver: zodResolver(memberFormSchema),
   })
 
+  // Scoped by user id (not a fixed key) so a draft from one account editing
+  // this same shared form never bleeds into another account's session on a
+  // shared/public device — this form carries real PII (CIN, address, phone).
+  const draftKey = currentUser ? `atb.profile-edit.${currentUser.id}.draft` : null
+
   useEffect(() => {
-    if (profile) {
-      form.reset(profileToFormValues(profile))
+    if (profile && currentUser) {
+      const draft = draftKey ? loadFormDraft<MemberFormValues>(draftKey) : null
+      form.reset({ ...profileToFormValues(profile), ...draft })
     }
     // form is stable across renders (react-hook-form) — only re-sync when
-    // the fetched profile itself changes.
+    // the fetched profile or the signed-in user itself changes.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [profile])
+  }, [profile, currentUser])
+
+  useAutosaveFormDraft(draftKey ?? 'unused', form.watch, Boolean(draftKey))
 
   async function onSubmit(values: MemberFormValues) {
     setSaveError(null)
     setSaveSuccess(false)
     try {
       await updateMemberProfile(values)
+      if (draftKey) clearFormDraft(draftKey)
       setSaveSuccess(true)
     } catch {
       setSaveError(t('profile.errorGeneric'))

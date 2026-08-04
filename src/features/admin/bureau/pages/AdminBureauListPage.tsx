@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
@@ -22,6 +22,24 @@ import { useAdminUsersList } from '@/features/admin/users/hooks/useAdminUsers'
 import type { UserListItemDto } from '@/features/admin/users/types'
 import { resolveMemberDisplayName } from '@/utils/displayName'
 import { useSignedPhotoUrls } from '@/hooks/useSignedPhotoUrls'
+import { clearFormDraft, loadFormDraft, useAutosaveFormDraft } from '@/hooks/useFormDraft'
+
+// A mobile tab reload while an admin is mid-way through adding a Bureau
+// member (e.g. backgrounding the app to go copy a Facebook link) shouldn't
+// lose their selection or typing — see src/hooks/useFormDraft.ts. The
+// selected member is plain component state (not a react-hook-form field),
+// so it gets its own small localStorage slot alongside the form draft.
+const MEMBER_DRAFT_KEY = 'atb.admin-bureau-create.member'
+const FORM_DRAFT_KEY = 'atb.admin-bureau-create.draft'
+
+function loadMemberDraft(): UserListItemDto | null {
+  try {
+    const raw = localStorage.getItem(MEMBER_DRAFT_KEY)
+    return raw ? (JSON.parse(raw) as UserListItemDto) : null
+  } catch {
+    return null
+  }
+}
 
 export function AdminBureauListPage() {
   const { t, i18n } = useTranslation()
@@ -29,9 +47,17 @@ export function AdminBureauListPage() {
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [memberSearchInput, setMemberSearchInput] = useState('')
   const [memberSearch, setMemberSearch] = useState('')
-  const [selectedMember, setSelectedMember] = useState<UserListItemDto | null>(null)
+  const [selectedMember, setSelectedMember] = useState<UserListItemDto | null>(loadMemberDraft)
   const [memberError, setMemberError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (selectedMember) {
+      localStorage.setItem(MEMBER_DRAFT_KEY, JSON.stringify(selectedMember))
+    } else {
+      localStorage.removeItem(MEMBER_DRAFT_KEY)
+    }
+  }, [selectedMember])
 
   const { data: members, isLoading, isError } = useBureauMembers()
   const createMutation = useCreateBureauMember()
@@ -49,8 +75,14 @@ export function AdminBureauListPage() {
     register,
     handleSubmit,
     reset,
+    watch,
     formState: { errors },
-  } = useForm<BureauMemberFormValues>({ resolver: zodResolver(bureauMemberFormSchema) })
+  } = useForm<BureauMemberFormValues>({
+    resolver: zodResolver(bureauMemberFormSchema),
+    defaultValues: loadFormDraft<BureauMemberFormValues>(FORM_DRAFT_KEY) ?? undefined,
+  })
+
+  useAutosaveFormDraft(FORM_DRAFT_KEY, watch)
 
   function closeCreateModal() {
     setCreateModalOpen(false)
@@ -58,6 +90,7 @@ export function AdminBureauListPage() {
     setMemberSearch('')
     setSelectedMember(null)
     setMemberError(null)
+    clearFormDraft(FORM_DRAFT_KEY)
     reset()
   }
 

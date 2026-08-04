@@ -11,6 +11,9 @@ import {
   useUpdateEvent,
 } from '@/features/admin/events/hooks/useAdminEvents'
 import { toDatetimeLocalValue, type EventFormValues } from '@/features/admin/events/validation'
+import { clearFormDraft } from '@/hooks/useFormDraft'
+
+const CREATE_DRAFT_KEY = 'atb.admin-event-create.draft'
 
 export function AdminEventFormPage() {
   const { t } = useTranslation()
@@ -30,6 +33,7 @@ export function AdminEventFormPage() {
         await updateMutation.mutateAsync(values)
       } else {
         await createMutation.mutateAsync(values)
+        clearFormDraft(CREATE_DRAFT_KEY)
       }
       navigate('/admin/evenements')
     } catch {
@@ -65,6 +69,7 @@ export function AdminEventFormPage() {
           showStatus={isEditMode}
           formError={formError}
           submitLabel={isEditMode ? t('admin.events.form.save') : t('admin.events.form.submit')}
+          draftKey={isEditMode ? undefined : CREATE_DRAFT_KEY}
           defaultValues={
             event
               ? {

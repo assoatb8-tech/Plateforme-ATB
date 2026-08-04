@@ -6,6 +6,7 @@ import { Textarea } from '@/components/ui/Textarea'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { eventFormSchema, type EventFormValues } from '@/features/admin/events/validation'
+import { loadFormDraft, useAutosaveFormDraft } from '@/hooks/useFormDraft'
 
 interface EventFormProps {
   defaultValues?: Partial<EventFormValues>
@@ -13,6 +14,11 @@ interface EventFormProps {
   submitLabel: string
   formError?: string | null
   showStatus?: boolean
+  // Only passed for the "create" route — a mobile tab reload while an
+  // admin is mid-way through a new event shouldn't lose their typing (see
+  // src/hooks/useFormDraft.ts). Edit mode already has real server values
+  // and has no business overwriting them with a stale local draft.
+  draftKey?: string
 }
 
 export function EventForm({
@@ -21,16 +27,22 @@ export function EventForm({
   submitLabel,
   formError,
   showStatus,
+  draftKey,
 }: EventFormProps) {
   const { t } = useTranslation()
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors, isSubmitting },
   } = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
-    defaultValues,
+    defaultValues: draftKey
+      ? { ...defaultValues, ...loadFormDraft<EventFormValues>(draftKey) }
+      : defaultValues,
   })
+
+  useAutosaveFormDraft(draftKey ?? 'unused', watch, Boolean(draftKey))
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
