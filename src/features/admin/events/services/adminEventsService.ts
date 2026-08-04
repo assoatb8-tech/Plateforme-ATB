@@ -15,6 +15,7 @@ export interface EventParticipantDto {
       firstNameAr: string
       lastNameAr: string
       phoneMobile: string
+      photoUrl: string | null
     } | null
   }
 }

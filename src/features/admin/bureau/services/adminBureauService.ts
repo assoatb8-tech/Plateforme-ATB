@@ -3,6 +3,8 @@ import type { BureauMemberDto } from '@/features/bureau/types'
 
 export interface CreateBureauMemberInput {
   userId: string
+  positionFr: string
+  positionAr: string
   facebookUrl: string
 }
 

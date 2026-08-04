@@ -449,6 +449,8 @@
         "noResults": "لم يتم العثور على أي منخرط.",
         "memberRequired": "يرجى اختيار عضو.",
         "changeSelection": "تغيير",
+        "positionFrLabel": "المنصب (بالفرنسية)",
+        "positionArLabel": "المنصب (بالعربية)",
         "facebookLabel": "رابط فيسبوك",
         "cancel": "إلغاء",
         "submit": "إضافة"

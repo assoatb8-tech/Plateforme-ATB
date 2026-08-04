@@ -41,3 +41,18 @@ export async function getSignedProfilePhotoUrl(path: string): Promise<string | n
   if (error) return null
   return data.signedUrl
 }
+
+// Batch version for list pages (admin members, event participants) — one
+// request instead of N, same RLS as the single version above.
+export async function getSignedProfilePhotoUrls(paths: string[]): Promise<Record<string, string>> {
+  if (paths.length === 0) return {}
+  const supabase = await getSupabaseClient()
+  const { data, error } = await supabase.storage.from(MEMBERS_BUCKET).createSignedUrls(paths, 3600)
+  if (error || !data) return {}
+
+  const map: Record<string, string> = {}
+  for (const item of data) {
+    if (item.signedUrl && item.path) map[item.path] = item.signedUrl
+  }
+  return map
+}

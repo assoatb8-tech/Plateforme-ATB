@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { Search, UserX } from 'lucide-react'
+import { Search, UserRound, UserX } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
@@ -11,6 +11,7 @@ import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { useAdminUsersList } from '@/features/admin/users/hooks/useAdminUsers'
 import { USER_STATUS_TONE } from '@/utils/statusTones'
 import { resolveMemberDisplayName } from '@/utils/displayName'
+import { useSignedPhotoUrls } from '@/hooks/useSignedPhotoUrls'
 
 export function AdminUsersListPage() {
   const { t, i18n } = useTranslation()
@@ -20,6 +21,7 @@ export function AdminUsersListPage() {
   const [status, setStatus] = useState('')
 
   const { data, isLoading, isError } = useAdminUsersList(page, search, status)
+  const photoUrls = useSignedPhotoUrls(data?.users.map((user) => user.photoUrl) ?? [])
 
   function handleSearchSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -100,8 +102,19 @@ export function AdminUsersListPage() {
                     <td className="px-4 py-3">
                       <Link
                         to={`/admin/membres/${user.id}`}
-                        className="font-medium text-primary hover:underline"
+                        className="flex items-center gap-3 font-medium text-primary hover:underline"
                       >
+                        {user.photoUrl && photoUrls[user.photoUrl] ? (
+                          <img
+                            src={photoUrls[user.photoUrl]}
+                            alt=""
+                            className="h-8 w-8 shrink-0 rounded-full object-cover"
+                          />
+                        ) : (
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-300">
+                            <UserRound size={16} />
+                          </span>
+                        )}
                         {resolveMemberDisplayName(user, i18n.language) || t('admin.users.noName')}
                       </Link>
                     </td>

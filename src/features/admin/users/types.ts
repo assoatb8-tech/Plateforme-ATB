@@ -12,6 +12,7 @@ export interface UserListItemDto {
   firstNameAr: string | null
   lastNameAr: string | null
   phoneMobile: string | null
+  photoUrl: string | null
 }
 
 export interface UsersListResponse {

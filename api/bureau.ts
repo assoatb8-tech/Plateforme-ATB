@@ -87,6 +87,8 @@ async function handleList(_req: VercelRequest, res: VercelResponse): Promise<voi
         lastNameAr: profile?.lastNameAr ?? '',
         phone: profile?.phoneMobile ?? '',
         email: profile?.contactEmail ?? member.user.email,
+        positionFr: member.positionFr,
+        positionAr: member.positionAr,
         facebookUrl: member.facebookUrl,
         photoUrl,
         createdAt: member.createdAt,

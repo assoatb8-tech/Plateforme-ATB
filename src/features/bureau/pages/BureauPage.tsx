@@ -3,7 +3,7 @@ import { Facebook, Mail, Phone, UserRound, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { useBureauMembers } from '@/features/bureau/hooks/useBureau'
-import { resolveMemberDisplayName } from '@/utils/displayName'
+import { resolveBureauPosition, resolveMemberDisplayName } from '@/utils/displayName'
 
 export function BureauPage() {
   const { t, i18n } = useTranslation()
@@ -40,6 +40,11 @@ export function BureauPage() {
               <h2 className="text-base font-semibold text-slate-900">
                 {resolveMemberDisplayName(member, i18n.language)}
               </h2>
+              {resolveBureauPosition(member, i18n.language) && (
+                <p className="text-sm font-medium text-primary">
+                  {resolveBureauPosition(member, i18n.language)}
+                </p>
+              )}
               <a
                 href={`tel:${member.phone}`}
                 className="flex items-center gap-2 text-sm text-slate-600 hover:text-primary"

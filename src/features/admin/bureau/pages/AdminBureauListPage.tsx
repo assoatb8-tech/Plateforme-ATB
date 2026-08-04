@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { Plus, Search, Trash2, UserRound, Users, X } from 'lucide-react'
+import { resolveBureauPosition } from '@/utils/displayName'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
@@ -20,6 +21,7 @@ import {
 import { useAdminUsersList } from '@/features/admin/users/hooks/useAdminUsers'
 import type { UserListItemDto } from '@/features/admin/users/types'
 import { resolveMemberDisplayName } from '@/utils/displayName'
+import { useSignedPhotoUrls } from '@/hooks/useSignedPhotoUrls'
 
 export function AdminBureauListPage() {
   const { t, i18n } = useTranslation()
@@ -38,6 +40,9 @@ export function AdminBureauListPage() {
     1,
     memberSearch,
     '',
+  )
+  const candidatePhotoUrls = useSignedPhotoUrls(
+    memberResults?.users.map((candidate) => candidate.photoUrl) ?? [],
   )
 
   const {
@@ -70,6 +75,8 @@ export function AdminBureauListPage() {
     try {
       await createMutation.mutateAsync({
         userId: selectedMember.id,
+        positionFr: values.positionFr,
+        positionAr: values.positionAr,
         facebookUrl: values.facebookUrl,
       })
       closeCreateModal()
@@ -133,6 +140,11 @@ export function AdminBureauListPage() {
                 <p className="truncate text-sm font-medium text-slate-800">
                   {resolveMemberDisplayName(member, i18n.language)}
                 </p>
+                {resolveBureauPosition(member, i18n.language) && (
+                  <p className="truncate text-xs font-medium text-primary">
+                    {resolveBureauPosition(member, i18n.language)}
+                  </p>
+                )}
                 <p className="truncate text-xs text-slate-500">{member.phone}</p>
                 <p className="truncate text-xs text-slate-500">{member.email}</p>
               </div>
@@ -166,6 +178,17 @@ export function AdminBureauListPage() {
 
             {selectedMember ? (
               <div className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-2.5">
+                {selectedMember.photoUrl && candidatePhotoUrls[selectedMember.photoUrl] ? (
+                  <img
+                    src={candidatePhotoUrls[selectedMember.photoUrl]}
+                    alt=""
+                    className="h-8 w-8 shrink-0 rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-300">
+                    <UserRound size={16} />
+                  </span>
+                )}
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-slate-800">
                     {resolveMemberDisplayName(selectedMember, i18n.language) ||
@@ -211,18 +234,49 @@ export function AdminBureauListPage() {
                       key={candidate.id}
                       type="button"
                       onClick={() => setSelectedMember(candidate)}
-                      className="flex flex-col items-start rounded-lg px-3 py-2 text-start hover:bg-slate-50"
+                      className="flex items-center gap-3 rounded-lg px-3 py-2 text-start hover:bg-slate-50"
                     >
-                      <span className="text-sm font-medium text-slate-800">
-                        {resolveMemberDisplayName(candidate, i18n.language) || candidate.email}
+                      {candidate.photoUrl && candidatePhotoUrls[candidate.photoUrl] ? (
+                        <img
+                          src={candidatePhotoUrls[candidate.photoUrl]}
+                          alt=""
+                          className="h-8 w-8 shrink-0 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-300">
+                          <UserRound size={16} />
+                        </span>
+                      )}
+                      <span className="flex flex-col items-start">
+                        <span className="text-sm font-medium text-slate-800">
+                          {resolveMemberDisplayName(candidate, i18n.language) || candidate.email}
+                        </span>
+                        <span className="text-xs text-slate-500">{candidate.email}</span>
                       </span>
-                      <span className="text-xs text-slate-500">{candidate.email}</span>
                     </button>
                   ))}
                 </div>
               </>
             )}
             {memberError && <p className="text-sm text-error">{memberError}</p>}
+          </div>
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Input
+              required
+              label={t('admin.bureau.create.positionFrLabel')}
+              placeholder="Président"
+              error={errors.positionFr && t(errors.positionFr.message ?? 'validation.required')}
+              {...register('positionFr')}
+            />
+            <Input
+              required
+              dir="rtl"
+              label={t('admin.bureau.create.positionArLabel')}
+              placeholder="رئيس"
+              error={errors.positionAr && t(errors.positionAr.message ?? 'validation.required')}
+              {...register('positionAr')}
+            />
           </div>
 
           <Input

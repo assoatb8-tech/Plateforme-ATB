@@ -302,6 +302,7 @@ async function handleParticipants(eventId: string, res: VercelResponse): Promise
               firstNameAr: true,
               lastNameAr: true,
               phoneMobile: true,
+              photoUrl: true,
             },
           },
         },

@@ -449,6 +449,8 @@
         "noResults": "Aucun adhérent trouvé.",
         "memberRequired": "Veuillez sélectionner un membre.",
         "changeSelection": "Changer",
+        "positionFrLabel": "Fonction (français)",
+        "positionArLabel": "Fonction (arabe)",
         "facebookLabel": "Lien Facebook",
         "cancel": "Annuler",
         "submit": "Ajouter"

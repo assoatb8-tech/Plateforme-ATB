@@ -1,12 +1,13 @@
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, Users } from 'lucide-react'
+import { ArrowLeft, UserRound, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useAdminEvent, useEventParticipants } from '@/features/admin/events/hooks/useAdminEvents'
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
 import { resolveMemberDisplayName } from '@/utils/displayName'
+import { useSignedPhotoUrls } from '@/hooks/useSignedPhotoUrls'
 import type { RegistrationStatus } from '@/features/events/types'
 
 const STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
@@ -20,6 +21,9 @@ export function AdminEventParticipantsPage() {
   const { id } = useParams<{ id: string }>()
   const { data: event } = useAdminEvent(id)
   const { data: participants, isLoading, isError } = useEventParticipants(id)
+  const photoUrls = useSignedPhotoUrls(
+    participants?.map((participant) => participant.user.memberProfile?.photoUrl) ?? [],
+  )
 
   return (
     <div className="flex flex-col gap-6">
@@ -67,9 +71,23 @@ export function AdminEventParticipantsPage() {
               {participants.map((participant) => (
                 <tr key={participant.id} className="border-b border-slate-100 last:border-0">
                   <td className="px-4 py-3 font-medium text-slate-800">
-                    {(participant.user.memberProfile &&
-                      resolveMemberDisplayName(participant.user.memberProfile, i18n.language)) ||
-                      t('admin.users.noName')}
+                    <div className="flex items-center gap-3">
+                      {participant.user.memberProfile?.photoUrl &&
+                      photoUrls[participant.user.memberProfile.photoUrl] ? (
+                        <img
+                          src={photoUrls[participant.user.memberProfile.photoUrl]}
+                          alt=""
+                          className="h-8 w-8 shrink-0 rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-300">
+                          <UserRound size={16} />
+                        </span>
+                      )}
+                      {(participant.user.memberProfile &&
+                        resolveMemberDisplayName(participant.user.memberProfile, i18n.language)) ||
+                        t('admin.users.noName')}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-slate-500">
                     {participant.user.memberProfile?.phoneMobile ?? '—'}

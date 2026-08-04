@@ -23,3 +23,22 @@ export function resolveMemberDisplayName(name: BilingualName, language: string):
   if (primaryJoined) return primaryJoined
   return fallback.filter(Boolean).join(' ')
 }
+
+interface BilingualPosition {
+  positionFr: string | null
+  positionAr: string | null
+}
+
+// Same pick-by-language-then-fallback pattern as resolveMemberDisplayName,
+// for Bureau members' title (e.g. "Président" / "رئيس"). Returns null if
+// neither language is set — existing entries added before this field
+// existed have no position yet (Bureau has no edit, only create/delete).
+export function resolveBureauPosition(
+  position: BilingualPosition,
+  language: string,
+): string | null {
+  const isArabic = language === 'ar'
+  const primary = isArabic ? position.positionAr : position.positionFr
+  const fallback = isArabic ? position.positionFr : position.positionAr
+  return primary || fallback || null
+}
