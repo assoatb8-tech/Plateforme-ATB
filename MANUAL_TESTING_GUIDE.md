@@ -25,7 +25,7 @@ URL de production : https://plateforme-atb.vercel.app
 
 ### 3. Gestion des membres
 - **Action** : aller sur `/admin/membres`.
-- **Résultat attendu** : liste des adhérents avec nom, email, statut, date d'inscription. Recherche et filtre par statut fonctionnels.
+- **Résultat attendu** : liste des adhérents avec photo de profil (ou icône générique si absente), nom, email, statut, date d'inscription. Recherche et filtre par statut fonctionnels.
 - **Action** : cliquer sur un adhérent.
 - **Résultat attendu** : page détail avec informations du dossier, sélecteur de statut (Actif / En attente / Suspendu), bouton "Bannir", bouton "Supprimer le compte".
 - **Vérifier** : changer le statut vers "Actif" se reflète immédiatement dans le tableau et dans le compte de l'adhérent (visible à sa prochaine connexion/rafraîchissement).
@@ -49,8 +49,8 @@ URL de production : https://plateforme-atb.vercel.app
 
 ### 5bis. Participants d'un événement
 - **Action** : sur `/admin/evenements`, cliquer le bouton "Participants" (icône personnes) d'un événement qui a au moins une inscription.
-- **Résultat attendu** : page avec le titre de l'événement et un tableau des inscrits (Nom, Téléphone, Email, Statut, Date d'inscription).
-- **Vérifier** : un événement sans inscription affiche un état vide clair plutôt qu'un tableau cassé ; le lien "Retour" ramène à `/admin/evenements`.
+- **Résultat attendu** : page avec le titre de l'événement et un tableau des inscrits (photo, Nom, Téléphone, Email, Statut, Date d'inscription).
+- **Vérifier** : la photo de profil de chaque inscrit s'affiche (ou une icône générique si absente) ; un événement sans inscription affiche un état vide clair plutôt qu'un tableau cassé ; le lien "Retour" ramène à `/admin/evenements`.
 
 ### 6. Gestion des sponsors
 - **Action** : aller sur `/admin/sponsors`, cliquer "Ajouter un sponsor".
@@ -66,9 +66,10 @@ URL de production : https://plateforme-atb.vercel.app
 - **Vérifier** : impossible de soumettre sans avoir sélectionné un membre (message d'erreur affiché).
 - **Action** : sélectionner un membre qui n'a pas encore de photo de profil, puis remplir le lien Facebook et soumettre.
 - **Résultat attendu** : erreur claire ("ce membre n'a pas encore de photo de profil"), car chaque membre du Bureau doit avoir une photo de profil.
-- **Action** : sélectionner un membre qui a déjà une photo de profil, remplir le lien Facebook, soumettre.
-- **Résultat attendu** : le membre apparaît dans la grille admin avec sa photo de profil (celle de son dossier d'adhésion, pas une photo distincte), avec un bouton de suppression.
-- **Vérifier** : le membre apparaît immédiatement sur la page publique `/bureau` avec sa photo, ses liens téléphone (`tel:`), email (`mailto:`) et Facebook fonctionnels ; le nom affiché correspond à la langue active de l'interface (français ou arabe).
+- **Action** : sélectionner un membre qui a déjà une photo de profil, remplir la fonction en français (ex. "Président") et en arabe (ex. "رئيس"), remplir le lien Facebook, soumettre.
+- **Résultat attendu** : le membre apparaît dans la grille admin avec sa photo de profil (celle de son dossier d'adhésion, pas une photo distincte) et sa fonction, avec un bouton de suppression.
+- **Vérifier** : le membre apparaît immédiatement sur la page publique `/bureau` avec sa photo, sa fonction, ses liens téléphone (`tel:`), email (`mailto:`) et Facebook fonctionnels ; le nom et la fonction affichés correspondent à la langue active de l'interface (français ou arabe).
+- **Vérifier la recherche de membre** : dans le champ de recherche du formulaire d'ajout, chaque résultat affiche la photo de profil du membre (ou une icône générique si absente).
 - **Action** : supprimer le membre depuis `/admin/bureau`.
 - **Résultat attendu** : confirmation demandée, puis disparition immédiate de la grille admin et de `/bureau` (le compte du membre lui-même n'est pas affecté).
 - **Vérifier l'état vide** : sans aucun membre, `/bureau` affiche un message clair plutôt qu'une page cassée.
@@ -166,5 +167,15 @@ membres explicitement publiés par un admin). Ajouter un membre au Bureau
 est bloqué tant que ce membre n'a pas lui-même de photo de profil. Un
 encart sur le tableau de bord invite les adhérents dont le profil n'a
 pas encore de photo à en ajouter une.
+
+Mise à jour du 2026-08-04 : ajout d'une fonction bilingue (ex. "Président"
+/ "رئيس") pour chaque membre du Bureau, affichée sous son nom. La photo
+de profil s'affiche désormais dans toutes les listes de personnes
+(adhérents, participants à un événement, recherche de membre pour le
+Bureau), pas seulement sur les pages Bureau. **Action requise** : les 2
+membres du Bureau ajoutés le 2026-08-03 (Khaled Mehdaoui, Firas Berriri)
+n'ont pas de fonction — la gestion du Bureau ne permet pas de modifier
+une entrée existante, il faut les supprimer puis les rajouter via
+`/admin/bureau` pour renseigner leur fonction.
 
 Aucun problème connu à ce jour.
