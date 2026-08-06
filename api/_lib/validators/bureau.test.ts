@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { bureauMemberCreateSchema } from './bureau.js'
+import { bureauMemberCreateSchema, bureauMemberUpdateSchema } from './bureau.js'
 
 const validInput = {
   userId: '9c858901-8a57-4791-81fe-4c455b099bc9',
@@ -42,5 +42,26 @@ describe('bureauMemberCreateSchema', () => {
   it('rejects a missing field', () => {
     const { facebookUrl: _omit, ...withoutFacebook } = validInput
     expect(bureauMemberCreateSchema.safeParse(withoutFacebook).success).toBe(false)
+  })
+})
+
+describe('bureauMemberUpdateSchema', () => {
+  const { userId: _omit, ...validUpdate } = validInput
+
+  it('accepts a valid update without userId', () => {
+    expect(bureauMemberUpdateSchema.safeParse(validUpdate).success).toBe(true)
+  })
+
+  it('rejects a userId being passed (not part of the update shape)', () => {
+    const result = bureauMemberUpdateSchema.safeParse(validUpdate)
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data).not.toHaveProperty('userId')
+    }
+  })
+
+  it('rejects a missing positionAr', () => {
+    const { positionAr: _omitPosition, ...withoutPosition } = validUpdate
+    expect(bureauMemberUpdateSchema.safeParse(withoutPosition).success).toBe(false)
   })
 })

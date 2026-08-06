@@ -12,6 +12,19 @@ export async function createBureauMember(input: CreateBureauMemberInput): Promis
   return apiRequest<BureauMemberDto>('/api/bureau', { method: 'POST', body: input })
 }
 
+export interface UpdateBureauMemberInput {
+  positionFr: string
+  positionAr: string
+  facebookUrl: string
+}
+
+export async function updateBureauMember(
+  id: string,
+  input: UpdateBureauMemberInput,
+): Promise<BureauMemberDto> {
+  return apiRequest<BureauMemberDto>('/api/bureau', { method: 'PATCH', query: { id }, body: input })
+}
+
 export async function deleteBureauMember(id: string): Promise<void> {
   await apiRequest('/api/bureau', { method: 'DELETE', query: { id } })
 }

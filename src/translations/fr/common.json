@@ -437,6 +437,7 @@
       "subtitle": "Ajouter ou retirer les membres affichés sur la page Bureau.",
       "noneYet": "Aucun membre du bureau pour le moment.",
       "actionError": "Une erreur est survenue. Merci de réessayer.",
+      "editAction": "Modifier",
       "deleteAction": "Supprimer",
       "deleteConfirmTitle": "Supprimer ce membre",
       "deleteConfirmText": "Cette action est irréversible. Le membre sera retiré de la page Bureau.",
@@ -455,6 +456,10 @@
         "facebookLabel": "Lien Facebook",
         "cancel": "Annuler",
         "submit": "Ajouter"
+      },
+      "edit": {
+        "title": "Modifier ce membre",
+        "submit": "Enregistrer"
       }
     }
   }

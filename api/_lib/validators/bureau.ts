@@ -11,3 +11,9 @@ export const bureauMemberCreateSchema = z.object({
 })
 
 export type BureauMemberCreateInput = z.infer<typeof bureauMemberCreateSchema>
+
+// Everything except userId — who the entry links to isn't editable, only
+// their position/link. Picking a different member is a delete + re-add.
+export const bureauMemberUpdateSchema = bureauMemberCreateSchema.omit({ userId: true })
+
+export type BureauMemberUpdateInput = z.infer<typeof bureauMemberUpdateSchema>

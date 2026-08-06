@@ -4,7 +4,7 @@ import { prisma } from './_lib/utils/prisma.js'
 import { withRole } from './_lib/middlewares/rbac.js'
 import { sendError, sendSuccess } from './_lib/utils/response.js'
 import { enforceIpRateLimit } from './_lib/utils/rateLimit.js'
-import { bureauMemberCreateSchema } from './_lib/validators/bureau.js'
+import { bureauMemberCreateSchema, bureauMemberUpdateSchema } from './_lib/validators/bureau.js'
 import { logAdminAction } from './_lib/utils/auditLog.js'
 import { isValidUuid } from './_lib/utils/validateId.js'
 import { supabaseAdmin } from './_lib/utils/supabaseAdmin.js'
@@ -23,6 +23,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   }
   if (req.method === 'POST') {
     await withRole(['ADMIN'], handleCreate)(req, res)
+    return
+  }
+  if (req.method === 'PATCH') {
+    await withRole(['ADMIN'], handleUpdate)(req, res)
     return
   }
   if (req.method === 'DELETE') {
@@ -142,6 +146,37 @@ async function handleCreate(
     }
     throw error
   }
+}
+
+// PATCH /api/bureau?id=... — ADMIN. Only position/Facebook link are
+// editable — who the entry links to is not (see bureauMemberUpdateSchema).
+async function handleUpdate(
+  req: VercelRequest,
+  res: VercelResponse,
+  user: { id: string },
+): Promise<void> {
+  const id = Array.isArray(req.query.id) ? req.query.id[0] : req.query.id
+  if (!id || !isValidUuid(id)) {
+    sendError(res, 'Bureau member not found', 404)
+    return
+  }
+
+  const parsed = bureauMemberUpdateSchema.safeParse(req.body)
+  if (!parsed.success) {
+    sendError(res, parsed.error.issues.map((issue) => issue.message).join(', '), 400)
+    return
+  }
+
+  const existing = await prisma.bureauMember.findUnique({ where: { id } })
+  if (!existing) {
+    sendError(res, 'Bureau member not found', 404)
+    return
+  }
+
+  const member = await prisma.bureauMember.update({ where: { id }, data: parsed.data })
+  await logAdminAction(user.id, 'BUREAU_MEMBER_UPDATED', id)
+
+  sendSuccess(res, member)
 }
 
 // DELETE /api/bureau?id=... — ADMIN.

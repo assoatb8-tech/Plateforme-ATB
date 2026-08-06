@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
-import { Plus, Search, Trash2, UserRound, Users, X } from 'lucide-react'
+import { Pencil, Plus, Search, Trash2, UserRound, Users, X } from 'lucide-react'
 import { resolveBureauPosition } from '@/utils/displayName'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
@@ -10,9 +10,11 @@ import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
 import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { useBureauMembers } from '@/features/bureau/hooks/useBureau'
+import type { BureauMemberDto } from '@/features/bureau/types'
 import {
   useCreateBureauMember,
   useDeleteBureauMember,
+  useUpdateBureauMember,
 } from '@/features/admin/bureau/hooks/useAdminBureau'
 import {
   bureauMemberFormSchema,
@@ -44,6 +46,7 @@ function loadMemberDraft(): UserListItemDto | null {
 export function AdminBureauListPage() {
   const { t, i18n } = useTranslation()
   const [createModalOpen, setCreateModalOpen] = useState(false)
+  const [editingMember, setEditingMember] = useState<BureauMemberDto | null>(null)
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [memberSearchInput, setMemberSearchInput] = useState('')
   const [memberSearch, setMemberSearch] = useState('')
@@ -61,6 +64,7 @@ export function AdminBureauListPage() {
 
   const { data: members, isLoading, isError } = useBureauMembers()
   const createMutation = useCreateBureauMember()
+  const updateMutation = useUpdateBureauMember()
   const deleteMutation = useDeleteBureauMember()
   const { data: memberResults, isFetching: isSearchingMembers } = useAdminUsersList(
     1,
@@ -83,6 +87,43 @@ export function AdminBureauListPage() {
   })
 
   useAutosaveFormDraft(FORM_DRAFT_KEY, watch)
+
+  // Editing an existing entry only ever touches position/Facebook link —
+  // who it's linked to is fixed (see bureauMemberUpdateSchema) — so this
+  // is a separate, simpler form than the create one above (no member
+  // picker, no draft persistence: a quick two-field edit isn't worth the
+  // same "survive a backgrounded tab" treatment as filling out a full
+  // create flow).
+  const {
+    register: registerEdit,
+    handleSubmit: handleEditSubmit,
+    reset: resetEdit,
+    formState: { errors: editErrors },
+  } = useForm<BureauMemberFormValues>({ resolver: zodResolver(bureauMemberFormSchema) })
+
+  function openEditModal(member: BureauMemberDto) {
+    setEditingMember(member)
+    resetEdit({
+      positionFr: member.positionFr ?? '',
+      positionAr: member.positionAr ?? '',
+      facebookUrl: member.facebookUrl,
+    })
+  }
+
+  function closeEditModal() {
+    setEditingMember(null)
+  }
+
+  async function onEditSubmit(values: BureauMemberFormValues) {
+    if (!editingMember) return
+    setActionError(null)
+    try {
+      await updateMutation.mutateAsync({ id: editingMember.id, input: values })
+      closeEditModal()
+    } catch {
+      setActionError(t('admin.bureau.actionError'))
+    }
+  }
 
   function closeCreateModal() {
     setCreateModalOpen(false)
@@ -184,6 +225,14 @@ export function AdminBureauListPage() {
                 <p className="truncate text-xs text-slate-500">{member.phone}</p>
                 <p className="truncate text-xs text-slate-500">{member.email}</p>
               </div>
+              <Button
+                type="button"
+                variant="ghost"
+                aria-label={t('admin.bureau.editAction')}
+                onClick={() => openEditModal(member)}
+              >
+                <Pencil size={16} />
+              </Button>
               <Button
                 type="button"
                 variant="ghost"
@@ -352,6 +401,79 @@ export function AdminBureauListPage() {
               loading={createMutation.isPending}
             >
               {t('admin.bureau.create.submit')}
+            </Button>
+          </div>
+        </form>
+      </Modal>
+
+      <Modal
+        open={editingMember !== null}
+        onClose={closeEditModal}
+        title={t('admin.bureau.edit.title')}
+      >
+        <form onSubmit={handleEditSubmit(onEditSubmit)} noValidate className="flex flex-col gap-4">
+          {editingMember && (
+            <div className="flex items-center gap-3 rounded-xl border border-slate-200 px-4 py-2.5">
+              {editingMember.photoUrl ? (
+                <img
+                  src={editingMember.photoUrl}
+                  alt=""
+                  className="h-8 w-8 shrink-0 rounded-full object-cover"
+                />
+              ) : (
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-300">
+                  <UserRound size={16} />
+                </span>
+              )}
+              <p className="truncate text-sm font-medium text-slate-800">
+                {resolveMemberDisplayName(editingMember, i18n.language)}
+              </p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Input
+              required
+              label={t('admin.bureau.create.positionFrLabel')}
+              placeholder="Président"
+              error={
+                editErrors.positionFr && t(editErrors.positionFr.message ?? 'validation.required')
+              }
+              {...registerEdit('positionFr')}
+            />
+            <Input
+              required
+              dir="rtl"
+              label={t('admin.bureau.create.positionArLabel')}
+              placeholder="رئيس"
+              error={
+                editErrors.positionAr && t(editErrors.positionAr.message ?? 'validation.required')
+              }
+              {...registerEdit('positionAr')}
+            />
+          </div>
+
+          <Input
+            type="url"
+            required
+            placeholder="https://facebook.com/..."
+            label={t('admin.bureau.create.facebookLabel')}
+            error={
+              editErrors.facebookUrl && t(editErrors.facebookUrl.message ?? 'validation.required')
+            }
+            {...registerEdit('facebookUrl')}
+          />
+
+          <div className="flex justify-end gap-2">
+            <Button type="button" variant="ghost" onClick={closeEditModal}>
+              {t('admin.bureau.create.cancel')}
+            </Button>
+            <Button
+              type="submit"
+              disabled={updateMutation.isPending}
+              loading={updateMutation.isPending}
+            >
+              {t('admin.bureau.edit.submit')}
             </Button>
           </div>
         </form>
