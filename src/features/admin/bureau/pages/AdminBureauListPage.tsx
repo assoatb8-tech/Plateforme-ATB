@@ -98,8 +98,7 @@ export function AdminBureauListPage() {
     clearFormDraft(FORM_DRAFT_KEY)
   }
 
-  function handleMemberSearchSubmit(event: React.FormEvent) {
-    event.preventDefault()
+  function runMemberSearch() {
     setMemberSearch(memberSearchInput.trim())
   }
 
@@ -244,19 +243,37 @@ export function AdminBureauListPage() {
               </div>
             ) : (
               <>
-                <form onSubmit={handleMemberSearchSubmit} className="flex gap-2">
+                {/* A <form> here (nested inside the outer create-member
+                    form below) is invalid HTML — browsers don't allow
+                    nested forms and silently break the boundary between
+                    them, which made this "inner form"'s submit fall
+                    through to a real native submit of the OUTER form
+                    (full page reload, losing everything). Plain div +
+                    explicit Enter-key handling instead. */}
+                <div className="flex gap-2">
                   <Input
                     type="search"
                     placeholder={t('admin.bureau.create.searchPlaceholder')}
                     value={memberSearchInput}
                     onChange={(event) => setMemberSearchInput(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter') {
+                        event.preventDefault()
+                        runMemberSearch()
+                      }
+                    }}
                     aria-label={t('admin.bureau.create.searchPlaceholder')}
                     className="min-w-0 flex-1"
                   />
-                  <Button type="submit" variant="secondary" className="shrink-0">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="shrink-0"
+                    onClick={runMemberSearch}
+                  >
                     <Search size={16} />
                   </Button>
-                </form>
+                </div>
                 <div className="flex max-h-48 flex-col gap-1 overflow-y-auto">
                   {isSearchingMembers && (
                     <p className="p-2 text-sm text-slate-500">{t('admin.loading')}</p>
