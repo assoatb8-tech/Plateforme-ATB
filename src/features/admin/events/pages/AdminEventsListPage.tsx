@@ -10,6 +10,7 @@ import { StatusBadge } from '@/components/ui/StatusBadge'
 import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { useAdminEventsList, useDeleteEvent } from '@/features/admin/events/hooks/useAdminEvents'
 import { EVENT_STATUS_TONE } from '@/utils/statusTones'
+import { getEffectiveEventStatus } from '@/utils/eventStatus'
 
 export function AdminEventsListPage() {
   const { t } = useTranslation()
@@ -112,8 +113,8 @@ export function AdminEventsListPage() {
                       {event.registeredCount} / {event.maxParticipants}
                     </td>
                     <td className="px-4 py-3">
-                      <StatusBadge tone={EVENT_STATUS_TONE[event.status]}>
-                        {t(`admin.events.status.${event.status}`)}
+                      <StatusBadge tone={EVENT_STATUS_TONE[getEffectiveEventStatus(event)]}>
+                        {t(`admin.events.status.${getEffectiveEventStatus(event)}`)}
                       </StatusBadge>
                     </td>
                     <td className="px-4 py-3">

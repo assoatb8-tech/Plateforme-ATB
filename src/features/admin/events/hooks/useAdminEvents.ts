@@ -1,5 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
+  assignEventLeader,
   createEvent,
   deleteEvent,
   fetchAdminEvent,
@@ -70,6 +71,14 @@ export function useDeleteEvent() {
   const invalidate = useInvalidateAdminEventQueries()
   return useMutation({
     mutationFn: (id: string) => deleteEvent(id),
+    onSuccess: invalidate,
+  })
+}
+
+export function useAssignEventLeader(eventId: string) {
+  const invalidate = useInvalidateAdminEventQueries()
+  return useMutation({
+    mutationFn: (userId: string | null) => assignEventLeader(eventId, userId),
     onSuccess: invalidate,
   })
 }

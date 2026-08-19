@@ -376,18 +376,24 @@
       },
       "status": {
         "ACTIVE": "Actif",
-        "CANCELLED": "Annulé"
+        "CANCELLED": "Annulé",
+        "DONE": "Terminé"
       },
       "participants": {
         "action": "Voir les participants",
         "title": "Participants",
         "noneYet": "Aucun participant pour le moment.",
+        "leader": "Chef de groupe",
+        "makeLeader": "Désigner comme chef",
+        "removeLeader": "Retirer",
+        "leaderError": "Une erreur est survenue. Merci de réessayer.",
         "columns": {
           "name": "Nom",
           "phone": "Téléphone",
           "email": "Email",
           "status": "Statut",
-          "date": "Date d'inscription"
+          "date": "Date d'inscription",
+          "leader": "Chef de groupe"
         }
       },
       "form": {
@@ -403,6 +409,7 @@
         "maxParticipants": "Nombre de places",
         "status": "Statut",
         "facebookPostUrl": "Lien Facebook (photos de l'événement)",
+        "banner": "Bannière (optionnelle)",
         "dateOrderError": "La date de fin doit être postérieure à la date de début.",
         "submit": "Créer l'événement",
         "save": "Enregistrer les modifications",

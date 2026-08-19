@@ -14,6 +14,8 @@ export interface EventDto {
   maxParticipants: number
   status: EventStatus
   facebookPostUrl: string | null
+  bannerUrl: string | null
+  leaderId: string | null
   createdAt: string
   registeredCount: number
   spotsLeft: number

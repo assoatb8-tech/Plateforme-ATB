@@ -18,6 +18,11 @@ const eventFormSchemaBase = z.object({
     .trim()
     .optional()
     .refine((val) => !val || z.string().url().safeParse(val).success, 'validation.invalidUrl'),
+  bannerUrl: z
+    .string()
+    .trim()
+    .optional()
+    .refine((val) => !val || z.string().url().safeParse(val).success, 'validation.invalidUrl'),
 })
 
 export const eventFormSchema = eventFormSchemaBase.refine(

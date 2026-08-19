@@ -147,6 +147,7 @@ async function handleCreate(req: VercelRequest, res: VercelResponse, user: { id:
       endDate: new Date(parsed.data.endDate),
       maxParticipants: parsed.data.maxParticipants,
       facebookPostUrl: parsed.data.facebookPostUrl,
+      bannerUrl: parsed.data.bannerUrl,
       createdBy: user.id,
     },
   })

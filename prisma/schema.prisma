@@ -94,6 +94,7 @@ model User {
   bans               Ban[]               @relation("BannedUser")
   bansIssued         Ban[]               @relation("BanIssuer")
   eventsCreated      Event[]             @relation("EventCreator")
+  eventsLed          Event[]             @relation("EventLeader")
   auditLogs          AuditLog[]
   bureauMembership   BureauMember?
 
@@ -178,6 +179,9 @@ model Event {
   maxParticipants Int         @map("max_participants")
   status          EventStatus @default(ACTIVE)
   facebookPostUrl String?     @map("facebook_post_url")
+  bannerUrl       String?     @map("banner_url")
+  leaderId        String?     @map("leader_id") @db.Uuid
+  leader          User?       @relation("EventLeader", fields: [leaderId], references: [id], onDelete: SetNull)
   createdBy       String      @map("created_by") @db.Uuid
   creator         User        @relation("EventCreator", fields: [createdBy], references: [id])
   createdAt       DateTime    @default(now()) @map("created_at")

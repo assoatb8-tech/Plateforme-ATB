@@ -84,6 +84,13 @@ export function EventDetailPage() {
       </Link>
 
       <Card className="flex flex-col gap-6">
+        {event.bannerUrl && (
+          <img
+            src={event.bannerUrl}
+            alt=""
+            className="-mx-6 -mt-6 h-56 rounded-t-xl object-cover"
+          />
+        )}
         <div>
           <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
           {isCancelledEvent && (

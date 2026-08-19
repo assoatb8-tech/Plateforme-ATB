@@ -25,6 +25,13 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <Link to={`/evenements/${event.id}`} className="block h-full">
       <Card className="flex h-full flex-col gap-3 transition-shadow hover:shadow-md">
+        {event.bannerUrl && (
+          <img
+            src={event.bannerUrl}
+            alt=""
+            className="-mx-6 -mt-6 h-36 rounded-t-xl object-cover"
+          />
+        )}
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-lg font-semibold text-slate-900">{title}</h3>
           {event.facebookPostUrl && (

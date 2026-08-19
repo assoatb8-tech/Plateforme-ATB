@@ -83,6 +83,7 @@ export function AdminEventFormPage() {
                   maxParticipants: event.maxParticipants,
                   status: event.status,
                   facebookPostUrl: event.facebookPostUrl ?? '',
+                  bannerUrl: event.bannerUrl ?? '',
                 }
               : undefined
           }

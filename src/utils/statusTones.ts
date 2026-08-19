@@ -1,5 +1,6 @@
 import type { UserStatus } from '@/types/domain'
-import type { EventStatus, RegistrationStatus } from '@/features/events/types'
+import type { RegistrationStatus } from '@/features/events/types'
+import type { EffectiveEventStatus } from '@/utils/eventStatus'
 import type { BadgeTone } from '@/components/ui/StatusBadge'
 
 export const USER_STATUS_TONE: Record<UserStatus, BadgeTone> = {
@@ -8,9 +9,10 @@ export const USER_STATUS_TONE: Record<UserStatus, BadgeTone> = {
   BANNED: 'error',
 }
 
-export const EVENT_STATUS_TONE: Record<EventStatus, BadgeTone> = {
+export const EVENT_STATUS_TONE: Record<EffectiveEventStatus, BadgeTone> = {
   ACTIVE: 'success',
   CANCELLED: 'error',
+  DONE: 'neutral',
 }
 
 export const REGISTRATION_STATUS_TONE: Record<RegistrationStatus, BadgeTone> = {

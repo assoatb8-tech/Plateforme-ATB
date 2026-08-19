@@ -23,6 +23,18 @@ const facebookPostUrl = z
     message: 'facebookPostUrl must be a valid URL',
   })
 
+// Same "always resolves to string | null" shape as facebookPostUrl — an
+// admin removing the banner should explicitly clear the column, not leave
+// a stale value in place because the key looked unset.
+const bannerUrl = z
+  .string()
+  .trim()
+  .optional()
+  .transform((val) => (val ? val : null))
+  .refine((val) => val === null || z.string().url().safeParse(val).success, {
+    message: 'bannerUrl must be a valid URL',
+  })
+
 const eventBaseSchema = z.object({
   titleFr: sanitizedText(2),
   titleAr: sanitizedText(2),
@@ -33,6 +45,7 @@ const eventBaseSchema = z.object({
   endDate: z.string().refine((val) => !Number.isNaN(Date.parse(val))),
   maxParticipants: z.number().int().positive(),
   facebookPostUrl,
+  bannerUrl,
 })
 
 function withDateOrderCheck<T extends z.ZodTypeAny>(schema: T) {
@@ -55,3 +68,9 @@ export const eventUpdateSchema = withDateOrderCheck(
 
 export type EventCreateInput = z.infer<typeof eventCreateSchema>
 export type EventUpdateInput = z.infer<typeof eventUpdateSchema>
+
+// null explicitly unassigns the current leader — distinct from omitting
+// the field, which this endpoint doesn't accept anyway (always required).
+export const eventLeaderSchema = z.object({ userId: z.string().uuid().nullable() })
+
+export type EventLeaderInput = z.infer<typeof eventLeaderSchema>

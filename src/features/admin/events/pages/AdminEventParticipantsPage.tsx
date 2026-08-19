@@ -1,10 +1,16 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { ArrowLeft, UserRound, Users } from 'lucide-react'
+import { ArrowLeft, Crown, UserRound, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
 import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import { useAdminEvent, useEventParticipants } from '@/features/admin/events/hooks/useAdminEvents'
+import {
+  useAdminEvent,
+  useAssignEventLeader,
+  useEventParticipants,
+} from '@/features/admin/events/hooks/useAdminEvents'
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
 import { resolveMemberDisplayName } from '@/utils/displayName'
 import { useSignedPhotoUrls } from '@/hooks/useSignedPhotoUrls'
@@ -24,6 +30,17 @@ export function AdminEventParticipantsPage() {
   const photoUrls = useSignedPhotoUrls(
     participants?.map((participant) => participant.user.memberProfile?.photoUrl) ?? [],
   )
+  const leaderMutation = useAssignEventLeader(id ?? '')
+  const [leaderError, setLeaderError] = useState<string | null>(null)
+
+  async function handleLeaderToggle(userId: string, isCurrentLeader: boolean) {
+    setLeaderError(null)
+    try {
+      await leaderMutation.mutateAsync(isCurrentLeader ? null : userId)
+    } catch {
+      setLeaderError(t('admin.events.participants.leaderError'))
+    }
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -41,6 +58,8 @@ export function AdminEventParticipantsPage() {
         {event && <p className="text-sm text-slate-500">{event.titleFr}</p>}
       </div>
 
+      {leaderError && <p className="text-sm text-error">{leaderError}</p>}
+
       {isLoading && (
         <Card className="p-4">
           <SkeletonRows count={5} />
@@ -57,7 +76,7 @@ export function AdminEventParticipantsPage() {
 
       {!isLoading && participants && participants.length > 0 && (
         <Card className="overflow-x-auto p-0">
-          <table className="w-full min-w-[560px] text-start text-sm">
+          <table className="w-full min-w-[640px] text-start text-sm">
             <thead className="border-b border-slate-200 text-xs font-semibold uppercase tracking-wide text-slate-500">
               <tr>
                 <th className="px-4 py-3">{t('admin.events.participants.columns.name')}</th>
@@ -65,44 +84,74 @@ export function AdminEventParticipantsPage() {
                 <th className="px-4 py-3">{t('admin.events.participants.columns.email')}</th>
                 <th className="px-4 py-3">{t('admin.events.participants.columns.status')}</th>
                 <th className="px-4 py-3">{t('admin.events.participants.columns.date')}</th>
+                <th className="px-4 py-3 text-end">
+                  {t('admin.events.participants.columns.leader')}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {participants.map((participant) => (
-                <tr key={participant.id} className="border-b border-slate-100 last:border-0">
-                  <td className="px-4 py-3 font-medium text-slate-800">
-                    <div className="flex items-center gap-3">
-                      {participant.user.memberProfile?.photoUrl &&
-                      photoUrls[participant.user.memberProfile.photoUrl] ? (
-                        <img
-                          src={photoUrls[participant.user.memberProfile.photoUrl]}
-                          alt=""
-                          className="h-8 w-8 shrink-0 rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-300">
-                          <UserRound size={16} />
-                        </span>
+              {participants.map((participant) => {
+                const isCurrentLeader = event?.leaderId === participant.user.id
+                return (
+                  <tr key={participant.id} className="border-b border-slate-100 last:border-0">
+                    <td className="px-4 py-3 font-medium text-slate-800">
+                      <div className="flex items-center gap-3">
+                        {participant.user.memberProfile?.photoUrl &&
+                        photoUrls[participant.user.memberProfile.photoUrl] ? (
+                          <img
+                            src={photoUrls[participant.user.memberProfile.photoUrl]}
+                            alt=""
+                            className="h-8 w-8 shrink-0 rounded-full object-cover"
+                          />
+                        ) : (
+                          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-300">
+                            <UserRound size={16} />
+                          </span>
+                        )}
+                        {(participant.user.memberProfile &&
+                          resolveMemberDisplayName(
+                            participant.user.memberProfile,
+                            i18n.language,
+                          )) ||
+                          t('admin.users.noName')}
+                        {isCurrentLeader && (
+                          <span title={t('admin.events.participants.leader')}>
+                            <Crown size={14} className="shrink-0 text-secondary" />
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-slate-500">
+                      {participant.user.memberProfile?.phoneMobile ?? '—'}
+                    </td>
+                    <td className="px-4 py-3 text-slate-500">{participant.user.email}</td>
+                    <td className="px-4 py-3">
+                      <StatusBadge tone={REGISTRATION_STATUS_TONE[participant.status]}>
+                        {t(STATUS_LABEL_KEY[participant.status])}
+                      </StatusBadge>
+                    </td>
+                    <td className="px-4 py-3 text-slate-500">
+                      {new Date(participant.registeredAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3 text-end">
+                      {participant.status === 'REGISTERED' && (
+                        <Button
+                          type="button"
+                          variant={isCurrentLeader ? 'danger' : 'secondary'}
+                          disabled={leaderMutation.isPending}
+                          onClick={() =>
+                            void handleLeaderToggle(participant.user.id, isCurrentLeader)
+                          }
+                        >
+                          {isCurrentLeader
+                            ? t('admin.events.participants.removeLeader')
+                            : t('admin.events.participants.makeLeader')}
+                        </Button>
                       )}
-                      {(participant.user.memberProfile &&
-                        resolveMemberDisplayName(participant.user.memberProfile, i18n.language)) ||
-                        t('admin.users.noName')}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-slate-500">
-                    {participant.user.memberProfile?.phoneMobile ?? '—'}
-                  </td>
-                  <td className="px-4 py-3 text-slate-500">{participant.user.email}</td>
-                  <td className="px-4 py-3">
-                    <StatusBadge tone={REGISTRATION_STATUS_TONE[participant.status]}>
-                      {t(STATUS_LABEL_KEY[participant.status])}
-                    </StatusBadge>
-                  </td>
-                  <td className="px-4 py-3 text-slate-500">
-                    {new Date(participant.registeredAt).toLocaleDateString()}
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                  </tr>
+                )
+              })}
             </tbody>
           </table>
         </Card>

@@ -4,7 +4,7 @@ import { prisma } from '../_lib/utils/prisma.js'
 import { withRole } from '../_lib/middlewares/rbac.js'
 import { withAuth, getOptionalUser, type AuthedUser } from '../_lib/middlewares/auth.js'
 import { sendError, sendSuccess } from '../_lib/utils/response.js'
-import { eventUpdateSchema } from '../_lib/validators/event.js'
+import { eventUpdateSchema, eventLeaderSchema } from '../_lib/validators/event.js'
 import { serializeEvent } from '../_lib/utils/eventSerializer.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
 import { enforceIpRateLimit } from '../_lib/utils/rateLimit.js'
@@ -93,6 +93,17 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       return
     }
     await withRole(['ADMIN'], (_roleReq, roleRes) => handleParticipants(id, roleRes))(req, res)
+    return
+  }
+
+  if (action === 'leader') {
+    if (req.method !== 'PATCH') {
+      sendError(res, 'Method not allowed', 405)
+      return
+    }
+    await withRole(['ADMIN'], (roleReq, roleRes, user) =>
+      handleAssignLeader(id, roleReq, roleRes, user.id),
+    )(req, res)
     return
   }
 
@@ -311,4 +322,44 @@ async function handleParticipants(eventId: string, res: VercelResponse): Promise
   })
 
   sendSuccess(res, registrations)
+}
+
+// --- /api/events/:id?action=leader ----------------------------------------
+
+// PATCH — ADMIN. userId: null unassigns; otherwise the given user must
+// have a REGISTERED (not waiting-list/cancelled) registration for this
+// event — a leader has to actually be a confirmed participant.
+async function handleAssignLeader(
+  eventId: string,
+  req: VercelRequest,
+  res: VercelResponse,
+  adminId: string,
+): Promise<void> {
+  const parsed = eventLeaderSchema.safeParse(req.body)
+  if (!parsed.success) {
+    sendError(res, parsed.error.issues.map((issue) => issue.message).join(', '), 400)
+    return
+  }
+
+  const event = await prisma.event.findUnique({ where: { id: eventId } })
+  if (!event) {
+    sendError(res, 'Event not found', 404)
+    return
+  }
+
+  const { userId } = parsed.data
+  if (userId) {
+    const registration = await prisma.eventRegistration.findUnique({
+      where: { eventId_userId: { eventId, userId } },
+    })
+    if (!registration || registration.status !== 'REGISTERED') {
+      sendError(res, 'This user is not a confirmed participant of this event', 400)
+      return
+    }
+  }
+
+  await prisma.event.update({ where: { id: eventId }, data: { leaderId: userId } })
+  await logAdminAction(adminId, userId ? 'EVENT_LEADER_ASSIGNED' : 'EVENT_LEADER_REMOVED', eventId)
+
+  sendSuccess(res, { leaderId: userId })
 }

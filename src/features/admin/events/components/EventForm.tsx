@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
@@ -5,7 +6,10 @@ import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
+import { ShadowDotsLoader } from '@/components/ui/ShadowDotsLoader'
 import { eventFormSchema, type EventFormValues } from '@/features/admin/events/validation'
+import { uploadEventBanner } from '@/features/admin/events/services/adminEventsService'
+import { PhotoDecodeError } from '@/services/storageService'
 import { loadFormDraft, useAutosaveFormDraft } from '@/hooks/useFormDraft'
 
 interface EventFormProps {
@@ -34,6 +38,7 @@ export function EventForm({
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -43,6 +48,32 @@ export function EventForm({
   })
 
   useAutosaveFormDraft(draftKey ?? 'unused', watch, Boolean(draftKey))
+
+  const bannerUrl = watch('bannerUrl')
+  const [uploadingBanner, setUploadingBanner] = useState(false)
+  const [bannerError, setBannerError] = useState<string | null>(null)
+
+  async function handleBannerChange(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setBannerError(null)
+    setUploadingBanner(true)
+    try {
+      const url = await uploadEventBanner(file)
+      setValue('bannerUrl', url, { shouldValidate: true, shouldDirty: true })
+    } catch (error) {
+      setBannerError(
+        t(
+          error instanceof PhotoDecodeError
+            ? 'profile.photoDecodeError'
+            : 'profile.photoUploadError',
+        ),
+      )
+    } finally {
+      setUploadingBanner(false)
+    }
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate className="flex flex-col gap-4">
@@ -126,6 +157,35 @@ export function EventForm({
         }
         {...register('facebookPostUrl')}
       />
+
+      <div className="flex flex-col gap-2">
+        <label className="text-sm font-medium text-slate-700">
+          {t('admin.events.form.banner')}
+        </label>
+        <div className="flex items-center gap-4">
+          {bannerUrl ? (
+            <img src={bannerUrl} alt="" className="h-16 w-28 shrink-0 rounded-lg object-cover" />
+          ) : (
+            <div className="h-16 w-28 shrink-0 rounded-lg bg-slate-100" aria-hidden="true" />
+          )}
+          <div className="flex flex-col gap-1">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(event) => void handleBannerChange(event)}
+              disabled={uploadingBanner}
+              className="text-sm text-slate-600 file:me-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/20"
+            />
+            {uploadingBanner && (
+              <p className="flex items-center gap-2 text-sm text-slate-500">
+                <ShadowDotsLoader />
+                {t('profile.photoUploading')}
+              </p>
+            )}
+            {bannerError && <p className="text-sm text-error">{bannerError}</p>}
+          </div>
+        </div>
+      </div>
 
       {formError && <p className="text-sm text-error">{formError}</p>}
 

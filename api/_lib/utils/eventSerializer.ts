@@ -14,6 +14,8 @@ export interface EventWithMeta {
   maxParticipants: number
   status: string
   facebookPostUrl: string | null
+  bannerUrl: string | null
+  leaderId: string | null
   createdAt: Date
   registeredCount: number
   spotsLeft: number
@@ -36,6 +38,8 @@ export function serializeEvent(
     maxParticipants: event.maxParticipants,
     status: event.status,
     facebookPostUrl: event.facebookPostUrl,
+    bannerUrl: event.bannerUrl,
+    leaderId: event.leaderId,
     createdAt: event.createdAt,
     registeredCount: event.registeredCount,
     spotsLeft: Math.max(0, event.maxParticipants - event.registeredCount),
