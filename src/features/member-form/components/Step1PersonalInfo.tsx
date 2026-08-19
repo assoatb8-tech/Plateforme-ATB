@@ -91,7 +91,7 @@ export function Step1PersonalInfo({ form }: { form: UseFormReturn<MemberFormValu
               accept="image/*"
               onChange={(event) => void handleFileChange(event)}
               disabled={uploading}
-              className="text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/20"
+              className="text-sm text-slate-600 file:me-3 file:rounded-lg file:border-0 file:bg-primary/10 file:px-3 file:py-1.5 file:text-sm file:font-medium file:text-primary hover:file:bg-primary/20"
             />
             {uploading && (
               <p className="flex items-center gap-2 text-sm text-slate-500">

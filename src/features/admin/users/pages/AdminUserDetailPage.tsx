@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft, Ban, Trash2 } from 'lucide-react'
+import { ArrowLeft, Ban, Trash2, UserRound } from 'lucide-react'
+import { getSignedProfilePhotoUrl } from '@/services/storageService'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Select } from '@/components/ui/Select'
@@ -41,6 +42,7 @@ export function AdminUserDetailPage() {
 
   const { user: currentAdmin } = useAuth()
   const { data: user, isLoading, isError } = useAdminUser(id)
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null)
   const updateStatus = useUpdateUserStatus(id ?? '')
   const updateRole = useUpdateUserRole(id ?? '')
   const banMutation = useBanUser(id ?? '')
@@ -52,6 +54,21 @@ export function AdminUserDetailPage() {
     reset,
     formState: { errors, isSubmitting },
   } = useForm<BanFormValues>({ resolver: zodResolver(banFormSchema) })
+
+  useEffect(() => {
+    let cancelled = false
+    const path = user?.memberProfile?.photoUrl
+    if (path) {
+      void getSignedProfilePhotoUrl(path).then((url) => {
+        if (!cancelled) setPhotoUrl(url)
+      })
+    } else {
+      setPhotoUrl(null)
+    }
+    return () => {
+      cancelled = true
+    }
+  }, [user?.memberProfile?.photoUrl])
 
   async function handleStatusChange(status: UserStatus) {
     setActionError(null)
@@ -112,10 +129,19 @@ export function AdminUserDetailPage() {
           <ArrowLeft size={16} className="rtl:-scale-x-100" />
           {t('admin.users.detail.back')}
         </Link>
-        <h1 className="text-2xl font-semibold text-slate-900">
-          {(user.memberProfile && resolveMemberDisplayName(user.memberProfile, i18n.language)) ||
-            user.email}
-        </h1>
+        <div className="flex items-center gap-3">
+          {photoUrl ? (
+            <img src={photoUrl} alt="" className="h-12 w-12 shrink-0 rounded-full object-cover" />
+          ) : (
+            <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-300">
+              <UserRound size={22} />
+            </span>
+          )}
+          <h1 className="text-2xl font-semibold text-slate-900">
+            {(user.memberProfile && resolveMemberDisplayName(user.memberProfile, i18n.language)) ||
+              user.email}
+          </h1>
+        </div>
       </div>
 
       {actionError && <p className="text-sm text-error">{actionError}</p>}
