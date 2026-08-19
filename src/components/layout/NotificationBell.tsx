@@ -66,7 +66,9 @@ function NotificationItem({ notification, onNavigate }: NotificationItemProps) {
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className={cn('text-slate-700', isUnread && 'font-semibold text-slate-900')}>{label}</p>
         <p className="text-xs text-slate-400">
-          {new Date(notification.createdAt).toLocaleString(i18n.language)}
+          {new Date(notification.createdAt).toLocaleString(
+            i18n.language === 'ar' ? 'ar-TN' : 'fr-TN',
+          )}
         </p>
       </div>
       {isUnread && <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-primary" />}
@@ -80,13 +82,22 @@ function NotificationItem({ notification, onNavigate }: NotificationItemProps) {
       </Link>
     )
   }
-  return <div onClick={() => onNavigate(notification.id)}>{content}</div>
+  // No target to navigate to (the referenced event/member row no longer
+  // exists) — still needs to be a real interactive element, not a bare div
+  // with an onClick, so it stays keyboard-reachable and matches the
+  // Link's semantics above.
+  return (
+    <button type="button" className="w-full text-start" onClick={() => onNavigate(notification.id)}>
+      {content}
+    </button>
+  )
 }
 
 export function NotificationBell() {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
   const wrapperRef = useRef<HTMLDivElement>(null)
+  const bellButtonRef = useRef<HTMLButtonElement>(null)
 
   const { data } = useNotifications(true)
   const markRead = useMarkNotificationRead()
@@ -102,8 +113,18 @@ export function NotificationBell() {
         setOpen(false)
       }
     }
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setOpen(false)
+        bellButtonRef.current?.focus()
+      }
+    }
     document.addEventListener('mousedown', handleClickOutside)
-    return () => document.removeEventListener('mousedown', handleClickOutside)
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
   }, [open])
 
   function handleItemClick(id: string) {
@@ -117,6 +138,7 @@ export function NotificationBell() {
   return (
     <div ref={wrapperRef} className="relative">
       <button
+        ref={bellButtonRef}
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-label={t('notifications.bellLabel')}

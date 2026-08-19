@@ -88,7 +88,7 @@ export function EventDetailPage() {
           <img
             src={event.bannerUrl}
             alt=""
-            className="-mx-6 -mt-6 h-56 rounded-t-xl object-cover"
+            className="-mx-6 -mt-6 w-[calc(100%+3rem)] max-w-none rounded-t-xl"
           />
         )}
         <div>
