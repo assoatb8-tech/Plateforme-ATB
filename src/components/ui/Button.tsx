@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes, ReactNode } from 'react'
 import { cn } from '@/utils/cn'
 import { ShadowDotsLoader } from '@/components/ui/ShadowDotsLoader'
 
-type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost'
+type ButtonVariant = 'primary' | 'secondary' | 'danger' | 'ghost' | 'success'
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
@@ -16,6 +16,7 @@ const variantStyles: Record<ButtonVariant, string> = {
   secondary: 'bg-secondary text-white hover:bg-secondary-dark focus-visible:ring-secondary',
   danger: 'bg-error text-white hover:bg-red-700 focus-visible:ring-error',
   ghost: 'bg-transparent text-primary hover:bg-primary/10 focus-visible:ring-primary',
+  success: 'bg-success text-white hover:bg-green-700 focus-visible:ring-success',
 }
 
 export function Button({

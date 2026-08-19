@@ -55,6 +55,11 @@ const ParticipationsPage = lazy(() =>
     default: m.ParticipationsPage,
   })),
 )
+const MyEventAttendancePage = lazy(() =>
+  import('@/features/events/pages/MyEventAttendancePage').then((m) => ({
+    default: m.MyEventAttendancePage,
+  })),
+)
 const AdminDashboardPage = lazy(() =>
   import('@/features/admin/dashboard/pages/AdminDashboardPage').then((m) => ({
     default: m.AdminDashboardPage,
@@ -165,6 +170,14 @@ function AppRoutes() {
             element={
               <ProtectedRoute>
                 <ParticipationsPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="mes-evenements/:id/presences"
+            element={
+              <ProtectedRoute>
+                <MyEventAttendancePage />
               </ProtectedRoute>
             }
           />

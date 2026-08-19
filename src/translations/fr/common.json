@@ -254,6 +254,9 @@
       "registered": "Inscrit(e)",
       "waitingList": "Liste d'attente",
       "cancelled": "Annulée"
+    },
+    "myLedEvents": {
+      "forbidden": "Vous n'êtes pas autorisé(e) à gérer les présences de cet événement."
     }
   },
   "dashboard": {
@@ -274,7 +277,9 @@
     "upcomingEvents": "Prochains événements",
     "viewAllParticipations": "Toutes mes participations",
     "noUpcomingEvents": "Vous n'êtes inscrit(e) à aucun événement à venir.",
-    "browseEvents": "Découvrir les événements"
+    "browseEvents": "Découvrir les événements",
+    "ledEvents": "Événements que vous dirigez",
+    "manageAttendance": "Gérer les présences"
   },
   "profile": {
     "title": "Mon profil",
@@ -313,7 +318,8 @@
         "totalMembers": "Adhérents au total",
         "newMembers": "Nouveaux adhérents (30 jours)",
         "activeEvents": "Événements actifs",
-        "totalRegistrations": "Inscriptions aux événements"
+        "totalRegistrations": "Inscriptions aux événements",
+        "totalAbsences": "Absences enregistrées"
       }
     },
     "users": {
@@ -395,13 +401,18 @@
         "makeLeader": "Désigner comme chef",
         "removeLeader": "Retirer",
         "leaderError": "Une erreur est survenue. Merci de réessayer.",
+        "present": "Présent",
+        "absent": "Absent",
+        "attendancePending": "Disponible après l'événement",
+        "attendanceError": "Une erreur est survenue. Merci de réessayer.",
         "columns": {
           "name": "Nom",
           "phone": "Téléphone",
           "email": "Email",
           "status": "Statut",
           "date": "Date d'inscription",
-          "leader": "Chef de groupe"
+          "leader": "Chef de groupe",
+          "attendance": "Présence"
         }
       },
       "form": {

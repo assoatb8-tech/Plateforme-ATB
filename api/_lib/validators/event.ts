@@ -74,3 +74,12 @@ export type EventUpdateInput = z.infer<typeof eventUpdateSchema>
 export const eventLeaderSchema = z.object({ userId: z.string().uuid().nullable() })
 
 export type EventLeaderInput = z.infer<typeof eventLeaderSchema>
+
+// status: null clears a previously recorded mark back to "not yet taken" —
+// same "explicit null, not omission" shape as eventLeaderSchema above.
+export const eventAttendanceSchema = z.object({
+  registrationId: z.string().uuid(),
+  status: z.enum(['PRESENT', 'ABSENT']).nullable(),
+})
+
+export type EventAttendanceInput = z.infer<typeof eventAttendanceSchema>

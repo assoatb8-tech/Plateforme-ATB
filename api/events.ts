@@ -35,6 +35,7 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
   const searchParam = Array.isArray(req.query.search) ? req.query.search[0] : req.query.search
   const allParam = Array.isArray(req.query.all) ? req.query.all[0] : req.query.all
   const whenParam = Array.isArray(req.query.when) ? req.query.when[0] : req.query.when
+  const ledByMeParam = Array.isArray(req.query.ledByMe) ? req.query.ledByMe[0] : req.query.ledByMe
 
   const page = Math.max(1, Number(pageParam) || 1)
   const search = searchParam?.trim() ?? ''
@@ -65,8 +66,17 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
     includeAll = dbUser?.role === 'ADMIN'
   }
 
+  // `ledByMe=true` also lifts the ACTIVE-only filter — a "chef de groupe"
+  // needs to see the events they led even after they've ended (that's
+  // exactly when attendance marking becomes available) or were cancelled.
+  // Safe regardless of role: the leaderId filter below always scopes to
+  // the caller's own id, never anyone else's.
+  const ledByMeUserId = ledByMeParam === 'true' && user ? user.id : null
+  if (ledByMeUserId) includeAll = true
+
   const where = {
     ...(includeAll ? {} : { status: 'ACTIVE' as const }),
+    ...(ledByMeUserId ? { leaderId: ledByMeUserId } : {}),
     ...timeWhere,
     ...(search
       ? {

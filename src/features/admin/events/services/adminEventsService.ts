@@ -1,7 +1,7 @@
 import { apiRequest } from '@/services/apiClient'
 import { getSupabaseClient } from '@/services/supabaseClient'
 import { compressToJpeg } from '@/services/imageCompression'
-import type { EventDto, EventsListResponse, RegistrationStatus } from '@/features/events/types'
+import type { EventDto, EventsListResponse } from '@/features/events/types'
 import type { EventFormValues } from '@/features/admin/events/validation'
 
 const BANNER_BUCKET = 'event-banners'
@@ -25,24 +25,6 @@ export async function uploadEventBanner(file: File): Promise<string> {
     data: { publicUrl },
   } = supabase.storage.from(BANNER_BUCKET).getPublicUrl(path)
   return publicUrl
-}
-
-export interface EventParticipantDto {
-  id: string
-  status: RegistrationStatus
-  registeredAt: string
-  user: {
-    id: string
-    email: string
-    memberProfile: {
-      firstNameFr: string
-      lastNameFr: string
-      firstNameAr: string
-      lastNameAr: string
-      phoneMobile: string
-      photoUrl: string | null
-    } | null
-  }
 }
 
 // `all: 'true'` is honored by GET /api/events only for authenticated ADMIN
@@ -71,12 +53,6 @@ export async function updateEvent(id: string, values: EventFormValues): Promise<
 
 export async function deleteEvent(id: string): Promise<void> {
   await apiRequest(`/api/events/${id}`, { method: 'DELETE' })
-}
-
-export async function fetchEventParticipants(id: string): Promise<EventParticipantDto[]> {
-  return apiRequest<EventParticipantDto[]>(`/api/events/${id}`, {
-    query: { action: 'participants' },
-  })
 }
 
 // userId: null unassigns the current leader.

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { eventCreateSchema, eventUpdateSchema } from './event.js'
+import { eventAttendanceSchema, eventCreateSchema, eventUpdateSchema } from './event.js'
 
 const validEvent = {
   titleFr: 'Nettoyage de plage',
@@ -139,6 +139,40 @@ describe('eventUpdateSchema', () => {
       startDate: '2026-09-02T09:00:00.000Z',
       endDate: '2026-09-01T09:00:00.000Z',
     })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('eventAttendanceSchema', () => {
+  const registrationId = '11111111-1111-1111-1111-111111111111'
+
+  it('accepts a PRESENT mark', () => {
+    const result = eventAttendanceSchema.safeParse({ registrationId, status: 'PRESENT' })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts an ABSENT mark', () => {
+    const result = eventAttendanceSchema.safeParse({ registrationId, status: 'ABSENT' })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts an explicit null to clear a mark', () => {
+    const result = eventAttendanceSchema.safeParse({ registrationId, status: null })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects an invalid status value', () => {
+    const result = eventAttendanceSchema.safeParse({ registrationId, status: 'LATE' })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a missing status key', () => {
+    const result = eventAttendanceSchema.safeParse({ registrationId })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a non-UUID registrationId', () => {
+    const result = eventAttendanceSchema.safeParse({ registrationId: 'not-a-uuid', status: null })
     expect(result.success).toBe(false)
   })
 })

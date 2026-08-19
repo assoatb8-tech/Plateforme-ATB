@@ -254,6 +254,9 @@
       "registered": "مسجَّل",
       "waitingList": "قائمة الانتظار",
       "cancelled": "ملغاة"
+    },
+    "myLedEvents": {
+      "forbidden": "غير مصرح لك بإدارة الحضور لهذا النشاط."
     }
   },
   "dashboard": {
@@ -274,7 +277,9 @@
     "upcomingEvents": "الأنشطة القادمة",
     "viewAllParticipations": "كل مشاركاتي",
     "noUpcomingEvents": "لست مسجَّلاً في أي نشاط قادم.",
-    "browseEvents": "اكتشف الأنشطة"
+    "browseEvents": "اكتشف الأنشطة",
+    "ledEvents": "الأنشطة التي تقودها",
+    "manageAttendance": "إدارة الحضور"
   },
   "profile": {
     "title": "ملفي الشخصي",
@@ -313,7 +318,8 @@
         "totalMembers": "إجمالي المنخرطين",
         "newMembers": "منخرطون جدد (30 يومًا)",
         "activeEvents": "الأنشطة النشطة",
-        "totalRegistrations": "التسجيلات في الأنشطة"
+        "totalRegistrations": "التسجيلات في الأنشطة",
+        "totalAbsences": "الغيابات المسجَّلة"
       }
     },
     "users": {
@@ -395,13 +401,18 @@
         "makeLeader": "تعيين كقائد",
         "removeLeader": "إزالة",
         "leaderError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
+        "present": "حاضر",
+        "absent": "غائب",
+        "attendancePending": "متاح بعد انتهاء النشاط",
+        "attendanceError": "حدث خطأ. يرجى المحاولة مرة أخرى.",
         "columns": {
           "name": "الاسم",
           "phone": "الهاتف",
           "email": "البريد الإلكتروني",
           "status": "الحالة",
           "date": "تاريخ التسجيل",
-          "leader": "قائد المجموعة"
+          "leader": "قائد المجموعة",
+          "attendance": "الحضور"
         }
       },
       "form": {

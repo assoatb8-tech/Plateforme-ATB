@@ -50,11 +50,21 @@ URL de production : https://plateforme-atb.vercel.app
 
 ### 5bis. Participants d'un événement
 - **Action** : sur `/admin/evenements`, cliquer le bouton "Participants" (icône personnes) d'un événement qui a au moins une inscription confirmée.
-- **Résultat attendu** : page avec le titre de l'événement et un tableau des inscrits (photo, Nom, Téléphone, Email, Statut, Date d'inscription, Chef de groupe).
+- **Résultat attendu** : page avec le titre de l'événement et un tableau des inscrits (photo, Nom, Téléphone, Email, Statut, Date d'inscription, Présence, Chef de groupe).
 - **Vérifier** : la photo de profil de chaque inscrit s'affiche (ou une icône générique si absente) ; un événement sans inscription affiche un état vide clair plutôt qu'un tableau cassé ; le lien "Retour" ramène à `/admin/evenements`.
 - **Action** : sur un participant au statut "Inscrit" (confirmé), cliquer "Désigner comme chef".
 - **Résultat attendu** : une couronne apparaît à côté de son nom, le bouton devient "Retirer".
 - **Vérifier** : aucun bouton de désignation n'apparaît pour un participant en liste d'attente ou annulé (seul un participant confirmé peut être chef) ; désigner un nouveau chef retire automatiquement la couronne du précédent (un seul chef par événement).
+
+### 5ter. Présences (marquées par un admin ou le chef de groupe)
+- **Vérifier sur un événement à venir** : la colonne "Présence" affiche "Disponible après l'événement" pour chaque participant confirmé — aucun bouton Présent/Absent tant que l'événement n'est pas terminé.
+- **Action** : sur un événement déjà terminé (statut "Terminé"), depuis `/admin/evenements/:id/participants`, cliquer "Présent" puis "Absent" sur un participant confirmé.
+- **Résultat attendu** : le bouton cliqué devient coloré (vert pour Présent, rouge pour Absent) ; cliquer à nouveau sur le même bouton l'annule (retour à l'état neutre).
+- **Vérifier** : aucun bouton de présence n'apparaît pour un participant en liste d'attente ou annulé.
+- **Action (chef de groupe)** : se connecter avec le compte adhérent désigné comme chef d'un événement terminé, aller sur `/tableau-de-bord`.
+- **Résultat attendu** : un encart "Événements que vous dirigez" liste l'événement avec un bouton "Gérer les présences", menant à `/mes-evenements/:id/presences` — même tableau que la page admin (sans le contrôle de désignation de chef), avec les mêmes boutons Présent/Absent fonctionnels.
+- **Vérifier la protection** : un adhérent qui n'est ni admin ni chef de cet événement, en visitant directement `/mes-evenements/:id/presences` d'un événement qu'il ne dirige pas, obtient un message d'erreur clair (pas de fuite de la liste des participants).
+- **Vérifier le tableau de bord admin** : `/admin` affiche une carte "Absences enregistrées" reflétant le nombre total de marques "Absent" dans l'association.
 
 ### 6. Gestion des sponsors
 - **Action** : aller sur `/admin/sponsors`, cliquer "Ajouter un sponsor".
@@ -206,5 +216,20 @@ la photo de profil manquait sur la fiche détail d'un adhérent
 (`/admin/membres/:id`, corrigé) et un espacement fixe (au lieu d'un
 espacement logique) ne s'inversait pas correctement en arabe sur le champ
 photo du dossier d'adhésion (corrigé).
+
+Mise à jour du 2026-08-19 (suite) : le chef de groupe désigné pour un
+événement (ou un administrateur) peut désormais marquer chaque participant
+confirmé "Présent" ou "Absent" une fois l'événement terminé, depuis
+`/admin/evenements/:id/participants` (admin) ou `/mes-evenements/:id/presences`
+(chef, accessible depuis un nouvel encart "Événements que vous dirigez" sur
+le tableau de bord adhérent). Le tableau de bord administrateur affiche une
+nouvelle carte "Absences enregistrées" (total des marques "Absent" dans
+l'association).
+
+**Déploiement en attente** : cette fonctionnalité nécessite une migration
+SQL (`supabase/sql/018_attendance.sql`, colonne `attendance_status` sur
+`event_registrations`) qui n'a pas encore été appliquée à la base de
+production — le code est prêt et testé localement, mais n'a pas encore été
+déployé.
 
 Aucun problème connu à ce jour.

@@ -3,4 +3,5 @@ export interface AdminStatsDto {
   newMembers: number
   activeEvents: number
   totalRegistrations: number
+  totalAbsences: number
 }

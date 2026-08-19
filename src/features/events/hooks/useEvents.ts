@@ -2,10 +2,13 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import {
   cancelEventRegistration,
   fetchEvent,
+  fetchEventParticipants,
   fetchEvents,
+  fetchMyLedEvents,
   registerForEvent,
+  setAttendance,
 } from '@/features/events/services/eventsService'
-import type { EventTense } from '@/features/events/types'
+import type { AttendanceStatus, EventTense } from '@/features/events/types'
 
 export const eventsKeys = {
   all: ['events'] as const,
@@ -52,5 +55,39 @@ export function useCancelEventRegistration(id: string) {
   return useMutation({
     mutationFn: () => cancelEventRegistration(id),
     onSuccess: invalidate,
+  })
+}
+
+// Events the current user leads ("chef de groupe") — used by the member
+// dashboard to surface an attendance-marking entry point.
+export function useMyLedEvents() {
+  return useQuery({ queryKey: ['events', 'ledByMe'], queryFn: fetchMyLedEvents })
+}
+
+// ADMIN or the event's own leader (enforced server-side) — the same query
+// key prefix as `eventsKeys` so the existing leader-assignment mutation's
+// broad `['events']` invalidation also refreshes this list.
+export function useEventParticipants(id: string | undefined) {
+  return useQuery({
+    queryKey: ['events', 'participants', id ?? ''],
+    queryFn: () => fetchEventParticipants(id as string),
+    enabled: Boolean(id),
+  })
+}
+
+export function useSetAttendance(eventId: string) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: ({
+      registrationId,
+      status,
+    }: {
+      registrationId: string
+      status: AttendanceStatus | null
+    }) => setAttendance(eventId, registrationId, status),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['events', 'participants', eventId] })
+      void queryClient.invalidateQueries({ queryKey: ['admin', 'stats'] })
+    },
   })
 }

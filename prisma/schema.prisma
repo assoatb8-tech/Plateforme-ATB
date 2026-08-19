@@ -62,6 +62,11 @@ enum RegistrationStatus {
   WAITING_LIST
 }
 
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+}
+
 enum DocumentType {
   PROFILE_IMAGE
   CIN_COPY
@@ -203,13 +208,17 @@ model Event {
 }
 
 model EventRegistration {
-  id           String             @id @default(uuid()) @db.Uuid
-  eventId      String             @map("event_id") @db.Uuid
-  event        Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
-  userId       String             @map("user_id") @db.Uuid
-  user         User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  status       RegistrationStatus @default(REGISTERED)
-  registeredAt DateTime           @default(now()) @map("registered_at")
+  id               String             @id @default(uuid()) @db.Uuid
+  eventId          String             @map("event_id") @db.Uuid
+  event            Event              @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  userId           String             @map("user_id") @db.Uuid
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  status           RegistrationStatus @default(REGISTERED)
+  registeredAt     DateTime           @default(now()) @map("registered_at")
+  // Set by an admin or the event's leader ("chef de groupe") once the event
+  // has ended — null until then, and only ever meaningful for a REGISTERED
+  // row (never WAITING_LIST/CANCELLED, which never actually attended).
+  attendanceStatus AttendanceStatus?  @map("attendance_status")
 
   @@unique([eventId, userId])
   @@index([eventId])

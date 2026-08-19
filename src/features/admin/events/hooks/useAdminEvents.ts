@@ -5,7 +5,6 @@ import {
   deleteEvent,
   fetchAdminEvent,
   fetchAdminEvents,
-  fetchEventParticipants,
   updateEvent,
 } from '@/features/admin/events/services/adminEventsService'
 import type { EventFormValues } from '@/features/admin/events/validation'
@@ -28,14 +27,6 @@ export function useAdminEvent(id: string | undefined) {
   return useQuery({
     queryKey: adminEventsKeys.detail(id ?? ''),
     queryFn: () => fetchAdminEvent(id as string),
-    enabled: Boolean(id),
-  })
-}
-
-export function useEventParticipants(id: string | undefined) {
-  return useQuery({
-    queryKey: ['admin', 'events', 'participants', id ?? ''],
-    queryFn: () => fetchEventParticipants(id as string),
     enabled: Boolean(id),
   })
 }

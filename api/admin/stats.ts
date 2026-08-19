@@ -17,17 +17,20 @@ export default withRole(['ADMIN'], async (req: VercelRequest, res: VercelRespons
   const thirtyDaysAgo = new Date()
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30)
 
-  const [totalMembers, newMembers, activeEvents, totalRegistrations] = await Promise.all([
-    prisma.user.count(),
-    prisma.user.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
-    prisma.event.count({ where: { status: 'ACTIVE' } }),
-    prisma.eventRegistration.count({ where: { status: 'REGISTERED' } }),
-  ])
+  const [totalMembers, newMembers, activeEvents, totalRegistrations, totalAbsences] =
+    await Promise.all([
+      prisma.user.count(),
+      prisma.user.count({ where: { createdAt: { gte: thirtyDaysAgo } } }),
+      prisma.event.count({ where: { status: 'ACTIVE' } }),
+      prisma.eventRegistration.count({ where: { status: 'REGISTERED' } }),
+      prisma.eventRegistration.count({ where: { attendanceStatus: 'ABSENT' } }),
+    ])
 
   sendSuccess(res, {
     totalMembers,
     newMembers,
     activeEvents,
     totalRegistrations,
+    totalAbsences,
   })
 })

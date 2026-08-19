@@ -6,15 +6,12 @@ import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { StatusBadge } from '@/components/ui/StatusBadge'
-import {
-  useAdminEvent,
-  useAssignEventLeader,
-  useEventParticipants,
-} from '@/features/admin/events/hooks/useAdminEvents'
+import { useAdminEvent, useAssignEventLeader } from '@/features/admin/events/hooks/useAdminEvents'
+import { useEventParticipants, useSetAttendance } from '@/features/events/hooks/useEvents'
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
 import { resolveMemberDisplayName } from '@/utils/displayName'
 import { useSignedPhotoUrls } from '@/hooks/useSignedPhotoUrls'
-import type { RegistrationStatus } from '@/features/events/types'
+import type { AttendanceStatus, RegistrationStatus } from '@/features/events/types'
 
 const STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
   REGISTERED: 'events.status.registered',
@@ -42,6 +39,26 @@ export function AdminEventParticipantsPage() {
     }
   }
 
+  const attendanceMutation = useSetAttendance(id ?? '')
+  const [attendanceError, setAttendanceError] = useState<string | null>(null)
+  const isEventEnded = Boolean(event && new Date(event.endDate) < new Date())
+
+  async function handleAttendance(
+    registrationId: string,
+    current: AttendanceStatus | null,
+    next: AttendanceStatus,
+  ) {
+    setAttendanceError(null)
+    try {
+      await attendanceMutation.mutateAsync({
+        registrationId,
+        status: current === next ? null : next,
+      })
+    } catch {
+      setAttendanceError(t('admin.events.participants.attendanceError'))
+    }
+  }
+
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -59,6 +76,7 @@ export function AdminEventParticipantsPage() {
       </div>
 
       {leaderError && <p className="text-sm text-error">{leaderError}</p>}
+      {attendanceError && <p className="text-sm text-error">{attendanceError}</p>}
 
       {isLoading && (
         <Card className="p-4">
@@ -84,6 +102,7 @@ export function AdminEventParticipantsPage() {
                 <th className="px-4 py-3">{t('admin.events.participants.columns.email')}</th>
                 <th className="px-4 py-3">{t('admin.events.participants.columns.status')}</th>
                 <th className="px-4 py-3">{t('admin.events.participants.columns.date')}</th>
+                <th className="px-4 py-3">{t('admin.events.participants.columns.attendance')}</th>
                 <th className="px-4 py-3 text-end">
                   {t('admin.events.participants.columns.leader')}
                 </th>
@@ -132,6 +151,48 @@ export function AdminEventParticipantsPage() {
                     </td>
                     <td className="px-4 py-3 text-slate-500">
                       {new Date(participant.registeredAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-4 py-3">
+                      {participant.status !== 'REGISTERED' ? (
+                        <span className="text-slate-300">—</span>
+                      ) : !isEventEnded ? (
+                        <span className="text-xs text-slate-400">
+                          {t('admin.events.participants.attendancePending')}
+                        </span>
+                      ) : (
+                        <div className="flex gap-1.5">
+                          <Button
+                            type="button"
+                            variant={
+                              participant.attendanceStatus === 'PRESENT' ? 'success' : 'ghost'
+                            }
+                            disabled={attendanceMutation.isPending}
+                            onClick={() =>
+                              void handleAttendance(
+                                participant.id,
+                                participant.attendanceStatus,
+                                'PRESENT',
+                              )
+                            }
+                          >
+                            {t('admin.events.participants.present')}
+                          </Button>
+                          <Button
+                            type="button"
+                            variant={participant.attendanceStatus === 'ABSENT' ? 'danger' : 'ghost'}
+                            disabled={attendanceMutation.isPending}
+                            onClick={() =>
+                              void handleAttendance(
+                                participant.id,
+                                participant.attendanceStatus,
+                                'ABSENT',
+                              )
+                            }
+                          >
+                            {t('admin.events.participants.absent')}
+                          </Button>
+                        </div>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-end">
                       {participant.status === 'REGISTERED' && (

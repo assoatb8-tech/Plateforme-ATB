@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { CalendarCheck, ClipboardList, UserRound } from 'lucide-react'
+import { CalendarCheck, ClipboardList, Crown, UserRound } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { StatusBadge } from '@/components/ui/StatusBadge'
@@ -9,10 +9,11 @@ import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import { useCurrentUserProfile, useMyRegistrations } from '@/features/dashboard/hooks/useDashboard'
 import { RegistrationCard } from '@/features/events/components/RegistrationCard'
+import { useMyLedEvents } from '@/features/events/hooks/useEvents'
 import { USER_STATUS_TONE } from '@/utils/statusTones'
 
 export function DashboardPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { user } = useAuth()
   const {
     data: currentUser,
@@ -24,6 +25,7 @@ export function DashboardPage() {
     isLoading: isLoadingRegistrations,
     isError: isRegistrationsError,
   } = useMyRegistrations()
+  const { data: ledEvents } = useMyLedEvents()
 
   const upcomingRegistrations = (registrations ?? [])
     .filter((registration) => new Date(registration.event.startDate) >= new Date())
@@ -132,6 +134,31 @@ export function DashboardPage() {
           )}
         </Card>
       </div>
+
+      {ledEvents && ledEvents.length > 0 && (
+        <Card className="mt-6 flex flex-col gap-3">
+          <div className="flex items-center gap-2 text-slate-500">
+            <Crown size={20} />
+            <h2 className="text-sm font-semibold uppercase tracking-wide">
+              {t('dashboard.ledEvents')}
+            </h2>
+          </div>
+          <div className="flex flex-col divide-y divide-slate-100">
+            {ledEvents.map((ledEvent) => (
+              <div key={ledEvent.id} className="flex items-center justify-between gap-3 py-3">
+                <p className="text-sm font-medium text-slate-800">
+                  {i18n.language === 'ar' ? ledEvent.titleAr : ledEvent.titleFr}
+                </p>
+                <Link to={`/mes-evenements/${ledEvent.id}/presences`}>
+                  <Button type="button" variant="secondary">
+                    {t('dashboard.manageAttendance')}
+                  </Button>
+                </Link>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
     </div>
   )
 }

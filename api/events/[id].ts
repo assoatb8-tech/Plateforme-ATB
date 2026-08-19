@@ -4,7 +4,11 @@ import { prisma } from '../_lib/utils/prisma.js'
 import { withRole } from '../_lib/middlewares/rbac.js'
 import { withAuth, getOptionalUser, type AuthedUser } from '../_lib/middlewares/auth.js'
 import { sendError, sendSuccess } from '../_lib/utils/response.js'
-import { eventUpdateSchema, eventLeaderSchema } from '../_lib/validators/event.js'
+import {
+  eventUpdateSchema,
+  eventLeaderSchema,
+  eventAttendanceSchema,
+} from '../_lib/validators/event.js'
 import { serializeEvent } from '../_lib/utils/eventSerializer.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
 import { enforceIpRateLimit } from '../_lib/utils/rateLimit.js'
@@ -92,7 +96,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       sendError(res, 'Method not allowed', 405)
       return
     }
-    await withRole(['ADMIN'], (_roleReq, roleRes) => handleParticipants(id, roleRes))(req, res)
+    await withAuth((_authReq, authRes, user) => handleParticipants(id, authRes, user.id))(req, res)
+    return
+  }
+
+  if (action === 'attendance') {
+    if (req.method !== 'PATCH') {
+      sendError(res, 'Method not allowed', 405)
+      return
+    }
+    await withAuth((authReq, authRes, user) => handleSetAttendance(id, authReq, authRes, user.id))(
+      req,
+      res,
+    )
     return
   }
 
@@ -291,10 +307,32 @@ async function handleCancel(eventId: string, user: AuthedUser, res: VercelRespon
 
 // --- /api/events/:id?action=participants ---------------------------------------
 
-async function handleParticipants(eventId: string, res: VercelResponse): Promise<void> {
+// Shared by the participants list and attendance-marking action: both are
+// available to an ADMIN or to the event's own leader ("chef de groupe"),
+// never to any other member — checked here against the DB role/leaderId,
+// never trusted from the client.
+async function canManageEvent(
+  event: { leaderId: string | null },
+  userId: string,
+): Promise<boolean> {
+  if (event.leaderId === userId) return true
+  const requester = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } })
+  return requester?.role === 'ADMIN'
+}
+
+async function handleParticipants(
+  eventId: string,
+  res: VercelResponse,
+  userId: string,
+): Promise<void> {
   const event = await prisma.event.findUnique({ where: { id: eventId } })
   if (!event) {
     sendError(res, 'Event not found', 404)
+    return
+  }
+
+  if (!(await canManageEvent(event, userId))) {
+    sendError(res, 'Forbidden', 403)
     return
   }
 
@@ -322,6 +360,55 @@ async function handleParticipants(eventId: string, res: VercelResponse): Promise
   })
 
   sendSuccess(res, registrations)
+}
+
+// --- /api/events/:id?action=attendance --------------------------------------
+
+// PATCH — ADMIN or the event's leader. Only meaningful once the event has
+// ended (can't confirm attendance for something that hasn't happened yet),
+// and only for a REGISTERED row — a waiting-list or cancelled entry was
+// never actually expected to show up.
+async function handleSetAttendance(
+  eventId: string,
+  req: VercelRequest,
+  res: VercelResponse,
+  userId: string,
+): Promise<void> {
+  const parsed = eventAttendanceSchema.safeParse(req.body)
+  if (!parsed.success) {
+    sendError(res, parsed.error.issues.map((issue) => issue.message).join(', '), 400)
+    return
+  }
+
+  const event = await prisma.event.findUnique({ where: { id: eventId } })
+  if (!event) {
+    sendError(res, 'Event not found', 404)
+    return
+  }
+
+  if (!(await canManageEvent(event, userId))) {
+    sendError(res, 'Forbidden', 403)
+    return
+  }
+
+  if (new Date(event.endDate) > new Date()) {
+    sendError(res, 'Cannot record attendance before the event has ended', 400)
+    return
+  }
+
+  const { registrationId, status } = parsed.data
+  const registration = await prisma.eventRegistration.findUnique({ where: { id: registrationId } })
+  if (!registration || registration.eventId !== eventId || registration.status !== 'REGISTERED') {
+    sendError(res, 'Registration not found', 404)
+    return
+  }
+
+  const updated = await prisma.eventRegistration.update({
+    where: { id: registrationId },
+    data: { attendanceStatus: status },
+  })
+
+  sendSuccess(res, updated)
 }
 
 // --- /api/events/:id?action=leader ----------------------------------------
