@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { describe, expect, it, vi } from 'vitest'
 import { Navbar } from './Navbar'
 import { AuthContext, type AuthContextValue } from '@/features/auth/hooks/AuthContext'
@@ -14,12 +15,18 @@ vi.mock('react-i18next', () => ({
 }))
 
 function renderNavbar(authValue: AuthContextValue) {
+  // A signed-in user renders NotificationBell, which calls useQuery — needs
+  // a real QueryClient in the tree even though this suite never asserts on
+  // its data.
+  const queryClient = new QueryClient()
   return render(
-    <MemoryRouter>
-      <AuthContext.Provider value={authValue}>
-        <Navbar />
-      </AuthContext.Provider>
-    </MemoryRouter>,
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>
+        <AuthContext.Provider value={authValue}>
+          <Navbar />
+        </AuthContext.Provider>
+      </MemoryRouter>
+    </QueryClientProvider>,
   )
 }
 
@@ -70,17 +77,19 @@ describe('Navbar auth-state rendering', () => {
     expect(screen.queryByText('nav.admin')).not.toBeInTheDocument()
 
     rerender(
-      <MemoryRouter>
-        <AuthContext.Provider
-          value={{
-            ...baseAuth,
-            loading: false,
-            user: { id: 'u2', email: 'admin@b.com', role: 'ADMIN', status: 'ACTIVE' },
-          }}
-        >
-          <Navbar />
-        </AuthContext.Provider>
-      </MemoryRouter>,
+      <QueryClientProvider client={new QueryClient()}>
+        <MemoryRouter>
+          <AuthContext.Provider
+            value={{
+              ...baseAuth,
+              loading: false,
+              user: { id: 'u2', email: 'admin@b.com', role: 'ADMIN', status: 'ACTIVE' },
+            }}
+          >
+            <Navbar />
+          </AuthContext.Provider>
+        </MemoryRouter>
+      </QueryClientProvider>,
     )
     expect(screen.getAllByText('nav.admin').length).toBeGreaterThan(0)
   })

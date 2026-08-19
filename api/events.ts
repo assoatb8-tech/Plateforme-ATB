@@ -154,5 +154,19 @@ async function handleCreate(req: VercelRequest, res: VercelResponse, user: { id:
 
   await logAdminAction(user.id, 'EVENT_CREATED', event.id)
 
+  const members = await prisma.user.findMany({
+    where: { role: 'USER', status: 'ACTIVE' },
+    select: { id: true },
+  })
+  if (members.length > 0) {
+    await prisma.notification.createMany({
+      data: members.map((member) => ({
+        userId: member.id,
+        type: 'NEW_EVENT' as const,
+        eventId: event.id,
+      })),
+    })
+  }
+
   sendSuccess(res, serializeEvent({ ...event, registeredCount: 0 }, null), 201)
 }

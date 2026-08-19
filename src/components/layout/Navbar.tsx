@@ -3,6 +3,7 @@ import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Menu, X } from 'lucide-react'
 import { LanguageSwitcher } from '@/components/layout/LanguageSwitcher'
+import { NotificationBell } from '@/components/layout/NotificationBell'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/utils/cn'
 import { useAuth } from '@/features/auth/hooks/useAuth'
@@ -107,6 +108,7 @@ export function Navbar() {
 
         <div className="flex min-w-0 flex-1 items-center justify-end gap-3">
           <LanguageSwitcher />
+          {!loading && user && <NotificationBell />}
           {/* Rendering nothing while the session is still restoring (rather
               than defaulting to the guest buttons) avoids a brief false
               "you're not logged in" flash on a hard reload of an

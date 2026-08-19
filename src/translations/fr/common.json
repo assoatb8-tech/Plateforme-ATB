@@ -29,6 +29,14 @@
     "ar": "العربية",
     "switch": "Changer de langue"
   },
+  "notifications": {
+    "bellLabel": "Notifications",
+    "title": "Notifications",
+    "markAllRead": "Tout marquer comme lu",
+    "empty": "Aucune notification pour le moment",
+    "newEvent": "Nouvel événement : {{title}}",
+    "newMember": "{{name}} a rejoint l'association"
+  },
   "home": {
     "hero": {
       "subtitle": "Rejoignez une communauté de bénévoles engagés et participez à des actions solidaires partout en Tunisie.",

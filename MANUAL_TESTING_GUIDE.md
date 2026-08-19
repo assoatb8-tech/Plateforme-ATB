@@ -41,16 +41,20 @@ URL de production : https://plateforme-atb.vercel.app
 
 ### 5. Gestion des événements
 - **Action** : aller sur `/admin/evenements`, cliquer "Créer un événement".
-- **Remplir** : titre FR/AR, description FR/AR, lieu, date de début, date de fin, nombre de places, lien Facebook (optionnel).
+- **Remplir** : titre FR/AR, description FR/AR, lieu, date de début, date de fin, nombre de places, lien Facebook (optionnel), bannière (optionnelle, sélecteur de fichier image).
 - **Résultat attendu** : après soumission, redirection vers la liste avec le nouvel événement affiché, statut "Actif".
-- **Vérifier** : l'événement apparaît immédiatement sur `/evenements` (page publique) dans l'onglet "À venir".
-- **Action** : modifier l'événement, changer une date pour le passé.
-- **Résultat attendu** : l'événement bascule automatiquement dans l'onglet "Précédents" côté public, et les boutons d'inscription disparaissent sur sa page détail.
+- **Vérifier** : l'événement apparaît immédiatement sur `/evenements` (page publique) dans l'onglet "À venir", avec sa bannière affichée en haut de la carte et de sa page détail si une a été ajoutée.
+- **Action** : modifier l'événement, changer une date pour le passé (sans toucher au statut).
+- **Résultat attendu** : l'événement bascule automatiquement dans l'onglet "Précédents" côté public, son badge de statut affiche désormais "Terminé" (calculé automatiquement à partir de la date de fin, jamais stocké ni nécessitant d'action admin), et les boutons d'inscription disparaissent sur sa page détail.
+- **Vérifier** : un événement annulé (statut "Annulé") reste "Annulé" même après sa date de fin — "Terminé" ne s'applique qu'aux événements non annulés dont la date de fin est passée.
 
 ### 5bis. Participants d'un événement
-- **Action** : sur `/admin/evenements`, cliquer le bouton "Participants" (icône personnes) d'un événement qui a au moins une inscription.
-- **Résultat attendu** : page avec le titre de l'événement et un tableau des inscrits (photo, Nom, Téléphone, Email, Statut, Date d'inscription).
+- **Action** : sur `/admin/evenements`, cliquer le bouton "Participants" (icône personnes) d'un événement qui a au moins une inscription confirmée.
+- **Résultat attendu** : page avec le titre de l'événement et un tableau des inscrits (photo, Nom, Téléphone, Email, Statut, Date d'inscription, Chef de groupe).
 - **Vérifier** : la photo de profil de chaque inscrit s'affiche (ou une icône générique si absente) ; un événement sans inscription affiche un état vide clair plutôt qu'un tableau cassé ; le lien "Retour" ramène à `/admin/evenements`.
+- **Action** : sur un participant au statut "Inscrit" (confirmé), cliquer "Désigner comme chef".
+- **Résultat attendu** : une couronne apparaît à côté de son nom, le bouton devient "Retirer".
+- **Vérifier** : aucun bouton de désignation n'apparaît pour un participant en liste d'attente ou annulé (seul un participant confirmé peut être chef) ; désigner un nouveau chef retire automatiquement la couronne du précédent (un seul chef par événement).
 
 ### 6. Gestion des sponsors
 - **Action** : aller sur `/admin/sponsors`, cliquer "Ajouter un sponsor".
@@ -132,6 +136,17 @@ URL de production : https://plateforme-atb.vercel.app
 
 ---
 
+## Notifications (adhérents et administrateurs)
+- **Vérifier** : la cloche de notification n'apparaît dans la barre de navigation que pour un utilisateur connecté (absente pour un visiteur).
+- **Action (admin)** : créer un nouvel événement depuis `/admin/evenements`.
+- **Résultat attendu** : chaque adhérent au statut Actif reçoit une notification "Nouvel événement : …" ; cliquer dessus ouvre la page détail de l'événement et marque la notification comme lue (le point bleu disparaît).
+- **Action (visiteur)** : créer un nouveau compte adhérent.
+- **Résultat attendu** : chaque administrateur reçoit une notification "… a rejoint l'association" ; cliquer dessus ouvre la fiche du nouvel adhérent sur `/admin/membres/:id`.
+- **Vérifier** : le badge sur la cloche affiche le nombre de notifications non lues (jusqu'à "9+") et disparaît une fois toutes les notifications lues ; le bouton "Tout marquer comme lu" vide le badge en un clic sans recharger la page ; sans aucune notification, le panneau affiche un état vide clair.
+- **Vérifier le rafraîchissement** : une nouvelle notification apparaît dans le panneau sans action de l'utilisateur dans la minute qui suit (rafraîchissement automatique en arrière-plan).
+
+---
+
 ## Historique des corrections
 
 Les deux points relevés lors de l'audit initial ont été corrigés le même
@@ -177,5 +192,19 @@ membres du Bureau ajoutés le 2026-08-03 (Khaled Mehdaoui, Firas Berriri)
 n'ont pas de fonction — la gestion du Bureau ne permet pas de modifier
 une entrée existante, il faut les supprimer puis les rajouter via
 `/admin/bureau` pour renseigner leur fonction.
+
+Mise à jour du 2026-08-19 : statut "Terminé" calculé automatiquement pour
+les événements dont la date de fin est passée (sans annulation manuelle et
+sans tâche planifiée — recalculé à chaque affichage) ; bannière d'image
+optionnelle pour les événements, affichée sur les cartes et la page détail ;
+désignation d'un "chef de groupe" par événement parmi les participants
+confirmés ; nouveau système de notifications intégré (cloche dans la barre
+de navigation) — les adhérents actifs sont notifiés à la création d'un
+nouvel événement, les administrateurs sont notifiés à chaque nouvelle
+inscription. Audit qualité mené sur deux points transverses signalés :
+la photo de profil manquait sur la fiche détail d'un adhérent
+(`/admin/membres/:id`, corrigé) et un espacement fixe (au lieu d'un
+espacement logique) ne s'inversait pas correctement en arabe sur le champ
+photo du dossier d'adhésion (corrigé).
 
 Aucun problème connu à ce jour.
