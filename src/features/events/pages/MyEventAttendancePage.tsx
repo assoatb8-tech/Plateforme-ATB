@@ -60,7 +60,7 @@ export function MyEventAttendancePage() {
         className="mb-6 inline-flex items-center gap-1 text-sm text-primary hover:underline"
       >
         <ArrowLeft size={16} className="rtl:-scale-x-100" />
-        {t('dashboard.title')}
+        {t('nav.dashboard')}
       </Link>
 
       <h1 className="mb-1 text-2xl font-semibold text-slate-900">
