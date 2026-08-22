@@ -1,8 +1,10 @@
+import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Calendar, Facebook, MapPin, Users } from 'lucide-react'
+import { Calendar, CalendarDays, Facebook, MapPin, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { ApiError } from '@/services/apiClient'
@@ -11,8 +13,22 @@ import {
   useCancelEventRegistration,
   useEvent,
   useRegisterForEvent,
+  useUpdateMyEventDays,
 } from '@/features/events/hooks/useEvents'
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
+import type { EventDayDto } from '@/features/events/types'
+
+function formatDayLabel(day: EventDayDto, locale: string): string {
+  const start = new Date(day.startAt)
+  const end = new Date(day.endAt)
+  const dateLabel = start.toLocaleDateString(locale, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  })
+  const timeOptions: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
+  return `${dateLabel} · ${start.toLocaleTimeString(locale, timeOptions)}–${end.toLocaleTimeString(locale, timeOptions)}`
+}
 
 export function EventDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -22,6 +38,19 @@ export function EventDetailPage() {
   const { data: event, isLoading, isError } = useEvent(id)
   const registerMutation = useRegisterForEvent(id ?? '')
   const cancelMutation = useCancelEventRegistration(id ?? '')
+  const updateDaysMutation = useUpdateMyEventDays(id ?? '')
+
+  const [selectedDayIds, setSelectedDayIds] = useState<string[]>([])
+  useEffect(() => {
+    if (event) setSelectedDayIds(event.myRegistrationDayIds)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [event?.id, event?.myRegistrationDayIds.join(',')])
+
+  function toggleDay(dayId: string) {
+    setSelectedDayIds((prev) =>
+      prev.includes(dayId) ? prev.filter((existing) => existing !== dayId) : [...prev, dayId],
+    )
+  }
 
   if (isLoading) {
     return (
@@ -60,7 +89,7 @@ export function EventDetailPage() {
   const isPastEvent = new Date(event.endDate) < new Date()
   const isRegistered = event.myRegistrationStatus === 'REGISTERED'
   const isWaitingList = event.myRegistrationStatus === 'WAITING_LIST'
-  const mutationError = registerMutation.error ?? cancelMutation.error
+  const mutationError = registerMutation.error ?? cancelMutation.error ?? updateDaysMutation.error
   const mutationErrorMessage = mutationError
     ? t(
         mutationError instanceof ApiError && mutationError.status === 409
@@ -76,6 +105,8 @@ export function EventDetailPage() {
       : user && user.status === 'BANNED'
         ? 'events.registrationBlockedBanned'
         : null
+  const canPickDays =
+    Boolean(user) && !isCancelledEvent && !isPastEvent && !registrationBlockedReason
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:px-6">
@@ -102,8 +133,17 @@ export function EventDetailPage() {
 
         <div className="flex flex-col gap-2 text-sm text-slate-600">
           <span className="flex items-center gap-2">
-            <Calendar size={16} className="shrink-0" />
-            {t('events.dateRange', { start: startDate, end: endDate })}
+            {event.isMultiDay ? (
+              <>
+                <CalendarDays size={16} className="shrink-0" />
+                {t('events.multiDayCount', { count: event.days.length })}
+              </>
+            ) : (
+              <>
+                <Calendar size={16} className="shrink-0" />
+                {t('events.dateRange', { start: startDate, end: endDate })}
+              </>
+            )}
           </span>
           <span className="flex items-center gap-2">
             <MapPin size={16} className="shrink-0" />
@@ -119,6 +159,35 @@ export function EventDetailPage() {
         </div>
 
         <p className="whitespace-pre-line text-sm text-slate-700">{description}</p>
+
+        {event.isMultiDay && (
+          <div className="flex flex-col gap-2 rounded-xl border border-slate-200 p-4">
+            <p className="text-sm font-semibold text-slate-700">{t('events.pickYourDays')}</p>
+            <div className="flex flex-col gap-2">
+              {event.days.map((day) => (
+                <Checkbox
+                  key={day.id}
+                  label={formatDayLabel(day, locale)}
+                  checked={selectedDayIds.includes(day.id)}
+                  disabled={!canPickDays}
+                  onChange={() => toggleDay(day.id)}
+                />
+              ))}
+            </div>
+            {canPickDays && (isRegistered || isWaitingList) && (
+              <Button
+                type="button"
+                variant="secondary"
+                className="w-fit"
+                disabled={updateDaysMutation.isPending || selectedDayIds.length === 0}
+                loading={updateDaysMutation.isPending}
+                onClick={() => updateDaysMutation.mutate(selectedDayIds)}
+              >
+                {t('events.updateMyDays')}
+              </Button>
+            )}
+          </div>
+        )}
 
         {event.facebookPostUrl && (
           <a
@@ -169,8 +238,10 @@ export function EventDetailPage() {
           !registrationBlockedReason && (
             <Button
               type="button"
-              onClick={() => registerMutation.mutate()}
-              disabled={registerMutation.isPending}
+              onClick={() => registerMutation.mutate(event.isMultiDay ? selectedDayIds : undefined)}
+              disabled={
+                registerMutation.isPending || (event.isMultiDay && selectedDayIds.length === 0)
+              }
               loading={registerMutation.isPending}
             >
               {isFull ? t('events.joinWaitingList') : t('events.register')}

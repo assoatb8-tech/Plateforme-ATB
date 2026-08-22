@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Calendar, Facebook, MapPin, Users } from 'lucide-react'
+import { Calendar, CalendarDays, Facebook, MapPin, Users } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import type { EventDto } from '@/features/events/types'
@@ -48,8 +48,17 @@ export function EventCard({ event }: EventCardProps) {
 
         <div className="flex flex-col gap-1.5 text-sm text-slate-500">
           <span className="flex items-center gap-2">
-            <Calendar size={16} className="shrink-0" />
-            {startDate}
+            {event.isMultiDay ? (
+              <>
+                <CalendarDays size={16} className="shrink-0" />
+                {t('events.multiDayCount', { count: event.days.length })}
+              </>
+            ) : (
+              <>
+                <Calendar size={16} className="shrink-0" />
+                {startDate}
+              </>
+            )}
           </span>
           <span className="flex items-center gap-2">
             <MapPin size={16} className="shrink-0" />

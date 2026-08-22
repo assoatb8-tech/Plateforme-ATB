@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { eventAttendanceSchema, eventCreateSchema, eventUpdateSchema } from './event.js'
+import {
+  eventAttendanceSchema,
+  eventCreateSchema,
+  eventDaySelectionSchema,
+  eventRegisterSchema,
+  eventUpdateSchema,
+} from './event.js'
 
 const validEvent = {
   titleFr: 'Nettoyage de plage',
@@ -113,6 +119,59 @@ describe('eventCreateSchema', () => {
   })
 })
 
+describe('eventCreateSchema — multi-day', () => {
+  const validDay = { startAt: '2026-09-01T09:00:00.000Z', endAt: '2026-09-01T12:00:00.000Z' }
+
+  it('accepts a multi-day event with startDate/endDate omitted', () => {
+    const { startDate: _s, endDate: _e, ...withoutDates } = validEvent
+    const result = eventCreateSchema.safeParse({
+      ...withoutDates,
+      isMultiDay: true,
+      days: [validDay, { startAt: '2026-09-02T09:00:00.000Z', endAt: '2026-09-02T12:00:00.000Z' }],
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects a multi-day event with an empty days array', () => {
+    const { startDate: _s, endDate: _e, ...withoutDates } = validEvent
+    const result = eventCreateSchema.safeParse({ ...withoutDates, isMultiDay: true, days: [] })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a multi-day event with no days field at all', () => {
+    const { startDate: _s, endDate: _e, ...withoutDates } = validEvent
+    const result = eventCreateSchema.safeParse({ ...withoutDates, isMultiDay: true })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a day whose endAt is before its startAt', () => {
+    const { startDate: _s, endDate: _e, ...withoutDates } = validEvent
+    const result = eventCreateSchema.safeParse({
+      ...withoutDates,
+      isMultiDay: true,
+      days: [{ startAt: '2026-09-01T12:00:00.000Z', endAt: '2026-09-01T09:00:00.000Z' }],
+    })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a single-day event missing startDate/endDate', () => {
+    const { startDate: _s, endDate: _e, ...withoutDates } = validEvent
+    const result = eventCreateSchema.safeParse(withoutDates)
+    expect(result.success).toBe(false)
+  })
+
+  it('carries a day id through when editing (update schema)', () => {
+    const result = eventUpdateSchema.safeParse({
+      isMultiDay: true,
+      days: [{ id: '11111111-1111-1111-1111-111111111111', ...validDay }],
+    })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.days?.[0].id).toBe('11111111-1111-1111-1111-111111111111')
+    }
+  })
+})
+
 describe('eventUpdateSchema', () => {
   it('accepts a partial update with a single field', () => {
     const result = eventUpdateSchema.safeParse({ maxParticipants: 30 })
@@ -139,6 +198,54 @@ describe('eventUpdateSchema', () => {
       startDate: '2026-09-02T09:00:00.000Z',
       endDate: '2026-09-01T09:00:00.000Z',
     })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('eventRegisterSchema', () => {
+  it('accepts an empty body (single-day registration)', () => {
+    const result = eventRegisterSchema.safeParse({})
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts an explicit dayIds array', () => {
+    const result = eventRegisterSchema.safeParse({
+      dayIds: ['11111111-1111-1111-1111-111111111111'],
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts an empty dayIds array', () => {
+    const result = eventRegisterSchema.safeParse({ dayIds: [] })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects a non-UUID entry in dayIds', () => {
+    const result = eventRegisterSchema.safeParse({ dayIds: ['not-a-uuid'] })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('eventDaySelectionSchema', () => {
+  it('accepts a non-empty dayIds array', () => {
+    const result = eventDaySelectionSchema.safeParse({
+      dayIds: ['11111111-1111-1111-1111-111111111111'],
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects an empty dayIds array', () => {
+    const result = eventDaySelectionSchema.safeParse({ dayIds: [] })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a missing dayIds key', () => {
+    const result = eventDaySelectionSchema.safeParse({})
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a non-UUID entry in dayIds', () => {
+    const result = eventDaySelectionSchema.safeParse({ dayIds: ['not-a-uuid'] })
     expect(result.success).toBe(false)
   })
 })

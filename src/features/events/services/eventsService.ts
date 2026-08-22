@@ -23,8 +23,25 @@ export async function fetchEvent(id: string): Promise<EventDto> {
   return apiRequest<EventDto>(`/api/events/${id}`, { requireAuth: false })
 }
 
-export async function registerForEvent(id: string): Promise<void> {
-  await apiRequest(`/api/events/${id}`, { method: 'POST', query: { action: 'register' } })
+// dayIds: only meaningful (and required server-side) for a multi-day
+// event — ignored otherwise, so a plain single-day registration still
+// calls this with no argument at all.
+export async function registerForEvent(id: string, dayIds?: string[]): Promise<void> {
+  await apiRequest(`/api/events/${id}`, {
+    method: 'POST',
+    query: { action: 'register' },
+    body: dayIds ? { dayIds } : undefined,
+  })
+}
+
+// Changes which day(s) an already-registered member intends to attend,
+// without touching their registration/waitlist status.
+export async function updateMyEventDays(id: string, dayIds: string[]): Promise<void> {
+  await apiRequest(`/api/events/${id}`, {
+    method: 'PATCH',
+    query: { action: 'days' },
+    body: { dayIds },
+  })
 }
 
 export async function cancelEventRegistration(id: string): Promise<void> {

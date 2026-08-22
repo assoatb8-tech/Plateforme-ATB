@@ -7,7 +7,7 @@ import {
   fetchAdminEvents,
   updateEvent,
 } from '@/features/admin/events/services/adminEventsService'
-import type { EventFormValues } from '@/features/admin/events/validation'
+import type { EventSubmitPayload } from '@/features/admin/events/validation'
 
 export const adminEventsKeys = {
   all: ['admin', 'events'] as const,
@@ -45,7 +45,7 @@ function useInvalidateAdminEventQueries() {
 export function useCreateEvent() {
   const invalidate = useInvalidateAdminEventQueries()
   return useMutation({
-    mutationFn: (values: EventFormValues) => createEvent(values),
+    mutationFn: (values: EventSubmitPayload) => createEvent(values),
     onSuccess: invalidate,
   })
 }
@@ -53,7 +53,7 @@ export function useCreateEvent() {
 export function useUpdateEvent(id: string) {
   const invalidate = useInvalidateAdminEventQueries()
   return useMutation({
-    mutationFn: (values: EventFormValues) => updateEvent(id, values),
+    mutationFn: (values: EventSubmitPayload) => updateEvent(id, values),
     onSuccess: invalidate,
   })
 }

@@ -186,6 +186,11 @@ model Event {
   descriptionFr   String      @map("description_fr") @db.Text
   descriptionAr   String      @map("description_ar") @db.Text
   location        String
+  // For a multi-day event these are always DERIVED (min/max across `days`,
+  // recomputed server-side on every create/update) — never edited directly
+  // by the client in that mode. Kept populated regardless of isMultiDay so
+  // every existing query/sort/status-computation (event list filtering,
+  // "Terminé" status, EventCard's date display) keeps working unchanged.
   startDate       DateTime    @map("start_date")
   endDate         DateTime    @map("end_date")
   maxParticipants Int         @map("max_participants")
@@ -199,12 +204,34 @@ model Event {
   createdAt       DateTime    @default(now()) @map("created_at")
   updatedAt       DateTime    @updatedAt @map("updated_at")
 
+  // A one-off single-day event (the default) has no `days` rows at all —
+  // startDate/endDate alone describe it, exactly as before this feature.
+  isMultiDay Boolean @default(false) @map("is_multi_day")
+
   registrations EventRegistration[]
   notifications Notification[]
+  days          EventDay[]
 
   @@index([startDate])
   @@index([createdBy])
   @@map("events")
+}
+
+// One session of a multi-day event. Ordered by startAt (no separate
+// sort-order column needed — two sessions sharing an exact instant would be
+// a data-entry mistake, not a real ordering case).
+model EventDay {
+  id      String @id @default(uuid()) @db.Uuid
+  eventId String @map("event_id") @db.Uuid
+  event   Event  @relation(fields: [eventId], references: [id], onDelete: Cascade)
+
+  startAt DateTime @map("start_at")
+  endAt   DateTime @map("end_at")
+
+  selections EventDaySelection[]
+
+  @@index([eventId])
+  @@map("event_days")
 }
 
 model EventRegistration {
@@ -220,10 +247,30 @@ model EventRegistration {
   // row (never WAITING_LIST/CANCELLED, which never actually attended).
   attendanceStatus AttendanceStatus?  @map("attendance_status")
 
+  // Which day(s) of a multi-day event this registrant intends to attend —
+  // empty for a single-day event's registrations (nothing to choose from).
+  // Replaced wholesale (delete + recreate) on every register/update-days
+  // call rather than diffed, since there's no meaningful identity to a
+  // selection beyond "which days are currently picked".
+  daySelections EventDaySelection[]
+
   @@unique([eventId, userId])
   @@index([eventId])
   @@index([userId])
   @@map("event_registrations")
+}
+
+model EventDaySelection {
+  id             String            @id @default(uuid()) @db.Uuid
+  registrationId String            @map("registration_id") @db.Uuid
+  registration   EventRegistration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  eventDayId     String            @map("event_day_id") @db.Uuid
+  eventDay       EventDay          @relation(fields: [eventDayId], references: [id], onDelete: Cascade)
+
+  @@unique([registrationId, eventDayId])
+  @@index([registrationId])
+  @@index([eventDayId])
+  @@map("event_day_selections")
 }
 
 model Document {

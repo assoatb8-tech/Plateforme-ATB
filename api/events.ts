@@ -3,8 +3,9 @@ import { prisma } from './_lib/utils/prisma.js'
 import { withRole } from './_lib/middlewares/rbac.js'
 import { getOptionalUser } from './_lib/middlewares/auth.js'
 import { sendError, sendSuccess } from './_lib/utils/response.js'
-import { eventCreateSchema } from './_lib/validators/event.js'
+import { eventCreateSchema, type EventDayInput } from './_lib/validators/event.js'
 import { serializeEvent } from './_lib/utils/eventSerializer.js'
+import { computeEventDateRange } from './_lib/utils/eventSchedule.js'
 import { logAdminAction } from './_lib/utils/auditLog.js'
 import { enforceIpRateLimit } from './_lib/utils/rateLimit.js'
 
@@ -100,6 +101,7 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
       orderBy,
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
+      include: { days: { select: { id: true, startAt: true, endAt: true } } },
     }),
     prisma.event.count({ where }),
   ])
@@ -146,6 +148,21 @@ async function handleCreate(req: VercelRequest, res: VercelResponse, user: { id:
     return
   }
 
+  const isMultiDay = parsed.data.isMultiDay ?? false
+  const dayRanges = (parsed.data.days ?? []).map((day: EventDayInput) => ({
+    startAt: new Date(day.startAt),
+    endAt: new Date(day.endAt),
+  }))
+  // withScheduleCheck already guaranteed one or the other is present —
+  // startDate/endDate for a single-day event, a non-empty `days` for a
+  // multi-day one.
+  const { startDate, endDate } = isMultiDay
+    ? computeEventDateRange(dayRanges)
+    : {
+        startDate: new Date(parsed.data.startDate as string),
+        endDate: new Date(parsed.data.endDate as string),
+      }
+
   const event = await prisma.event.create({
     data: {
       titleFr: parsed.data.titleFr,
@@ -153,13 +170,16 @@ async function handleCreate(req: VercelRequest, res: VercelResponse, user: { id:
       descriptionFr: parsed.data.descriptionFr,
       descriptionAr: parsed.data.descriptionAr,
       location: parsed.data.location,
-      startDate: new Date(parsed.data.startDate),
-      endDate: new Date(parsed.data.endDate),
+      startDate,
+      endDate,
       maxParticipants: parsed.data.maxParticipants,
       facebookPostUrl: parsed.data.facebookPostUrl,
       bannerUrl: parsed.data.bannerUrl,
       createdBy: user.id,
+      isMultiDay,
+      ...(isMultiDay ? { days: { create: dayRanges } } : {}),
     },
+    include: { days: { select: { id: true, startAt: true, endAt: true } } },
   })
 
   await logAdminAction(user.id, 'EVENT_CREATED', event.id)

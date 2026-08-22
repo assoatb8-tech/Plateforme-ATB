@@ -2,7 +2,7 @@ import { apiRequest } from '@/services/apiClient'
 import { getSupabaseClient } from '@/services/supabaseClient'
 import { compressToJpeg } from '@/services/imageCompression'
 import type { EventDto, EventsListResponse } from '@/features/events/types'
-import type { EventFormValues } from '@/features/admin/events/validation'
+import type { EventSubmitPayload } from '@/features/admin/events/validation'
 
 const BANNER_BUCKET = 'event-banners'
 
@@ -43,11 +43,11 @@ export async function fetchAdminEvent(id: string): Promise<EventDto> {
   return apiRequest<EventDto>(`/api/events/${id}`)
 }
 
-export async function createEvent(values: EventFormValues): Promise<EventDto> {
+export async function createEvent(values: EventSubmitPayload): Promise<EventDto> {
   return apiRequest<EventDto>('/api/events', { method: 'POST', body: values })
 }
 
-export async function updateEvent(id: string, values: EventFormValues): Promise<EventDto> {
+export async function updateEvent(id: string, values: EventSubmitPayload): Promise<EventDto> {
   return apiRequest<EventDto>(`/api/events/${id}`, { method: 'PATCH', body: values })
 }
 

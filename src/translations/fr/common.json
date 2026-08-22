@@ -257,7 +257,10 @@
     },
     "myLedEvents": {
       "forbidden": "Vous n'êtes pas autorisé(e) à gérer les présences de cet événement."
-    }
+    },
+    "multiDayCount": "Événement sur {{count}} jours",
+    "pickYourDays": "Choisissez les jours où vous participerez",
+    "updateMyDays": "Mettre à jour mes jours"
   },
   "dashboard": {
     "greeting": "Bienvenue, {{email}}",
@@ -412,7 +415,8 @@
           "status": "Statut",
           "date": "Date d'inscription",
           "leader": "Chef de groupe",
-          "attendance": "Présence"
+          "attendance": "Présence",
+          "days": "Jours choisis"
         }
       },
       "form": {
@@ -430,6 +434,15 @@
         "facebookPostUrl": "Lien Facebook (photos de l'événement)",
         "banner": "Bannière (optionnelle)",
         "dateOrderError": "La date de fin doit être postérieure à la date de début.",
+        "isMultiDay": "Événement sur plusieurs jours",
+        "sameTimeEachDay": "Même horaire chaque jour",
+        "startTime": "Heure de début",
+        "endTime": "Heure de fin",
+        "dayDate": "Jour {{number}} — Date",
+        "addDay": "Ajouter un jour",
+        "removeDay": "Retirer ce jour",
+        "daysRequiredError": "Ajoutez au moins un jour.",
+        "dayTimeOrderError": "L'heure de fin doit être postérieure à l'heure de début.",
         "submit": "Créer l'événement",
         "save": "Enregistrer les modifications",
         "errorGeneric": "Une erreur est survenue. Merci de réessayer."

@@ -7,6 +7,7 @@ import {
   fetchMyLedEvents,
   registerForEvent,
   setAttendance,
+  updateMyEventDays,
 } from '@/features/events/services/eventsService'
 import type { AttendanceStatus, EventTense } from '@/features/events/types'
 
@@ -45,7 +46,16 @@ function useInvalidateEventQueries(id: string) {
 export function useRegisterForEvent(id: string) {
   const invalidate = useInvalidateEventQueries(id)
   return useMutation({
-    mutationFn: () => registerForEvent(id),
+    mutationFn: (dayIds?: string[]) => registerForEvent(id, dayIds),
+    onSuccess: invalidate,
+  })
+}
+
+// Changing which day(s) an already-registered member intends to attend.
+export function useUpdateMyEventDays(id: string) {
+  const invalidate = useInvalidateEventQueries(id)
+  return useMutation({
+    mutationFn: (dayIds: string[]) => updateMyEventDays(id, dayIds),
     onSuccess: invalidate,
   })
 }

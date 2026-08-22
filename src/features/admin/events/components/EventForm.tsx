@@ -1,11 +1,13 @@
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useFieldArray, useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
+import { Plus, Trash2 } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Textarea } from '@/components/ui/Textarea'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
+import { Checkbox } from '@/components/ui/Checkbox'
 import { ShadowDotsLoader } from '@/components/ui/ShadowDotsLoader'
 import { eventFormSchema, type EventFormValues } from '@/features/admin/events/validation'
 import { uploadEventBanner } from '@/features/admin/events/services/adminEventsService'
@@ -25,6 +27,8 @@ interface EventFormProps {
   draftKey?: string
 }
 
+const EMPTY_DAY = { date: '', startTime: '', endTime: '' }
+
 export function EventForm({
   defaultValues,
   onSubmit,
@@ -39,6 +43,7 @@ export function EventForm({
     handleSubmit,
     watch,
     setValue,
+    control,
     formState: { errors, isSubmitting },
   } = useForm<EventFormValues>({
     resolver: zodResolver(eventFormSchema),
@@ -48,6 +53,30 @@ export function EventForm({
   })
 
   useAutosaveFormDraft(draftKey ?? 'unused', watch, Boolean(draftKey))
+
+  const { fields, append, remove } = useFieldArray({ control, name: 'days' })
+
+  const isMultiDay = watch('isMultiDay')
+  // UI-only convenience, not part of the validated schema — reduces
+  // filling the same start/end time on every single day row.
+  const [sameTime, setSameTime] = useState(true)
+  const [sharedStartTime, setSharedStartTime] = useState('')
+  const [sharedEndTime, setSharedEndTime] = useState('')
+
+  function applySharedTime(startTime: string, endTime: string) {
+    setSharedStartTime(startTime)
+    setSharedEndTime(endTime)
+    fields.forEach((_field, index) => {
+      setValue(`days.${index}.startTime`, startTime, { shouldValidate: true })
+      setValue(`days.${index}.endTime`, endTime, { shouldValidate: true })
+    })
+  }
+
+  function handleAddDay() {
+    append(
+      sameTime ? { ...EMPTY_DAY, startTime: sharedStartTime, endTime: sharedEndTime } : EMPTY_DAY,
+    )
+  }
 
   const bannerUrl = watch('bannerUrl')
   const [uploadingBanner, setUploadingBanner] = useState(false)
@@ -111,20 +140,116 @@ export function EventForm({
         {...register('location')}
       />
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <Input
-          type="datetime-local"
-          label={t('admin.events.form.startDate')}
-          error={errors.startDate && t(errors.startDate.message ?? 'validation.invalidDate')}
-          {...register('startDate')}
-        />
-        <Input
-          type="datetime-local"
-          label={t('admin.events.form.endDate')}
-          error={errors.endDate && t(errors.endDate.message ?? 'validation.invalidDate')}
-          {...register('endDate')}
-        />
-      </div>
+      <Checkbox label={t('admin.events.form.isMultiDay')} {...register('isMultiDay')} />
+
+      {!isMultiDay && (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <Input
+            type="datetime-local"
+            label={t('admin.events.form.startDate')}
+            error={errors.startDate && t(errors.startDate.message ?? 'validation.invalidDate')}
+            {...register('startDate')}
+          />
+          <Input
+            type="datetime-local"
+            label={t('admin.events.form.endDate')}
+            error={errors.endDate && t(errors.endDate.message ?? 'validation.invalidDate')}
+            {...register('endDate')}
+          />
+        </div>
+      )}
+
+      {isMultiDay && (
+        <div className="flex flex-col gap-3 rounded-xl border border-slate-200 p-4">
+          <Checkbox
+            label={t('admin.events.form.sameTimeEachDay')}
+            checked={sameTime}
+            onChange={(event) => setSameTime(event.target.checked)}
+          />
+
+          {sameTime && (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <Input
+                type="time"
+                id="sharedStartTime"
+                label={t('admin.events.form.startTime')}
+                value={sharedStartTime}
+                onChange={(event) => applySharedTime(event.target.value, sharedEndTime)}
+              />
+              <Input
+                type="time"
+                id="sharedEndTime"
+                label={t('admin.events.form.endTime')}
+                value={sharedEndTime}
+                onChange={(event) => applySharedTime(sharedStartTime, event.target.value)}
+              />
+            </div>
+          )}
+
+          {errors.days?.message && <p className="text-sm text-error">{t(errors.days.message)}</p>}
+
+          <div className="flex flex-col gap-3">
+            {fields.map((field, index) => {
+              const dayErrors = errors.days?.[index]
+              return (
+                <div
+                  key={field.id}
+                  className="flex flex-col gap-3 rounded-lg bg-slate-50 p-3 sm:flex-row sm:items-end"
+                >
+                  <div className="flex-1">
+                    <Input
+                      type="date"
+                      label={t('admin.events.form.dayDate', { number: index + 1 })}
+                      error={dayErrors?.date && t(dayErrors.date.message ?? 'validation.required')}
+                      {...register(`days.${index}.date`)}
+                    />
+                  </div>
+                  {!sameTime && (
+                    <>
+                      <div className="flex-1">
+                        <Input
+                          type="time"
+                          label={t('admin.events.form.startTime')}
+                          error={
+                            dayErrors?.startTime &&
+                            t(dayErrors.startTime.message ?? 'validation.required')
+                          }
+                          {...register(`days.${index}.startTime`)}
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          type="time"
+                          label={t('admin.events.form.endTime')}
+                          error={
+                            dayErrors?.endTime &&
+                            t(dayErrors.endTime.message ?? 'validation.required')
+                          }
+                          {...register(`days.${index}.endTime`)}
+                        />
+                      </div>
+                    </>
+                  )}
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={fields.length <= 1}
+                    onClick={() => remove(index)}
+                    aria-label={t('admin.events.form.removeDay')}
+                  >
+                    <Trash2 size={16} />
+                  </Button>
+                </div>
+              )
+            })}
+          </div>
+
+          <Button type="button" variant="secondary" onClick={handleAddDay} className="w-fit">
+            <Plus size={16} />
+            {t('admin.events.form.addDay')}
+          </Button>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Input

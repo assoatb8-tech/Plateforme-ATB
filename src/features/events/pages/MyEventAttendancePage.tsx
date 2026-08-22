@@ -10,6 +10,7 @@ import { useEvent, useEventParticipants, useSetAttendance } from '@/features/eve
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
 import { resolveMemberDisplayName } from '@/utils/displayName'
 import { useSignedPhotoUrls } from '@/hooks/useSignedPhotoUrls'
+import { formatSelectedDays } from '@/utils/eventDays'
 import { ApiError } from '@/services/apiClient'
 import type { AttendanceStatus, RegistrationStatus } from '@/features/events/types'
 
@@ -94,6 +95,9 @@ export function MyEventAttendancePage() {
                 <th className="px-4 py-3">{t('admin.events.participants.columns.name')}</th>
                 <th className="px-4 py-3">{t('admin.events.participants.columns.phone')}</th>
                 <th className="px-4 py-3">{t('admin.events.participants.columns.status')}</th>
+                {event?.isMultiDay && (
+                  <th className="px-4 py-3">{t('admin.events.participants.columns.days')}</th>
+                )}
                 <th className="px-4 py-3">{t('admin.events.participants.columns.attendance')}</th>
               </tr>
             </thead>
@@ -127,6 +131,13 @@ export function MyEventAttendancePage() {
                       {t(STATUS_LABEL_KEY[participant.status])}
                     </StatusBadge>
                   </td>
+                  {event?.isMultiDay && (
+                    <td className="px-4 py-3 text-slate-500">
+                      {participant.daySelections.length > 0
+                        ? formatSelectedDays(participant.daySelections, i18n.language)
+                        : '—'}
+                    </td>
+                  )}
                   <td className="px-4 py-3">
                     {participant.status !== 'REGISTERED' ? (
                       <span className="text-slate-300">—</span>

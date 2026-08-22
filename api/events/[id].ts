@@ -8,8 +8,12 @@ import {
   eventUpdateSchema,
   eventLeaderSchema,
   eventAttendanceSchema,
+  eventRegisterSchema,
+  eventDaySelectionSchema,
+  type EventDayInput,
 } from '../_lib/validators/event.js'
 import { serializeEvent } from '../_lib/utils/eventSerializer.js'
+import { computeEventDateRange } from '../_lib/utils/eventSchedule.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
 import { enforceIpRateLimit } from '../_lib/utils/rateLimit.js'
 import { isValidUuid } from '../_lib/utils/validateId.js'
@@ -79,7 +83,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   if (action === 'register') {
     await withAuth(async (authReq, authRes, user) => {
       if (authReq.method === 'POST') {
-        await handleRegister(id, user, authRes)
+        await handleRegister(id, authReq, user, authRes)
         return
       }
       if (authReq.method === 'DELETE') {
@@ -88,6 +92,18 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
       }
       sendError(authRes, 'Method not allowed', 405)
     })(req, res)
+    return
+  }
+
+  if (action === 'days') {
+    if (req.method !== 'PATCH') {
+      sendError(res, 'Method not allowed', 405)
+      return
+    }
+    await withAuth((authReq, authRes, user) => handleUpdateMyDays(id, authReq, authRes, user))(
+      req,
+      res,
+    )
     return
   }
 
@@ -129,7 +145,10 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
 // --- /api/events/:id ---------------------------------------------------------
 
 async function handleGet(id: string, req: VercelRequest, res: VercelResponse): Promise<void> {
-  const event = await prisma.event.findUnique({ where: { id } })
+  const event = await prisma.event.findUnique({
+    where: { id },
+    include: { days: { select: { id: true, startAt: true, endAt: true } } },
+  })
   if (!event) {
     sendError(res, 'Event not found', 404)
     return
@@ -143,10 +162,61 @@ async function handleGet(id: string, req: VercelRequest, res: VercelResponse): P
   const myRegistration = user
     ? await prisma.eventRegistration.findUnique({
         where: { eventId_userId: { eventId: id, userId: user.id } },
+        include: { daySelections: { select: { eventDayId: true } } },
       })
     : null
+  const myRegistrationDayIds = myRegistration?.daySelections.map((s) => s.eventDayId) ?? []
 
-  sendSuccess(res, serializeEvent({ ...event, registeredCount }, myRegistration?.status ?? null))
+  sendSuccess(
+    res,
+    serializeEvent(
+      { ...event, registeredCount },
+      myRegistration?.status ?? null,
+      myRegistrationDayIds,
+    ),
+  )
+}
+
+// Thrown inside handleUpdate's transaction when the submitted (or existing,
+// for a mode switch with no days supplied) schedule can't produce a valid
+// startDate/endDate — caught outside and turned into a clean 400.
+class ScheduleError extends Error {}
+
+// Reconciles an event's EventDay rows against a submitted list by identity
+// (`id` present = update that row, absent = create a new one; any existing
+// row not mentioned is deleted) rather than delete-everything-and-recreate
+// — the latter would cascade-delete every member's day selections on every
+// unrelated edit (e.g. fixing a typo in one day's end time).
+async function syncEventDays(
+  tx: Prisma.TransactionClient,
+  eventId: string,
+  incomingDays: { id?: string; startAt: Date; endAt: Date }[],
+) {
+  const existing = await tx.eventDay.findMany({ where: { eventId }, select: { id: true } })
+  const existingIds = new Set(existing.map((day) => day.id))
+  const incomingIds = new Set(
+    incomingDays
+      .filter((day): day is typeof day & { id: string } => Boolean(day.id))
+      .map((d) => d.id),
+  )
+
+  const idsToDelete = [...existingIds].filter((existingId) => !incomingIds.has(existingId))
+  if (idsToDelete.length > 0) {
+    await tx.eventDay.deleteMany({ where: { id: { in: idsToDelete } } })
+  }
+
+  for (const day of incomingDays) {
+    if (day.id && existingIds.has(day.id)) {
+      await tx.eventDay.update({
+        where: { id: day.id },
+        data: { startAt: day.startAt, endAt: day.endAt },
+      })
+    } else {
+      await tx.eventDay.create({ data: { eventId, startAt: day.startAt, endAt: day.endAt } })
+    }
+  }
+
+  return tx.eventDay.findMany({ where: { eventId }, orderBy: { startAt: 'asc' } })
 }
 
 async function handleUpdate(
@@ -167,23 +237,74 @@ async function handleUpdate(
     return
   }
 
-  const { startDate, endDate, ...rest } = parsed.data
-  const event = await prisma.event.update({
-    where: { id },
-    data: {
-      ...rest,
-      ...(startDate ? { startDate: new Date(startDate) } : {}),
-      ...(endDate ? { endDate: new Date(endDate) } : {}),
-    },
-  })
+  const { startDate, endDate, isMultiDay, days, ...rest } = parsed.data
+  const nextIsMultiDay = isMultiDay ?? existing.isMultiDay
 
-  await logAdminAction(adminId, 'EVENT_UPDATED', id)
+  try {
+    const event = await prisma.$transaction(async (tx) => {
+      let nextStartDate = existing.startDate
+      let nextEndDate = existing.endDate
 
-  const registeredCount = await prisma.eventRegistration.count({
-    where: { eventId: id, status: 'REGISTERED' },
-  })
+      if (nextIsMultiDay) {
+        if (days) {
+          const finalDays = await syncEventDays(
+            tx,
+            id,
+            days.map((day: EventDayInput) => ({
+              id: day.id,
+              startAt: new Date(day.startAt),
+              endAt: new Date(day.endAt),
+            })),
+          )
+          if (finalDays.length === 0) {
+            throw new ScheduleError('A multi-day event needs at least one day')
+          }
+          const range = computeEventDateRange(finalDays)
+          nextStartDate = range.startDate
+          nextEndDate = range.endDate
+        } else if (!existing.isMultiDay) {
+          // Switching to multi-day with no days submitted — nothing to
+          // derive a schedule from.
+          throw new ScheduleError('At least one day is required to switch to a multi-day event')
+        }
+        // else: staying multi-day with no day changes in this request —
+        // keep the event's already-computed startDate/endDate as-is.
+      } else {
+        if (existing.isMultiDay) {
+          // Downgrading to single-day — the days no longer mean anything;
+          // cascades their members' day selections too.
+          await tx.eventDay.deleteMany({ where: { eventId: id } })
+        }
+        if (startDate) nextStartDate = new Date(startDate)
+        if (endDate) nextEndDate = new Date(endDate)
+      }
 
-  sendSuccess(res, serializeEvent({ ...event, registeredCount }, null))
+      return tx.event.update({
+        where: { id },
+        data: {
+          ...rest,
+          isMultiDay: nextIsMultiDay,
+          startDate: nextStartDate,
+          endDate: nextEndDate,
+        },
+        include: { days: { select: { id: true, startAt: true, endAt: true } } },
+      })
+    })
+
+    await logAdminAction(adminId, 'EVENT_UPDATED', id)
+
+    const registeredCount = await prisma.eventRegistration.count({
+      where: { eventId: id, status: 'REGISTERED' },
+    })
+
+    sendSuccess(res, serializeEvent({ ...event, registeredCount }, null))
+  } catch (error) {
+    if (error instanceof ScheduleError) {
+      sendError(res, error.message, 400)
+      return
+    }
+    throw error
+  }
 }
 
 async function handleDelete(id: string, res: VercelResponse, adminId: string): Promise<void> {
@@ -212,10 +333,20 @@ function isUniqueConstraintError(error: unknown): boolean {
 
 async function handleRegister(
   eventId: string,
+  req: VercelRequest,
   user: AuthedUser,
   res: VercelResponse,
 ): Promise<void> {
-  const event = await prisma.event.findUnique({ where: { id: eventId } })
+  const parsed = eventRegisterSchema.safeParse(req.body ?? {})
+  if (!parsed.success) {
+    sendError(res, parsed.error.issues.map((issue) => issue.message).join(', '), 400)
+    return
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: { days: { select: { id: true } } },
+  })
   if (!event) {
     sendError(res, 'Event not found', 404)
     return
@@ -223,6 +354,19 @@ async function handleRegister(
   if (event.status !== 'ACTIVE') {
     sendError(res, 'This event is not open for registration', 400)
     return
+  }
+
+  // A multi-day event requires picking at least one real day up front —
+  // enforced here rather than in the zod schema since "required" depends
+  // on which event this is, not on the shape of the body alone.
+  let dayIds: string[] = []
+  if (event.isMultiDay) {
+    const validDayIds = new Set(event.days.map((day) => day.id))
+    dayIds = parsed.data.dayIds ?? []
+    if (dayIds.length === 0 || dayIds.some((dayId) => !validDayIds.has(dayId))) {
+      sendError(res, 'At least one valid day must be selected for a multi-day event', 400)
+      return
+    }
   }
 
   try {
@@ -252,12 +396,23 @@ async function handleRegister(
       // -> waitlist instead of a hard rejection, per RegistrationStatus enum.
       const status = activeCount < event.maxParticipants ? 'REGISTERED' : 'WAITING_LIST'
 
-      return existing
-        ? tx.eventRegistration.update({
+      const reg = existing
+        ? await tx.eventRegistration.update({
             where: { id: existing.id },
             data: { status, registeredAt: new Date() },
           })
-        : tx.eventRegistration.create({ data: { eventId, userId: user.id, status } })
+        : await tx.eventRegistration.create({ data: { eventId, userId: user.id, status } })
+
+      if (event.isMultiDay) {
+        // Replace wholesale — covers both a fresh registration and a
+        // cancelled-then-rejoined one picking different days this time.
+        await tx.eventDaySelection.deleteMany({ where: { registrationId: reg.id } })
+        await tx.eventDaySelection.createMany({
+          data: dayIds.map((dayId) => ({ registrationId: reg.id, eventDayId: dayId })),
+        })
+      }
+
+      return reg
     })
 
     sendSuccess(res, registration, 201)
@@ -303,6 +458,60 @@ async function handleCancel(eventId: string, user: AuthedUser, res: VercelRespon
   })
 
   sendSuccess(res, { status: 'CANCELLED' })
+}
+
+// --- /api/events/:id?action=days --------------------------------------------
+
+// PATCH — the caller's own REGISTERED registration only. Lets a member
+// change which day(s) of a multi-day event they intend to attend without
+// going through cancel+re-register (which would also risk losing their
+// REGISTERED spot to the waitlist if the event had since filled up).
+async function handleUpdateMyDays(
+  eventId: string,
+  req: VercelRequest,
+  res: VercelResponse,
+  user: AuthedUser,
+): Promise<void> {
+  const parsed = eventDaySelectionSchema.safeParse(req.body)
+  if (!parsed.success) {
+    sendError(res, parsed.error.issues.map((issue) => issue.message).join(', '), 400)
+    return
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: { days: { select: { id: true } } },
+  })
+  if (!event || !event.isMultiDay) {
+    sendError(res, 'Event not found', 404)
+    return
+  }
+
+  const validDayIds = new Set(event.days.map((day) => day.id))
+  if (parsed.data.dayIds.some((dayId) => !validDayIds.has(dayId))) {
+    sendError(res, 'Invalid day selection', 400)
+    return
+  }
+
+  const registration = await prisma.eventRegistration.findUnique({
+    where: { eventId_userId: { eventId, userId: user.id } },
+  })
+  if (!registration || registration.status === 'CANCELLED') {
+    sendError(res, 'You are not registered for this event', 404)
+    return
+  }
+
+  await prisma.$transaction([
+    prisma.eventDaySelection.deleteMany({ where: { registrationId: registration.id } }),
+    prisma.eventDaySelection.createMany({
+      data: parsed.data.dayIds.map((dayId) => ({
+        registrationId: registration.id,
+        eventDayId: dayId,
+      })),
+    }),
+  ])
+
+  sendSuccess(res, { dayIds: parsed.data.dayIds })
 }
 
 // --- /api/events/:id?action=participants ---------------------------------------
@@ -355,6 +564,9 @@ async function handleParticipants(
             },
           },
         },
+      },
+      daySelections: {
+        select: { eventDay: { select: { id: true, startAt: true, endAt: true } } },
       },
     },
   })

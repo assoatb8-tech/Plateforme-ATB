@@ -3,6 +3,12 @@ export type EventStatus = 'ACTIVE' | 'CANCELLED'
 export type EventTense = 'upcoming' | 'past'
 export type AttendanceStatus = 'PRESENT' | 'ABSENT'
 
+export interface EventDayDto {
+  id: string
+  startAt: string
+  endAt: string
+}
+
 export interface EventDto {
   id: string
   titleFr: string
@@ -21,6 +27,11 @@ export interface EventDto {
   registeredCount: number
   spotsLeft: number
   myRegistrationStatus: RegistrationStatus | null
+  isMultiDay: boolean
+  days: EventDayDto[]
+  // Which of `days` the current user picked for their own registration —
+  // empty when not registered, or when the event isn't multi-day.
+  myRegistrationDayIds: string[]
 }
 
 export interface EventsListResponse {
@@ -65,6 +76,7 @@ export interface EventParticipantDto {
   status: RegistrationStatus
   registeredAt: string
   attendanceStatus: AttendanceStatus | null
+  daySelections: { eventDay: EventDayDto }[]
   user: {
     id: string
     email: string

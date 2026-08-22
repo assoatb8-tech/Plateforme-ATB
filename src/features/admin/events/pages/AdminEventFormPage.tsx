@@ -10,7 +10,12 @@ import {
   useCreateEvent,
   useUpdateEvent,
 } from '@/features/admin/events/hooks/useAdminEvents'
-import { toDatetimeLocalValue, type EventFormValues } from '@/features/admin/events/validation'
+import {
+  toDatetimeLocalValue,
+  toDateAndTimeValues,
+  toEventSubmitPayload,
+  type EventFormValues,
+} from '@/features/admin/events/validation'
 import { clearFormDraft } from '@/hooks/useFormDraft'
 
 const CREATE_DRAFT_KEY = 'atb.admin-event-create.draft'
@@ -29,10 +34,11 @@ export function AdminEventFormPage() {
   async function onSubmit(values: EventFormValues) {
     setFormError(null)
     try {
+      const payload = toEventSubmitPayload(values)
       if (isEditMode && id) {
-        await updateMutation.mutateAsync(values)
+        await updateMutation.mutateAsync(payload)
       } else {
-        await createMutation.mutateAsync(values)
+        await createMutation.mutateAsync(payload)
         clearFormDraft(CREATE_DRAFT_KEY)
       }
       navigate('/admin/evenements')
@@ -84,6 +90,12 @@ export function AdminEventFormPage() {
                   status: event.status,
                   facebookPostUrl: event.facebookPostUrl ?? '',
                   bannerUrl: event.bannerUrl ?? '',
+                  isMultiDay: event.isMultiDay,
+                  days: event.days.map((day) => {
+                    const { date, time: startTime } = toDateAndTimeValues(day.startAt)
+                    const { time: endTime } = toDateAndTimeValues(day.endAt)
+                    return { id: day.id, date, startTime, endTime }
+                  }),
                 }
               : undefined
           }

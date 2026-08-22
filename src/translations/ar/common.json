@@ -257,7 +257,10 @@
     },
     "myLedEvents": {
       "forbidden": "غير مصرح لك بإدارة الحضور لهذا النشاط."
-    }
+    },
+    "multiDayCount": "فعالية على مدى {{count}} أيام",
+    "pickYourDays": "اختر الأيام التي ستشارك فيها",
+    "updateMyDays": "تحديث أيامي"
   },
   "dashboard": {
     "greeting": "مرحبًا، {{email}}",
@@ -412,7 +415,8 @@
           "status": "الحالة",
           "date": "تاريخ التسجيل",
           "leader": "قائد المجموعة",
-          "attendance": "الحضور"
+          "attendance": "الحضور",
+          "days": "الأيام المختارة"
         }
       },
       "form": {
@@ -430,6 +434,15 @@
         "facebookPostUrl": "رابط فيسبوك (صور النشاط)",
         "banner": "صورة الغلاف (اختياري)",
         "dateOrderError": "يجب أن يكون تاريخ النهاية بعد تاريخ البداية.",
+        "isMultiDay": "فعالية على عدة أيام",
+        "sameTimeEachDay": "نفس التوقيت كل يوم",
+        "startTime": "وقت البداية",
+        "endTime": "وقت النهاية",
+        "dayDate": "اليوم {{number}} — التاريخ",
+        "addDay": "إضافة يوم",
+        "removeDay": "إزالة هذا اليوم",
+        "daysRequiredError": "أضف يومًا واحدًا على الأقل.",
+        "dayTimeOrderError": "يجب أن يكون وقت النهاية بعد وقت البداية.",
         "submit": "إنشاء النشاط",
         "save": "حفظ التعديلات",
         "errorGeneric": "حدث خطأ. يرجى المحاولة مرة أخرى."

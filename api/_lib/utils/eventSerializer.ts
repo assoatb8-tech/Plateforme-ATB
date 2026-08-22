@@ -1,5 +1,11 @@
 import type { Event, RegistrationStatus } from '@prisma/client'
 
+export interface EventDayDto {
+  id: string
+  startAt: Date
+  endAt: Date
+}
+
 // Shared shape returned by GET /api/events and GET /api/events/:id so the
 // frontend never has to compute capacity/registration state itself.
 export interface EventWithMeta {
@@ -20,11 +26,15 @@ export interface EventWithMeta {
   registeredCount: number
   spotsLeft: number
   myRegistrationStatus: RegistrationStatus | null
+  isMultiDay: boolean
+  days: EventDayDto[]
+  myRegistrationDayIds: string[]
 }
 
 export function serializeEvent(
-  event: Event & { registeredCount: number },
+  event: Event & { registeredCount: number; days?: EventDayDto[] },
   myRegistrationStatus: RegistrationStatus | null,
+  myRegistrationDayIds: string[] = [],
 ): EventWithMeta {
   return {
     id: event.id,
@@ -44,5 +54,8 @@ export function serializeEvent(
     registeredCount: event.registeredCount,
     spotsLeft: Math.max(0, event.maxParticipants - event.registeredCount),
     myRegistrationStatus,
+    isMultiDay: event.isMultiDay,
+    days: (event.days ?? []).sort((a, b) => a.startAt.getTime() - b.startAt.getTime()),
+    myRegistrationDayIds,
   }
 }

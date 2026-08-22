@@ -11,6 +11,7 @@ import { useEventParticipants, useSetAttendance } from '@/features/events/hooks/
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
 import { resolveMemberDisplayName } from '@/utils/displayName'
 import { useSignedPhotoUrls } from '@/hooks/useSignedPhotoUrls'
+import { formatSelectedDays } from '@/utils/eventDays'
 import type { AttendanceStatus, RegistrationStatus } from '@/features/events/types'
 
 const STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
@@ -102,6 +103,9 @@ export function AdminEventParticipantsPage() {
                 <th className="px-4 py-3">{t('admin.events.participants.columns.email')}</th>
                 <th className="px-4 py-3">{t('admin.events.participants.columns.status')}</th>
                 <th className="px-4 py-3">{t('admin.events.participants.columns.date')}</th>
+                {event?.isMultiDay && (
+                  <th className="px-4 py-3">{t('admin.events.participants.columns.days')}</th>
+                )}
                 <th className="px-4 py-3">{t('admin.events.participants.columns.attendance')}</th>
                 <th className="px-4 py-3 text-end">
                   {t('admin.events.participants.columns.leader')}
@@ -152,6 +156,13 @@ export function AdminEventParticipantsPage() {
                     <td className="px-4 py-3 text-slate-500">
                       {new Date(participant.registeredAt).toLocaleDateString()}
                     </td>
+                    {event?.isMultiDay && (
+                      <td className="px-4 py-3 text-slate-500">
+                        {participant.daySelections.length > 0
+                          ? formatSelectedDays(participant.daySelections, i18n.language)
+                          : '—'}
+                      </td>
+                    )}
                     <td className="px-4 py-3">
                       {participant.status !== 'REGISTERED' ? (
                         <span className="text-slate-300">—</span>
