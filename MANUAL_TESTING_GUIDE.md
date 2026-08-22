@@ -48,6 +48,23 @@ URL de production : https://plateforme-atb.vercel.app
 - **Résultat attendu** : l'événement bascule automatiquement dans l'onglet "Précédents" côté public, son badge de statut affiche désormais "Terminé" (calculé automatiquement à partir de la date de fin, jamais stocké ni nécessitant d'action admin), et les boutons d'inscription disparaissent sur sa page détail.
 - **Vérifier** : un événement annulé (statut "Annulé") reste "Annulé" même après sa date de fin — "Terminé" ne s'applique qu'aux événements non annulés dont la date de fin est passée.
 
+### 5a. Événement sur plusieurs jours
+- **Action** : sur `/admin/evenements`, "Créer un événement", cocher "Événement sur plusieurs jours".
+- **Résultat attendu** : les champs date de début/fin uniques disparaissent, remplacés par un éditeur de jours (au moins un jour par défaut) avec une case "Même horaire chaque jour" cochée par défaut et deux champs d'heure partagés.
+- **Action** : renseigner l'heure partagée, cliquer "Ajouter un jour" plusieurs fois, choisir une date pour chaque jour.
+- **Résultat attendu** : chaque nouveau jour reprend automatiquement l'heure partagée déjà saisie ; décocher "Même horaire chaque jour" fait apparaître un champ heure de début/fin propre à chaque jour.
+- **Vérifier** : impossible de supprimer le dernier jour restant (bouton corbeille désactivé) ; soumettre sans aucun jour affiche une erreur claire.
+- **Résultat attendu après soumission** : la carte de l'événement et sa page détail affichent "Événement sur N jours" (avec l'icône calendrier) au lieu d'une plage de dates unique.
+- **Action** : modifier un événement multi-jours existant, changer seulement l'heure d'un des jours (sans toucher aux autres).
+- **Résultat attendu** : les autres jours et les choix de jours déjà faits par des adhérents inscrits restent intacts (l'édition ne supprime que les jours réellement retirés du formulaire).
+
+### 5b. Choix des jours par un adhérent
+- **Action (adhérent)** : ouvrir la page détail d'un événement multi-jours, cocher un ou plusieurs jours proposés, cliquer "S'inscrire".
+- **Résultat attendu** : inscription bloquée tant qu'aucun jour n'est coché ; une fois inscrit, les jours choisis restent cochés à la relecture de la page.
+- **Action** : décocher un jour puis cliquer "Mettre à jour mes jours".
+- **Résultat attendu** : la sélection est enregistrée sans nécessiter une nouvelle inscription complète.
+- **Vérifier côté admin/chef** : `/admin/evenements/:id/participants` et `/mes-evenements/:id/presences` affichent une colonne "Jours choisis" (uniquement pour un événement multi-jours) listant les jours sélectionnés par chaque participant.
+
 ### 5bis. Participants d'un événement
 - **Action** : sur `/admin/evenements`, cliquer le bouton "Participants" (icône personnes) d'un événement qui a au moins une inscription confirmée.
 - **Résultat attendu** : page avec le titre de l'événement et un tableau des inscrits (photo, Nom, Téléphone, Email, Statut, Date d'inscription, Présence, Chef de groupe).
@@ -226,10 +243,15 @@ le tableau de bord adhérent). Le tableau de bord administrateur affiche une
 nouvelle carte "Absences enregistrées" (total des marques "Absent" dans
 l'association).
 
-**Déploiement en attente** : cette fonctionnalité nécessite une migration
-SQL (`supabase/sql/018_attendance.sql`, colonne `attendance_status` sur
-`event_registrations`) qui n'a pas encore été appliquée à la base de
-production — le code est prêt et testé localement, mais n'a pas encore été
-déployé.
+Mise à jour du 2026-08-22 : les événements peuvent désormais s'étendre sur
+plusieurs jours (option "Événement sur plusieurs jours" à la création),
+chaque jour pouvant avoir son propre horaire ou reprendre un horaire
+partagé via une case à cocher dédiée (pour éviter la saisie répétitive).
+Un adhérent qui s'inscrit à un événement multi-jours choisit les jours où
+il participera, et peut modifier ce choix après coup depuis la page
+détail de l'événement ("Mettre à jour mes jours"). Les pages participants
+(admin) et présences (chef de groupe) affichent une colonne "Jours
+choisis" pour ces événements. Les événements existants sur un seul jour
+ne sont pas affectés.
 
 Aucun problème connu à ce jour.
