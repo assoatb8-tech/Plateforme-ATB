@@ -89,9 +89,15 @@ export interface EventSubmitPayload extends Omit<EventFormValues, 'days'> {
 }
 
 export function toEventSubmitPayload(values: EventFormValues): EventSubmitPayload {
-  const { days, ...rest } = values
+  const { days, startDate, endDate, ...rest } = values
   return {
     ...rest,
+    // react-hook-form keeps a field's last value after its input unmounts
+    // (no shouldUnregister) — an admin who toggles "multi-day" on after the
+    // single-day inputs briefly rendered would otherwise still submit a
+    // stale startDate/endDate (even just "") alongside `days`.
+    startDate: values.isMultiDay ? undefined : startDate,
+    endDate: values.isMultiDay ? undefined : endDate,
     days: values.isMultiDay
       ? (days ?? []).map((day) => ({
           id: day.id,

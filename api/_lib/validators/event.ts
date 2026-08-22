@@ -39,6 +39,13 @@ const isoDate = z.string().refine((val) => !Number.isNaN(Date.parse(val)), {
   message: 'must be a valid date',
 })
 
+// An optional date field that also accepts "" as "not provided" — a
+// client that briefly rendered then hid a datetime-local input (e.g.
+// toggling multi-day mode) may still submit its stale empty string
+// alongside the key, which is otherwise indistinguishable from a real
+// invalid date once .optional() only sees "present vs. absent".
+const optionalIsoDate = z.preprocess((val) => (val === '' ? undefined : val), isoDate.optional())
+
 // `id` present means "update this existing EventDay in place" (the server
 // diffs against it); absent means "create a new one" — see
 // api/events/[id].ts's syncEventDays. Never trust a client-supplied id
@@ -64,8 +71,8 @@ const eventBaseSchema = z.object({
   location: sanitizedText(2),
   // Required for a single-day event, ignored for a multi-day one (the
   // server derives them from `days` instead) — see withScheduleCheck.
-  startDate: isoDate.optional(),
-  endDate: isoDate.optional(),
+  startDate: optionalIsoDate,
+  endDate: optionalIsoDate,
   maxParticipants: z.number().int().positive(),
   facebookPostUrl,
   bannerUrl,

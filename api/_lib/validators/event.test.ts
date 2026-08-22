@@ -170,6 +170,20 @@ describe('eventCreateSchema — multi-day', () => {
       expect(result.data.days?.[0].id).toBe('11111111-1111-1111-1111-111111111111')
     }
   })
+
+  it('accepts a multi-day event with stale empty-string startDate/endDate', () => {
+    // A client can submit "" for startDate/endDate (e.g. a form that briefly
+    // rendered the single-day inputs before toggling to multi-day mode) —
+    // that must be treated the same as omitting the keys entirely.
+    const result = eventCreateSchema.safeParse({
+      ...validEvent,
+      startDate: '',
+      endDate: '',
+      isMultiDay: true,
+      days: [validDay],
+    })
+    expect(result.success).toBe(true)
+  })
 })
 
 describe('eventUpdateSchema', () => {
