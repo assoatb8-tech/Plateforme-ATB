@@ -1,4 +1,4 @@
-export type NotificationType = 'NEW_EVENT' | 'NEW_MEMBER'
+export type NotificationType = 'NEW_EVENT' | 'NEW_MEMBER' | 'EVENT_REMINDER'
 
 export interface NotificationDto {
   id: string

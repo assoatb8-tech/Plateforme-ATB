@@ -35,7 +35,8 @@
     "markAllRead": "Tout marquer comme lu",
     "empty": "Aucune notification pour le moment",
     "newEvent": "Nouvel événement : {{title}}",
-    "newMember": "{{name}} a rejoint l'association"
+    "newMember": "{{name}} a rejoint l'association",
+    "eventReminder": "Rappel : « {{title}} » a lieu demain"
   },
   "home": {
     "hero": {

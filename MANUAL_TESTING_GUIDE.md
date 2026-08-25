@@ -172,6 +172,12 @@ URL de production : https://plateforme-atb.vercel.app
 - **Vérifier** : le badge sur la cloche affiche le nombre de notifications non lues (jusqu'à "9+") et disparaît une fois toutes les notifications lues ; le bouton "Tout marquer comme lu" vide le badge en un clic sans recharger la page ; sans aucune notification, le panneau affiche un état vide clair.
 - **Vérifier le rafraîchissement** : une nouvelle notification apparaît dans le panneau sans action de l'utilisateur dans la minute qui suit (rafraîchissement automatique en arrière-plan).
 
+### Rappel la veille d'un événement
+- **Fonctionnement** : une tâche planifiée (Vercel Cron, gratuite) appelle chaque jour à 18h00 (heure de Tunis) `GET /api/notifications?action=send-reminders`, qui envoie une notification "Rappel : « … » a lieu demain" à chaque adhérent inscrit (statut "Inscrit(e)", pas liste d'attente) à un événement — ou, pour un événement sur plusieurs jours, à un jour précis — prévu le lendemain.
+- **Configuration requise (une seule fois, à faire manuellement)** : dans le tableau de bord Vercel du projet → Settings → Environment Variables, ajouter une variable `CRON_SECRET` avec une valeur aléatoire longue (ex. générée via `openssl rand -hex 32`), puis redéployer. Sans cette variable, l'endpoint refuse toute requête (401) et aucun rappel n'est envoyé — Vercel l'inclut automatiquement dans l'en-tête `Authorization` de ses propres appels planifiés, il n'y a rien d'autre à faire une fois la variable posée.
+- **Vérifier manuellement** (sans attendre 18h00) : avec un outil comme `curl -H "Authorization: Bearer <CRON_SECRET>" "https://plateforme-atb.vercel.app/api/notifications?action=send-reminders"` sur un événement (ou jour d'événement multi-jours) prévu le lendemain avec au moins un inscrit — la réponse indique `{ "created": N }` et l'adhérent voit la notification apparaître dans sa cloche.
+- **Vérifier l'absence de doublon** : appeler à nouveau le même endpoint le même jour ne crée pas de deuxième notification pour le même adhérent/événement.
+
 ---
 
 ## Historique des corrections
@@ -254,4 +260,21 @@ détail de l'événement ("Mettre à jour mes jours"). Les pages participants
 choisis" pour ces événements. Les événements existants sur un seul jour
 ne sont pas affectés.
 
-Aucun problème connu à ce jour.
+Mise à jour du 2026-08-22 (suite) : correction d'un décalage d'une heure
+sur les horaires d'événements — une date/heure saisie par un admin (ex.
+09:00) était stockée et réaffichée à tout le monde comme 10:00. Toutes les
+heures d'événements (simples et multi-jours) sont désormais interprétées
+et affichées de façon fixe en heure de Tunis (UTC+1, sans changement
+saisonnier), indépendamment du fuseau horaire de l'appareil de l'admin ou
+du serveur. **Action requise pour les données existantes** : les
+événements créés avant ce correctif ont leur horaire stocké avec ce
+décalage d'une heure ; demander à l'équipe technique une correction
+ponctuelle en base si l'exactitude des horaires passés/à venir déjà
+enregistrés importe.
+
+Mise à jour du 2026-08-22 (suite 2) : rappel automatique la veille d'un
+événement — voir la section "Rappel la veille d'un événement" plus haut.
+Nécessite une configuration unique côté Vercel (variable d'environnement
+`CRON_SECRET`) avant de fonctionner en production.
+
+Aucun autre problème connu à ce jour.

@@ -35,7 +35,8 @@
     "markAllRead": "تعليم الكل كمقروء",
     "empty": "لا توجد إشعارات حاليًا",
     "newEvent": "فعالية جديدة: {{title}}",
-    "newMember": "{{name}} انضم/انضمت إلى الجمعية"
+    "newMember": "{{name}} انضم/انضمت إلى الجمعية",
+    "eventReminder": "تذكير: فعالية «{{title}}» غدًا"
   },
   "home": {
     "hero": {

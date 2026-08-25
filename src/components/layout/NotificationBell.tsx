@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Bell, Calendar, UserPlus } from 'lucide-react'
+import { Bell, BellRing, Calendar, UserPlus } from 'lucide-react'
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -12,7 +12,10 @@ import { cn } from '@/utils/cn'
 import type { NotificationDto } from '@/features/notifications/types'
 
 function notificationHref(notification: NotificationDto): string | null {
-  if (notification.type === 'NEW_EVENT' && notification.event) {
+  if (
+    (notification.type === 'NEW_EVENT' || notification.type === 'EVENT_REMINDER') &&
+    notification.event
+  ) {
     return `/evenements/${notification.event.id}`
   }
   if (notification.type === 'NEW_MEMBER' && notification.relatedUser) {
@@ -31,20 +34,22 @@ function NotificationItem({ notification, onNavigate }: NotificationItemProps) {
   const href = notificationHref(notification)
   const isUnread = !notification.readAt
 
+  const eventTitle = notification.event
+    ? i18n.language === 'ar'
+      ? notification.event.titleAr
+      : notification.event.titleFr
+    : ''
+
   const label =
     notification.type === 'NEW_EVENT'
-      ? t('notifications.newEvent', {
-          title: notification.event
-            ? i18n.language === 'ar'
-              ? notification.event.titleAr
-              : notification.event.titleFr
-            : '',
-        })
-      : t('notifications.newMember', {
-          name: notification.relatedUser
-            ? resolveMemberDisplayName(notification.relatedUser, i18n.language)
-            : '',
-        })
+      ? t('notifications.newEvent', { title: eventTitle })
+      : notification.type === 'EVENT_REMINDER'
+        ? t('notifications.eventReminder', { title: eventTitle })
+        : t('notifications.newMember', {
+            name: notification.relatedUser
+              ? resolveMemberDisplayName(notification.relatedUser, i18n.language)
+              : '',
+          })
 
   const content = (
     <div
@@ -56,12 +61,18 @@ function NotificationItem({ notification, onNavigate }: NotificationItemProps) {
       <span
         className={cn(
           'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
-          notification.type === 'NEW_EVENT'
-            ? 'bg-primary/10 text-primary'
-            : 'bg-secondary/10 text-secondary',
+          notification.type === 'NEW_MEMBER'
+            ? 'bg-secondary/10 text-secondary'
+            : 'bg-primary/10 text-primary',
         )}
       >
-        {notification.type === 'NEW_EVENT' ? <Calendar size={16} /> : <UserPlus size={16} />}
+        {notification.type === 'NEW_EVENT' ? (
+          <Calendar size={16} />
+        ) : notification.type === 'EVENT_REMINDER' ? (
+          <BellRing size={16} />
+        ) : (
+          <UserPlus size={16} />
+        )}
       </span>
       <div className="flex min-w-0 flex-1 flex-col gap-0.5">
         <p className={cn('text-slate-700', isUnread && 'font-semibold text-slate-900')}>{label}</p>
