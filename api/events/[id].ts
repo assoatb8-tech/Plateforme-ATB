@@ -13,7 +13,7 @@ import {
   type EventDayInput,
 } from '../_lib/validators/event.js'
 import { serializeEvent } from '../_lib/utils/eventSerializer.js'
-import { computeEventDateRange } from '../_lib/utils/eventSchedule.js'
+import { computeEventDateRange, parseTunisDateTime } from '../_lib/utils/eventSchedule.js'
 import { logAdminAction } from '../_lib/utils/auditLog.js'
 import { enforceIpRateLimit } from '../_lib/utils/rateLimit.js'
 import { isValidUuid } from '../_lib/utils/validateId.js'
@@ -252,8 +252,8 @@ async function handleUpdate(
             id,
             days.map((day: EventDayInput) => ({
               id: day.id,
-              startAt: new Date(day.startAt),
-              endAt: new Date(day.endAt),
+              startAt: parseTunisDateTime(day.startAt),
+              endAt: parseTunisDateTime(day.endAt),
             })),
           )
           if (finalDays.length === 0) {
@@ -275,8 +275,8 @@ async function handleUpdate(
           // cascades their members' day selections too.
           await tx.eventDay.deleteMany({ where: { eventId: id } })
         }
-        if (startDate) nextStartDate = new Date(startDate)
-        if (endDate) nextEndDate = new Date(endDate)
+        if (startDate) nextStartDate = parseTunisDateTime(startDate)
+        if (endDate) nextEndDate = parseTunisDateTime(endDate)
       }
 
       return tx.event.update({

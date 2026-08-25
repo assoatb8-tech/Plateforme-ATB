@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/Card'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import type { EventDto } from '@/features/events/types'
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
+import { TUNIS_TIMEZONE } from '@/utils/eventDays'
 
 interface EventCardProps {
   event: EventDto
@@ -17,7 +18,7 @@ export function EventCard({ event }: EventCardProps) {
 
   const startDate = new Date(event.startDate).toLocaleDateString(
     i18n.language === 'ar' ? 'ar-TN' : 'fr-TN',
-    { day: 'numeric', month: 'long', year: 'numeric' },
+    { day: 'numeric', month: 'long', year: 'numeric', timeZone: TUNIS_TIMEZONE },
   )
 
   const isFull = event.spotsLeft <= 0

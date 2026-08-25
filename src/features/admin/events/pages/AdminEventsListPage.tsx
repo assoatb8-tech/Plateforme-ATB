@@ -11,6 +11,7 @@ import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { useAdminEventsList, useDeleteEvent } from '@/features/admin/events/hooks/useAdminEvents'
 import { EVENT_STATUS_TONE } from '@/utils/statusTones'
 import { getEffectiveEventStatus } from '@/utils/eventStatus'
+import { TUNIS_TIMEZONE } from '@/utils/eventDays'
 
 export function AdminEventsListPage() {
   const { t } = useTranslation()
@@ -107,7 +108,9 @@ export function AdminEventsListPage() {
                   <tr key={event.id} className="border-b border-slate-100 last:border-0">
                     <td className="px-4 py-3 font-medium text-slate-800">{event.titleFr}</td>
                     <td className="px-4 py-3 text-slate-500">
-                      {new Date(event.startDate).toLocaleDateString()}
+                      {new Date(event.startDate).toLocaleDateString(undefined, {
+                        timeZone: TUNIS_TIMEZONE,
+                      })}
                     </td>
                     <td className="px-4 py-3 text-slate-500">
                       {event.registeredCount} / {event.maxParticipants}

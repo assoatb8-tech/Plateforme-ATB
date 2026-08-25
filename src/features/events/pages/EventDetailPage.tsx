@@ -16,6 +16,7 @@ import {
   useUpdateMyEventDays,
 } from '@/features/events/hooks/useEvents'
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
+import { TUNIS_TIMEZONE } from '@/utils/eventDays'
 import type { EventDayDto } from '@/features/events/types'
 
 function formatDayLabel(day: EventDayDto, locale: string): string {
@@ -25,8 +26,13 @@ function formatDayLabel(day: EventDayDto, locale: string): string {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
+    timeZone: TUNIS_TIMEZONE,
   })
-  const timeOptions: Intl.DateTimeFormatOptions = { hour: '2-digit', minute: '2-digit' }
+  const timeOptions: Intl.DateTimeFormatOptions = {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: TUNIS_TIMEZONE,
+  }
   return `${dateLabel} · ${start.toLocaleTimeString(locale, timeOptions)}–${end.toLocaleTimeString(locale, timeOptions)}`
 }
 
@@ -80,6 +86,7 @@ export function EventDetailPage() {
     year: 'numeric',
     hour: '2-digit',
     minute: '2-digit',
+    timeZone: TUNIS_TIMEZONE,
   }
   const startDate = new Date(event.startDate).toLocaleString(locale, dateOptions)
   const endDate = new Date(event.endDate).toLocaleString(locale, dateOptions)

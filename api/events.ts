@@ -5,7 +5,7 @@ import { getOptionalUser } from './_lib/middlewares/auth.js'
 import { sendError, sendSuccess } from './_lib/utils/response.js'
 import { eventCreateSchema, type EventDayInput } from './_lib/validators/event.js'
 import { serializeEvent } from './_lib/utils/eventSerializer.js'
-import { computeEventDateRange } from './_lib/utils/eventSchedule.js'
+import { computeEventDateRange, parseTunisDateTime } from './_lib/utils/eventSchedule.js'
 import { logAdminAction } from './_lib/utils/auditLog.js'
 import { enforceIpRateLimit } from './_lib/utils/rateLimit.js'
 
@@ -150,8 +150,8 @@ async function handleCreate(req: VercelRequest, res: VercelResponse, user: { id:
 
   const isMultiDay = parsed.data.isMultiDay ?? false
   const dayRanges = (parsed.data.days ?? []).map((day: EventDayInput) => ({
-    startAt: new Date(day.startAt),
-    endAt: new Date(day.endAt),
+    startAt: parseTunisDateTime(day.startAt),
+    endAt: parseTunisDateTime(day.endAt),
   }))
   // withScheduleCheck already guaranteed one or the other is present —
   // startDate/endDate for a single-day event, a non-empty `days` for a
@@ -159,8 +159,8 @@ async function handleCreate(req: VercelRequest, res: VercelResponse, user: { id:
   const { startDate, endDate } = isMultiDay
     ? computeEventDateRange(dayRanges)
     : {
-        startDate: new Date(parsed.data.startDate as string),
-        endDate: new Date(parsed.data.endDate as string),
+        startDate: parseTunisDateTime(parsed.data.startDate as string),
+        endDate: parseTunisDateTime(parsed.data.endDate as string),
       }
 
   const event = await prisma.event.create({

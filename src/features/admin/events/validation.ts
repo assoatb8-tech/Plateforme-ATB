@@ -108,13 +108,20 @@ export function toEventSubmitPayload(values: EventFormValues): EventSubmitPayloa
   }
 }
 
+// Africa/Tunis is a fixed UTC+1 year-round (no DST since 2009) — see
+// api/_lib/utils/eventSchedule.ts's parseTunisDateTime for why this is
+// hard-coded rather than pulled from the admin's own device timezone.
+const TUNIS_OFFSET_MS = 60 * 60 * 1000
+
 // Prisma stores startDate/endDate as absolute instants; <input
-// type="datetime-local"> needs "YYYY-MM-DDTHH:mm" in the browser's local
-// time with no timezone suffix.
+// type="datetime-local"> needs "YYYY-MM-DDTHH:mm" in Tunis local time (what
+// the admin who created it actually typed), not the editing admin's own
+// browser timezone — reading the UTC fields of a Tunis-shifted copy of the
+// date gets that regardless of where the browser happens to be.
 export function toDatetimeLocalValue(iso: string): string {
-  const date = new Date(iso)
+  const tunis = new Date(new Date(iso).getTime() + TUNIS_OFFSET_MS)
   const pad = (n: number) => String(n).padStart(2, '0')
-  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`
+  return `${tunis.getUTCFullYear()}-${pad(tunis.getUTCMonth() + 1)}-${pad(tunis.getUTCDate())}T${pad(tunis.getUTCHours())}:${pad(tunis.getUTCMinutes())}`
 }
 
 // Same idea, split into the separate date/time fields the day-editor uses.
