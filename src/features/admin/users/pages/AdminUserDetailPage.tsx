@@ -23,6 +23,7 @@ import { banFormSchema, type BanFormValues } from '@/features/admin/users/valida
 import { useAuth } from '@/features/auth/hooks/useAuth'
 import type { Role, UserStatus } from '@/types/domain'
 import type { RegistrationStatus } from '@/features/events/types'
+import { TUNIS_TIMEZONE } from '@/utils/eventDays'
 
 const REGISTRATION_STATUS_LABEL_KEY: Record<RegistrationStatus, string> = {
   REGISTERED: 'events.status.registered',
@@ -268,7 +269,9 @@ export function AdminUserDetailPage() {
                     {t(REGISTRATION_STATUS_LABEL_KEY[registration.status])}
                   </StatusBadge>
                   <span className="text-slate-500">
-                    {new Date(registration.event.startDate).toLocaleDateString()}
+                    {new Date(registration.event.startDate).toLocaleDateString(undefined, {
+                      timeZone: TUNIS_TIMEZONE,
+                    })}
                   </span>
                 </span>
               </li>

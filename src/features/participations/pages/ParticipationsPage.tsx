@@ -10,6 +10,7 @@ import { useMyRegistrations } from '@/features/dashboard/hooks/useDashboard'
 import { cancelEventRegistration } from '@/features/events/services/eventsService'
 import type { RegistrationDto } from '@/features/events/types'
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
+import { TUNIS_TIMEZONE } from '@/utils/eventDays'
 
 export function ParticipationsPage() {
   const { t, i18n } = useTranslation()
@@ -37,6 +38,7 @@ export function ParticipationsPage() {
       day: 'numeric',
       month: 'long',
       year: 'numeric',
+      timeZone: TUNIS_TIMEZONE,
     })
   }
 
