@@ -824,6 +824,9 @@ async function handleRemoveParticipant(
   })
 
   await logAdminAction(userId, 'PARTICIPANT_REMOVED', registrationId)
+  await prisma.notification.create({
+    data: { userId: registration.userId, type: 'PARTICIPATION_REMOVED', eventId },
+  })
   sendSuccess(res, { id: registrationId })
 }
 

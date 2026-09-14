@@ -78,6 +78,7 @@ enum NotificationType {
   NEW_EVENT
   NEW_MEMBER
   EVENT_REMINDER
+  PARTICIPATION_REMOVED
 }
 
 // --- Models ---------------------------------------------------------------

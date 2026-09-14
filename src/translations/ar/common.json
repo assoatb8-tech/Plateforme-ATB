@@ -36,7 +36,8 @@
     "empty": "لا توجد إشعارات حاليًا",
     "newEvent": "فعالية جديدة: {{title}}",
     "newMember": "{{name}} انضم/انضمت إلى الجمعية",
-    "eventReminder": "تذكير: فعالية «{{title}}» غدًا"
+    "eventReminder": "تذكير: فعالية «{{title}}» غدًا",
+    "participationRemoved": "تمت إزالة مشاركتك في «{{title}}»"
   },
   "home": {
     "hero": {

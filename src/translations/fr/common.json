@@ -36,7 +36,8 @@
     "empty": "Aucune notification pour le moment",
     "newEvent": "Nouvel événement : {{title}}",
     "newMember": "{{name}} a rejoint l'association",
-    "eventReminder": "Rappel : « {{title}} » a lieu demain"
+    "eventReminder": "Rappel : « {{title}} » a lieu demain",
+    "participationRemoved": "Votre participation à « {{title}} » a été retirée"
   },
   "home": {
     "hero": {

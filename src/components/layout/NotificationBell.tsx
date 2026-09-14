@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
-import { Bell, BellRing, Calendar, UserPlus } from 'lucide-react'
+import { Bell, BellRing, Calendar, UserPlus, UserX } from 'lucide-react'
 import {
   useMarkAllNotificationsRead,
   useMarkNotificationRead,
@@ -13,7 +13,9 @@ import type { NotificationDto } from '@/features/notifications/types'
 
 function notificationHref(notification: NotificationDto): string | null {
   if (
-    (notification.type === 'NEW_EVENT' || notification.type === 'EVENT_REMINDER') &&
+    (notification.type === 'NEW_EVENT' ||
+      notification.type === 'EVENT_REMINDER' ||
+      notification.type === 'PARTICIPATION_REMOVED') &&
     notification.event
   ) {
     return `/evenements/${notification.event.id}`
@@ -45,11 +47,13 @@ function NotificationItem({ notification, onNavigate }: NotificationItemProps) {
       ? t('notifications.newEvent', { title: eventTitle })
       : notification.type === 'EVENT_REMINDER'
         ? t('notifications.eventReminder', { title: eventTitle })
-        : t('notifications.newMember', {
-            name: notification.relatedUser
-              ? resolveMemberDisplayName(notification.relatedUser, i18n.language)
-              : '',
-          })
+        : notification.type === 'PARTICIPATION_REMOVED'
+          ? t('notifications.participationRemoved', { title: eventTitle })
+          : t('notifications.newMember', {
+              name: notification.relatedUser
+                ? resolveMemberDisplayName(notification.relatedUser, i18n.language)
+                : '',
+            })
 
   const content = (
     <div
@@ -63,13 +67,17 @@ function NotificationItem({ notification, onNavigate }: NotificationItemProps) {
           'mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full',
           notification.type === 'NEW_MEMBER'
             ? 'bg-secondary/10 text-secondary'
-            : 'bg-primary/10 text-primary',
+            : notification.type === 'PARTICIPATION_REMOVED'
+              ? 'bg-error/10 text-error'
+              : 'bg-primary/10 text-primary',
         )}
       >
         {notification.type === 'NEW_EVENT' ? (
           <Calendar size={16} />
         ) : notification.type === 'EVENT_REMINDER' ? (
           <BellRing size={16} />
+        ) : notification.type === 'PARTICIPATION_REMOVED' ? (
+          <UserX size={16} />
         ) : (
           <UserPlus size={16} />
         )}
