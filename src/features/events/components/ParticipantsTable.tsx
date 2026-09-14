@@ -312,7 +312,7 @@ export function ParticipantsTable({
                               : t('admin.events.participants.makeLeader')}
                           </Button>
                         )}
-                        {mode === 'admin' && (
+                        {mode === 'admin' && participant.status !== 'CANCELLED' && (
                           <Button
                             type="button"
                             variant="ghost"
@@ -322,7 +322,7 @@ export function ParticipantsTable({
                             <Pencil size={16} />
                           </Button>
                         )}
-                        {canRemove && (
+                        {canRemove && participant.status !== 'CANCELLED' && (
                           <Button
                             type="button"
                             variant="ghost"
