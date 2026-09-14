@@ -47,6 +47,7 @@ URL de production : https://plateforme-atb.vercel.app
 - **Action** : modifier l'événement, changer une date pour le passé (sans toucher au statut).
 - **Résultat attendu** : l'événement bascule automatiquement dans l'onglet "Précédents" côté public, son badge de statut affiche désormais "Terminé" (calculé automatiquement à partir de la date de fin, jamais stocké ni nécessitant d'action admin), et les boutons d'inscription disparaissent sur sa page détail.
 - **Vérifier** : un événement annulé (statut "Annulé") reste "Annulé" même après sa date de fin — "Terminé" ne s'applique qu'aux événements non annulés dont la date de fin est passée.
+- **Vérifier le tri** : le menu déroulant "Trier par" (Par défaut / Titre A→Z / Titre Z→A / Date croissante / Date décroissante) réordonne la liste ; le même contrôle existe sur la page publique `/evenements`, et trie par le titre dans la langue active de l'interface (français ou arabe).
 
 ### 5a. Événement sur plusieurs jours
 - **Action** : sur `/admin/evenements`, "Créer un événement", cocher "Événement sur plusieurs jours".
@@ -67,11 +68,26 @@ URL de production : https://plateforme-atb.vercel.app
 
 ### 5bis. Participants d'un événement
 - **Action** : sur `/admin/evenements`, cliquer le bouton "Participants" (icône personnes) d'un événement qui a au moins une inscription confirmée.
-- **Résultat attendu** : page avec le titre de l'événement et un tableau des inscrits (photo, Nom, Téléphone, Email, Statut, Date d'inscription, Présence, Chef de groupe).
+- **Résultat attendu** : page avec le titre de l'événement (dans la langue active de l'interface) et un tableau des inscrits (photo, Nom, Téléphone, Email, Statut, Date d'inscription, Présence, Actions).
 - **Vérifier** : la photo de profil de chaque inscrit s'affiche (ou une icône générique si absente) ; un événement sans inscription affiche un état vide clair plutôt qu'un tableau cassé ; le lien "Retour" ramène à `/admin/evenements`.
 - **Action** : sur un participant au statut "Inscrit" (confirmé), cliquer "Désigner comme chef".
 - **Résultat attendu** : une couronne apparaît à côté de son nom, le bouton devient "Retirer".
 - **Vérifier** : aucun bouton de désignation n'apparaît pour un participant en liste d'attente ou annulé (seul un participant confirmé peut être chef) ; désigner un nouveau chef retire automatiquement la couronne du précédent (un seul chef par événement).
+- **Vérifier le tri** : le menu déroulant "Trier par" propose Premier inscrit / Dernier inscrit / Nom (A → Z) / Nom (Z → A) — chaque choix réordonne le tableau immédiatement, sans rechargement.
+- **Action (ajouter)** : cliquer "Ajouter un participant", rechercher un adhérent par nom ou email, le sélectionner (et, pour un événement multi-jours, cocher au moins un jour), valider.
+- **Résultat attendu** : le membre apparaît dans le tableau avec le statut "Inscrit" (ou "Liste d'attente" si l'événement est complet) ; un adhérent déjà inscrit n'apparaît plus dans les résultats de recherche.
+- **Action (modifier)** : cliquer "Modifier" sur un participant inscrit, changer son statut vers "Liste d'attente", enregistrer.
+- **Résultat attendu** : le statut affiché passe à "Liste d'attente" ; pour un événement multi-jours, les jours cochés dans la fenêtre de modification peuvent aussi être changés indépendamment du statut.
+- **Action (retirer)** : cliquer l'icône de retrait sur un participant.
+- **Résultat attendu** : son statut passe à "Annulée", sa place se libère (le premier de la liste d'attente, s'il y en a une, passe automatiquement à "Inscrit"), et les boutons Modifier/Retirer disparaissent pour cette ligne (rien à faire sur une inscription déjà annulée).
+- **Vérifier** : ajouter/modifier/retirer un participant fonctionne aussi bien sur un événement à venir que déjà terminé.
+
+### 5bis-b. Retrait d'un participant par le chef de groupe
+- **Action (chef de groupe)** : se connecter avec le compte désigné comme chef d'un événement **à venir**, aller sur `/mes-evenements/:id/presences`.
+- **Résultat attendu** : un bouton "Retirer ce participant" est disponible pour chaque participant (le chef n'a pas accès à "Ajouter un participant" ni "Modifier", ni aux colonnes Email/Date d'inscription — tableau plus réduit que la vue admin).
+- **Action** : cliquer "Retirer ce participant" sur un participant avant le début de l'événement.
+- **Résultat attendu** : le retrait fonctionne, comme pour un admin.
+- **Vérifier après le début de l'événement** : une fois la date de début de l'événement passée, le bouton "Retirer ce participant" disparaît pour le chef (mais reste disponible pour un administrateur, sans limite de temps) ; un appel direct à l'API après cette date renvoie une erreur claire plutôt que de réussir silencieusement.
 
 ### 5ter. Présences (marquées par un admin ou le chef de groupe)
 - **Vérifier sur un événement à venir** : la colonne "Présence" affiche "Disponible après l'événement" pour chaque participant confirmé — aucun bouton Présent/Absent tant que l'événement n'est pas terminé.
@@ -266,15 +282,28 @@ sur les horaires d'événements — une date/heure saisie par un admin (ex.
 heures d'événements (simples et multi-jours) sont désormais interprétées
 et affichées de façon fixe en heure de Tunis (UTC+1, sans changement
 saisonnier), indépendamment du fuseau horaire de l'appareil de l'admin ou
-du serveur. **Action requise pour les données existantes** : les
-événements créés avant ce correctif ont leur horaire stocké avec ce
-décalage d'une heure ; demander à l'équipe technique une correction
-ponctuelle en base si l'exactitude des horaires passés/à venir déjà
-enregistrés importe.
+du serveur. Les événements créés avant ce correctif ont été corrigés
+ponctuellement en base le 2026-09-14 (décalage d'une heure retiré) ; tout
+événement créé après le correctif était déjà correct.
 
 Mise à jour du 2026-08-22 (suite 2) : rappel automatique la veille d'un
 événement — voir la section "Rappel la veille d'un événement" plus haut.
 Nécessite une configuration unique côté Vercel (variable d'environnement
 `CRON_SECRET`) avant de fonctionner en production.
+
+Mise à jour du 2026-09-14 : le titre d'un événement s'affiche désormais
+dans la langue active de l'interface partout côté admin (liste des
+événements, page participants, page présences du chef, historique
+d'inscriptions d'un adhérent) — plusieurs de ces écrans affichaient
+toujours le titre français, même en arabe. Les événements et les
+participants peuvent être triés (titre/nom A→Z ou Z→A, date, premier/
+dernier inscrit) via un nouveau menu déroulant sur chaque page concernée.
+Un administrateur peut désormais ajouter un adhérent à un événement
+directement (bouton "Ajouter un participant"), modifier le statut ou les
+jours choisis d'un participant existant ("Modifier"), et retirer un
+participant — pour un événement à venir comme déjà terminé. Le chef de
+groupe d'un événement peut lui aussi retirer un participant, mais
+uniquement avant le début de l'événement ; passé ce point, seul un
+administrateur peut encore le faire.
 
 Aucun autre problème connu à ce jour.
