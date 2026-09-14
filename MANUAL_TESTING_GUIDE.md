@@ -81,6 +81,7 @@ URL de production : https://plateforme-atb.vercel.app
 - **Action (retirer)** : cliquer l'icône de retrait sur un participant.
 - **Résultat attendu** : son statut passe à "Annulée", sa place se libère (le premier de la liste d'attente, s'il y en a une, passe automatiquement à "Inscrit"), et les boutons Modifier/Retirer disparaissent pour cette ligne (rien à faire sur une inscription déjà annulée).
 - **Vérifier** : ajouter/modifier/retirer un participant fonctionne aussi bien sur un événement à venir que déjà terminé.
+- **Vérifier la notification** : le membre retiré reçoit une notification dans l'application ("Votre participation à « … » a été retirée"), visible dans sa cloche de notifications et menant à la page de l'événement — aucun email n'est envoyé.
 
 ### 5bis-b. Retrait d'un participant par le chef de groupe
 - **Action (chef de groupe)** : se connecter avec le compte désigné comme chef d'un événement **à venir**, aller sur `/mes-evenements/:id/presences`.
@@ -304,6 +305,7 @@ jours choisis d'un participant existant ("Modifier"), et retirer un
 participant — pour un événement à venir comme déjà terminé. Le chef de
 groupe d'un événement peut lui aussi retirer un participant, mais
 uniquement avant le début de l'événement ; passé ce point, seul un
-administrateur peut encore le faire.
+administrateur peut encore le faire. Dans les deux cas, le participant
+retiré reçoit une notification dans l'application.
 
 Aucun autre problème connu à ce jour.
