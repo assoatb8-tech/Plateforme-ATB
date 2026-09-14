@@ -431,9 +431,23 @@ async function performRegistration(
 // A REGISTERED spot just opened up (cancellation, admin removal, or an
 // admin demoting someone to the waiting list): promote the longest-waiting
 // person, if any, rather than leaving the seat empty.
-async function promoteNextWaiting(tx: Prisma.TransactionClient, eventId: string): Promise<void> {
+// `excludeRegistrationId`: when this promotion is happening because an
+// admin just demoted someone TO WAITING_LIST in this same transaction
+// (handleEditParticipant), that person would otherwise be their own
+// "longest-waiting" candidate — since they were just written with the
+// oldest registeredAt among waiting-list rows, they'd immediately get
+// promoted right back to REGISTERED, silently undoing the edit.
+async function promoteNextWaiting(
+  tx: Prisma.TransactionClient,
+  eventId: string,
+  excludeRegistrationId?: string,
+): Promise<void> {
   const nextWaiting = await tx.eventRegistration.findFirst({
-    where: { eventId, status: 'WAITING_LIST' },
+    where: {
+      eventId,
+      status: 'WAITING_LIST',
+      ...(excludeRegistrationId ? { id: { not: excludeRegistrationId } } : {}),
+    },
     orderBy: { registeredAt: 'asc' },
   })
   if (nextWaiting) {
@@ -736,9 +750,10 @@ async function handleEditParticipant(
     if (status && status !== registration.status) {
       await tx.eventRegistration.update({ where: { id: registrationId }, data: { status } })
       // Demoting someone off REGISTERED frees a spot — promote the next
-      // waitlisted person the same way a cancellation would.
+      // waitlisted person the same way a cancellation would (excluding the
+      // row we just demoted — see promoteNextWaiting's doc comment).
       if (registration.status === 'REGISTERED' && status === 'WAITING_LIST') {
-        await promoteNextWaiting(tx, eventId)
+        await promoteNextWaiting(tx, eventId, registrationId)
       }
     }
     if (resolvedDayIds) {
