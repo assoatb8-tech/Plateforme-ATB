@@ -6,23 +6,31 @@ import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
 import { Modal } from '@/components/ui/Modal'
+import { Select } from '@/components/ui/Select'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { useAdminEventsList, useDeleteEvent } from '@/features/admin/events/hooks/useAdminEvents'
 import { EVENT_STATUS_TONE } from '@/utils/statusTones'
 import { getEffectiveEventStatus } from '@/utils/eventStatus'
 import { TUNIS_TIMEZONE } from '@/utils/eventDays'
+import type { EventSort } from '@/features/events/types'
 
 export function AdminEventsListPage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const [page, setPage] = useState(1)
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
+  const [sort, setSort] = useState<EventSort>('default')
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
 
-  const { data, isLoading, isError } = useAdminEventsList(page, search)
+  const { data, isLoading, isError } = useAdminEventsList(page, search, sort)
   const deleteMutation = useDeleteEvent()
+
+  function handleSortChange(value: EventSort) {
+    setSort(value)
+    setPage(1)
+  }
 
   function handleSearchSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -72,6 +80,20 @@ export function AdminEventsListPage() {
         </Button>
       </form>
 
+      <Select
+        value={sort}
+        onChange={(event) => handleSortChange(event.target.value as EventSort)}
+        aria-label={t('events.sort.label')}
+        className="w-auto"
+        options={[
+          { value: 'default', label: t('events.sort.default') },
+          { value: 'title_asc', label: t('events.sort.titleAsc') },
+          { value: 'title_desc', label: t('events.sort.titleDesc') },
+          { value: 'date_asc', label: t('events.sort.dateAsc') },
+          { value: 'date_desc', label: t('events.sort.dateDesc') },
+        ]}
+      />
+
       {actionError && <p className="text-sm text-error">{actionError}</p>}
 
       {isLoading && (
@@ -106,7 +128,9 @@ export function AdminEventsListPage() {
               <tbody>
                 {data.events.map((event) => (
                   <tr key={event.id} className="border-b border-slate-100 last:border-0">
-                    <td className="px-4 py-3 font-medium text-slate-800">{event.titleFr}</td>
+                    <td className="px-4 py-3 font-medium text-slate-800">
+                      {i18n.language === 'ar' ? event.titleAr : event.titleFr}
+                    </td>
                     <td className="px-4 py-3 text-slate-500">
                       {new Date(event.startDate).toLocaleDateString(undefined, {
                         timeZone: TUNIS_TIMEZONE,

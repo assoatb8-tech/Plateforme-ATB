@@ -1,7 +1,7 @@
 import { apiRequest } from '@/services/apiClient'
 import { getSupabaseClient } from '@/services/supabaseClient'
 import { compressToJpeg } from '@/services/imageCompression'
-import type { EventDto, EventsListResponse } from '@/features/events/types'
+import type { EventDto, EventsListResponse, EventSort } from '@/features/events/types'
 import type { EventSubmitPayload } from '@/features/admin/events/validation'
 
 const BANNER_BUCKET = 'event-banners'
@@ -33,9 +33,17 @@ export async function uploadEventBanner(file: File): Promise<string> {
 export async function fetchAdminEvents(params: {
   page?: number
   search?: string
+  sort?: EventSort
+  lang?: string
 }): Promise<EventsListResponse> {
   return apiRequest<EventsListResponse>('/api/events', {
-    query: { page: params.page, search: params.search, all: 'true' },
+    query: {
+      page: params.page,
+      search: params.search,
+      all: 'true',
+      sort: params.sort && params.sort !== 'default' ? params.sort : undefined,
+      lang: params.lang,
+    },
   })
 }
 

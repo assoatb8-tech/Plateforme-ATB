@@ -3,6 +3,17 @@ export type EventStatus = 'ACTIVE' | 'CANCELLED'
 export type EventTense = 'upcoming' | 'past'
 export type AttendanceStatus = 'PRESENT' | 'ABSENT'
 
+// 'default' means "don't send a sort param" — the server falls back to its
+// own per-context default (soonest-first for upcoming, most-recent-first
+// for past). title_asc/title_desc alphabetize by whichever language column
+// matches the viewer's current UI language (see api/events.ts).
+export type EventSort = 'default' | 'title_asc' | 'title_desc' | 'date_asc' | 'date_desc'
+
+// Client-side only — the participants endpoint returns its full,
+// unpaginated list in one call, so sorting it is a pure presentation
+// concern with no server round-trip.
+export type ParticipantSort = 'name_asc' | 'name_desc' | 'joined_asc' | 'joined_desc'
+
 export interface EventDayDto {
   id: string
   startAt: string

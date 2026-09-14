@@ -37,6 +37,8 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
   const allParam = Array.isArray(req.query.all) ? req.query.all[0] : req.query.all
   const whenParam = Array.isArray(req.query.when) ? req.query.when[0] : req.query.when
   const ledByMeParam = Array.isArray(req.query.ledByMe) ? req.query.ledByMe[0] : req.query.ledByMe
+  const sortParam = Array.isArray(req.query.sort) ? req.query.sort[0] : req.query.sort
+  const langParam = Array.isArray(req.query.lang) ? req.query.lang[0] : req.query.lang
 
   const page = Math.max(1, Number(pageParam) || 1)
   const search = searchParam?.trim() ?? ''
@@ -90,10 +92,24 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
       : {}),
   }
 
-  // Soonest-first for upcoming (and the unfiltered admin view); most-recent-
-  // first for past, since that's what's actually useful when browsing an
-  // archive.
-  const orderBy = { startDate: whenParam === 'past' ? ('desc' as const) : ('asc' as const) }
+  // Default: soonest-first for upcoming (and the unfiltered admin view);
+  // most-recent-first for past, since that's what's actually useful when
+  // browsing an archive. `sort` opts into an explicit A-Z/Z-A title order
+  // instead — `lang` picks which language column to alphabetize by (the
+  // caller's current UI language), since French and Arabic collate
+  // differently and there's no single "correct" alphabetical order across
+  // both.
+  const titleColumn = langParam === 'ar' ? ('titleAr' as const) : ('titleFr' as const)
+  const orderBy =
+    sortParam === 'title_asc'
+      ? { [titleColumn]: 'asc' as const }
+      : sortParam === 'title_desc'
+        ? { [titleColumn]: 'desc' as const }
+        : sortParam === 'date_desc'
+          ? { startDate: 'desc' as const }
+          : sortParam === 'date_asc'
+            ? { startDate: 'asc' as const }
+            : { startDate: whenParam === 'past' ? ('desc' as const) : ('asc' as const) }
 
   const [events, total] = await Promise.all([
     prisma.event.findMany({

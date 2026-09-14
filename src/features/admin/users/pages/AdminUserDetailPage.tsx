@@ -263,7 +263,9 @@ export function AdminUserDetailPage() {
           <ul className="flex flex-col gap-2">
             {user.eventRegistrations.map((registration) => (
               <li key={registration.id} className="flex items-center justify-between gap-3 text-sm">
-                <span className="text-slate-800">{registration.event.titleFr}</span>
+                <span className="text-slate-800">
+                  {i18n.language === 'ar' ? registration.event.titleAr : registration.event.titleFr}
+                </span>
                 <span className="flex items-center gap-3">
                   <StatusBadge tone={REGISTRATION_STATUS_TONE[registration.status]}>
                     {t(REGISTRATION_STATUS_LABEL_KEY[registration.status])}

@@ -3,10 +3,11 @@ import { useTranslation } from 'react-i18next'
 import { CalendarX, Search } from 'lucide-react'
 import { Input } from '@/components/ui/Input'
 import { Button } from '@/components/ui/Button'
+import { Select } from '@/components/ui/Select'
 import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { EventCard } from '@/features/events/components/EventCard'
 import { useEventsList } from '@/features/events/hooks/useEvents'
-import type { EventTense } from '@/features/events/types'
+import type { EventSort, EventTense } from '@/features/events/types'
 import { cn } from '@/utils/cn'
 
 export function EventsListPage() {
@@ -15,8 +16,9 @@ export function EventsListPage() {
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [when, setWhen] = useState<EventTense>('upcoming')
+  const [sort, setSort] = useState<EventSort>('default')
 
-  const { data, isLoading, isError } = useEventsList(page, search, when)
+  const { data, isLoading, isError } = useEventsList(page, search, when, sort)
 
   function handleSearchSubmit(event: React.FormEvent) {
     event.preventDefault()
@@ -26,6 +28,11 @@ export function EventsListPage() {
 
   function handleTenseChange(tense: EventTense) {
     setWhen(tense)
+    setPage(1)
+  }
+
+  function handleSortChange(value: EventSort) {
+    setSort(value)
     setPage(1)
   }
 
@@ -83,6 +90,22 @@ export function EventsListPage() {
             {t('events.search')}
           </Button>
         </form>
+      </div>
+
+      <div className="mb-6 flex justify-end">
+        <Select
+          value={sort}
+          onChange={(event) => handleSortChange(event.target.value as EventSort)}
+          aria-label={t('events.sort.label')}
+          className="w-auto"
+          options={[
+            { value: 'default', label: t('events.sort.default') },
+            { value: 'title_asc', label: t('events.sort.titleAsc') },
+            { value: 'title_desc', label: t('events.sort.titleDesc') },
+            { value: 'date_asc', label: t('events.sort.dateAsc') },
+            { value: 'date_desc', label: t('events.sort.dateDesc') },
+          ]}
+        />
       </div>
 
       {isLoading && <SkeletonCards count={6} />}

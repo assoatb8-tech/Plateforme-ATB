@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import {
   assignEventLeader,
   createEvent,
@@ -8,17 +9,20 @@ import {
   updateEvent,
 } from '@/features/admin/events/services/adminEventsService'
 import type { EventSubmitPayload } from '@/features/admin/events/validation'
+import type { EventSort } from '@/features/events/types'
 
 export const adminEventsKeys = {
   all: ['admin', 'events'] as const,
-  list: (page: number, search: string) => ['admin', 'events', 'list', page, search] as const,
+  list: (page: number, search: string, sort: EventSort) =>
+    ['admin', 'events', 'list', page, search, sort] as const,
   detail: (id: string) => ['admin', 'events', 'detail', id] as const,
 }
 
-export function useAdminEventsList(page: number, search: string) {
+export function useAdminEventsList(page: number, search: string, sort: EventSort = 'default') {
+  const { i18n } = useTranslation()
   return useQuery({
-    queryKey: adminEventsKeys.list(page, search),
-    queryFn: () => fetchAdminEvents({ page, search }),
+    queryKey: adminEventsKeys.list(page, search, sort),
+    queryFn: () => fetchAdminEvents({ page, search, sort, lang: i18n.language }),
     placeholderData: keepPreviousData,
   })
 }

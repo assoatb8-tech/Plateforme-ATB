@@ -165,3 +165,37 @@ export const eventDaySelectionSchema = z.object({
 })
 
 export type EventDaySelectionInput = z.infer<typeof eventDaySelectionSchema>
+
+// Body of POST .../participants — an ADMIN registering someone on their
+// behalf (walk-ins, fixing a missed registration, etc). dayIds only
+// meaningful for a multi-day event, same as eventRegisterSchema.
+export const eventAddParticipantSchema = z.object({
+  userId: z.string().uuid(),
+  dayIds: z.array(z.string().uuid()).max(60).optional(),
+})
+
+export type EventAddParticipantInput = z.infer<typeof eventAddParticipantSchema>
+
+// Body of PATCH .../participants — an ADMIN correcting a participant's
+// status (e.g. promoting from the waiting list) and/or their day
+// selection. At least one of the two must actually be present.
+export const eventEditParticipantSchema = z
+  .object({
+    registrationId: z.string().uuid(),
+    status: z.enum(['REGISTERED', 'WAITING_LIST']).optional(),
+    dayIds: z.array(z.string().uuid()).max(60).optional(),
+  })
+  .refine((data) => data.status !== undefined || data.dayIds !== undefined, {
+    message: 'at least one of status or dayIds must be provided',
+  })
+
+export type EventEditParticipantInput = z.infer<typeof eventEditParticipantSchema>
+
+// Body of DELETE .../participants — an ADMIN (any time) or the event's own
+// leader ("chef de groupe", only before the event starts — checked in the
+// handler, not here) removing a participant.
+export const eventRemoveParticipantSchema = z.object({
+  registrationId: z.string().uuid(),
+})
+
+export type EventRemoveParticipantInput = z.infer<typeof eventRemoveParticipantSchema>

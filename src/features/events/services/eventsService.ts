@@ -4,18 +4,28 @@ import type {
   EventDto,
   EventParticipantDto,
   EventsListResponse,
+  EventSort,
   EventTense,
   RegistrationDto,
+  RegistrationStatus,
 } from '@/features/events/types'
 
 export async function fetchEvents(params: {
   page?: number
   search?: string
   when?: EventTense
+  sort?: EventSort
+  lang?: string
 }): Promise<EventsListResponse> {
   return apiRequest<EventsListResponse>('/api/events', {
     requireAuth: false,
-    query: { page: params.page, search: params.search, when: params.when },
+    query: {
+      page: params.page,
+      search: params.search,
+      when: params.when,
+      sort: params.sort && params.sort !== 'default' ? params.sort : undefined,
+      lang: params.lang,
+    },
   })
 }
 
@@ -81,5 +91,43 @@ export async function setAttendance(
     method: 'PATCH',
     query: { action: 'attendance' },
     body: { registrationId, status },
+  })
+}
+
+// ADMIN only — registers a member on the event's behalf. dayIds only
+// meaningful for a multi-day event, same as registerForEvent.
+export async function addParticipant(
+  eventId: string,
+  userId: string,
+  dayIds?: string[],
+): Promise<void> {
+  await apiRequest(`/api/events/${eventId}`, {
+    method: 'POST',
+    query: { action: 'participants' },
+    body: { userId, dayIds },
+  })
+}
+
+// ADMIN only — corrects a participant's status and/or (multi-day only)
+// their day selection. At least one of the two must be provided.
+export async function editParticipant(
+  eventId: string,
+  registrationId: string,
+  updates: { status?: RegistrationStatus; dayIds?: string[] },
+): Promise<void> {
+  await apiRequest(`/api/events/${eventId}`, {
+    method: 'PATCH',
+    query: { action: 'participants' },
+    body: { registrationId, ...updates },
+  })
+}
+
+// ADMIN (any time) or the event's own leader ("chef de groupe" — only
+// before the event starts, enforced server-side).
+export async function removeParticipant(eventId: string, registrationId: string): Promise<void> {
+  await apiRequest(`/api/events/${eventId}`, {
+    method: 'DELETE',
+    query: { action: 'participants' },
+    body: { registrationId },
   })
 }

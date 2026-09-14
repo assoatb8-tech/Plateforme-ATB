@@ -259,6 +259,14 @@
     "myLedEvents": {
       "forbidden": "Vous n'êtes pas autorisé(e) à gérer les présences de cet événement."
     },
+    "sort": {
+      "label": "Trier par",
+      "default": "Par défaut",
+      "titleAsc": "Titre (A → Z)",
+      "titleDesc": "Titre (Z → A)",
+      "dateAsc": "Date (croissante)",
+      "dateDesc": "Date (décroissante)"
+    },
     "multiDayCount": "Événement sur {{count}} jours",
     "pickYourDays": "Choisissez les jours où vous participerez",
     "updateMyDays": "Mettre à jour mes jours"
@@ -415,9 +423,35 @@
           "email": "Email",
           "status": "Statut",
           "date": "Date d'inscription",
-          "leader": "Chef de groupe",
           "attendance": "Présence",
-          "days": "Jours choisis"
+          "days": "Jours choisis",
+          "actions": "Actions"
+        },
+        "sort": {
+          "label": "Trier par",
+          "joinedAsc": "Premier inscrit",
+          "joinedDesc": "Dernier inscrit",
+          "nameAsc": "Nom (A → Z)",
+          "nameDesc": "Nom (Z → A)"
+        },
+        "add": {
+          "action": "Ajouter un participant",
+          "title": "Ajouter un participant",
+          "pickDays": "Choisissez les jours où il/elle participera",
+          "daysRequiredError": "Choisissez au moins un jour.",
+          "submit": "Ajouter",
+          "error": "Une erreur est survenue. Merci de réessayer."
+        },
+        "edit": {
+          "action": "Modifier",
+          "title": "Modifier ce participant",
+          "statusLabel": "Statut",
+          "submit": "Enregistrer",
+          "error": "Une erreur est survenue. Merci de réessayer."
+        },
+        "remove": {
+          "action": "Retirer ce participant",
+          "error": "Une erreur est survenue. Merci de réessayer."
         }
       },
       "form": {

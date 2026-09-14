@@ -1,9 +1,12 @@
 import { describe, expect, it } from 'vitest'
 import {
+  eventAddParticipantSchema,
   eventAttendanceSchema,
   eventCreateSchema,
   eventDaySelectionSchema,
+  eventEditParticipantSchema,
   eventRegisterSchema,
+  eventRemoveParticipantSchema,
   eventUpdateSchema,
 } from './event.js'
 
@@ -294,6 +297,79 @@ describe('eventAttendanceSchema', () => {
 
   it('rejects a non-UUID registrationId', () => {
     const result = eventAttendanceSchema.safeParse({ registrationId: 'not-a-uuid', status: null })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('eventAddParticipantSchema', () => {
+  const userId = '11111111-1111-1111-1111-111111111111'
+
+  it('accepts a userId with no dayIds', () => {
+    const result = eventAddParticipantSchema.safeParse({ userId })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts a userId with dayIds', () => {
+    const result = eventAddParticipantSchema.safeParse({
+      userId,
+      dayIds: ['22222222-2222-2222-2222-222222222222'],
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects a non-UUID userId', () => {
+    const result = eventAddParticipantSchema.safeParse({ userId: 'not-a-uuid' })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a missing userId', () => {
+    const result = eventAddParticipantSchema.safeParse({})
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('eventEditParticipantSchema', () => {
+  const registrationId = '11111111-1111-1111-1111-111111111111'
+
+  it('accepts a status-only edit', () => {
+    const result = eventEditParticipantSchema.safeParse({ registrationId, status: 'REGISTERED' })
+    expect(result.success).toBe(true)
+  })
+
+  it('accepts a dayIds-only edit', () => {
+    const result = eventEditParticipantSchema.safeParse({
+      registrationId,
+      dayIds: ['22222222-2222-2222-2222-222222222222'],
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects neither status nor dayIds being provided', () => {
+    const result = eventEditParticipantSchema.safeParse({ registrationId })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects an invalid status value', () => {
+    const result = eventEditParticipantSchema.safeParse({ registrationId, status: 'CANCELLED' })
+    expect(result.success).toBe(false)
+  })
+})
+
+describe('eventRemoveParticipantSchema', () => {
+  it('accepts a valid registrationId', () => {
+    const result = eventRemoveParticipantSchema.safeParse({
+      registrationId: '11111111-1111-1111-1111-111111111111',
+    })
+    expect(result.success).toBe(true)
+  })
+
+  it('rejects a non-UUID registrationId', () => {
+    const result = eventRemoveParticipantSchema.safeParse({ registrationId: 'not-a-uuid' })
+    expect(result.success).toBe(false)
+  })
+
+  it('rejects a missing registrationId', () => {
+    const result = eventRemoveParticipantSchema.safeParse({})
     expect(result.success).toBe(false)
   })
 })

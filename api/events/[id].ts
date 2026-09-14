@@ -10,6 +10,9 @@ import {
   eventAttendanceSchema,
   eventRegisterSchema,
   eventDaySelectionSchema,
+  eventAddParticipantSchema,
+  eventEditParticipantSchema,
+  eventRemoveParticipantSchema,
   type EventDayInput,
 } from '../_lib/validators/event.js'
 import { serializeEvent } from '../_lib/utils/eventSerializer.js'
@@ -108,11 +111,32 @@ export default async function handler(req: VercelRequest, res: VercelResponse): 
   }
 
   if (action === 'participants') {
-    if (req.method !== 'GET') {
-      sendError(res, 'Method not allowed', 405)
+    if (req.method === 'GET') {
+      await withAuth((_authReq, authRes, user) => handleParticipants(id, authRes, user.id))(
+        req,
+        res,
+      )
       return
     }
-    await withAuth((_authReq, authRes, user) => handleParticipants(id, authRes, user.id))(req, res)
+    if (req.method === 'POST') {
+      await withRole(['ADMIN'], (roleReq, roleRes, user) =>
+        handleAddParticipant(id, roleReq, roleRes, user.id),
+      )(req, res)
+      return
+    }
+    if (req.method === 'PATCH') {
+      await withRole(['ADMIN'], (roleReq, roleRes, user) =>
+        handleEditParticipant(id, roleReq, roleRes, user.id),
+      )(req, res)
+      return
+    }
+    if (req.method === 'DELETE') {
+      await withAuth((authReq, authRes, user) =>
+        handleRemoveParticipant(id, authReq, authRes, user.id),
+      )(req, res)
+      return
+    }
+    sendError(res, 'Method not allowed', 405)
     return
   }
 
@@ -326,9 +350,98 @@ async function handleDelete(id: string, res: VercelResponse, adminId: string): P
 // distinct from the DB-level unique constraint race (also 409) that can
 // happen if two requests for the same never-registered user land at once.
 class AlreadyRegisteredError extends Error {}
+class InvalidDaySelectionError extends Error {}
 
 function isUniqueConstraintError(error: unknown): boolean {
   return error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002'
+}
+
+// A multi-day event requires picking at least one real day of its own —
+// enforced here (rather than in the zod schema) since "required" depends on
+// which event this is, not on the shape of the body alone. Shared by every
+// entry point that resolves a day selection: self-register, admin-add, and
+// the member's own "update my days".
+function resolveDayIds(
+  event: { isMultiDay: boolean; days: { id: string }[] },
+  requested: string[] | undefined,
+): string[] {
+  if (!event.isMultiDay) return []
+  const validDayIds = new Set(event.days.map((day) => day.id))
+  const dayIds = requested ?? []
+  if (dayIds.length === 0 || dayIds.some((dayId) => !validDayIds.has(dayId))) {
+    throw new InvalidDaySelectionError()
+  }
+  return dayIds
+}
+
+// Capacity check + write happen inside a transaction so two concurrent
+// registrations can't both read "1 spot left" and both get REGISTERED.
+// Shared by a member registering themselves and an admin adding someone on
+// their behalf — same rules either way (waitlist over capacity, reactivate
+// a cancelled row rather than duplicate it, replace day selections
+// wholesale).
+async function performRegistration(
+  tx: Prisma.TransactionClient,
+  event: { id: string; maxParticipants: number; isMultiDay: boolean },
+  userId: string,
+  dayIds: string[],
+) {
+  // Postgres's default READ COMMITTED isolation lets two concurrent
+  // transactions both read the same activeCount before either commits,
+  // over-filling a nearly-full event — an advisory lock keyed on this
+  // event's id serializes concurrent registration attempts for THE SAME
+  // event (different events don't contend), and auto-releases at
+  // commit/rollback since this is the _xact_ variant.
+  await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${event.id})::bigint)`
+
+  const existing = await tx.eventRegistration.findUnique({
+    where: { eventId_userId: { eventId: event.id, userId } },
+  })
+
+  if (existing && existing.status !== 'CANCELLED') {
+    throw new AlreadyRegisteredError()
+  }
+
+  const activeCount = await tx.eventRegistration.count({
+    where: { eventId: event.id, status: 'REGISTERED' },
+  })
+  // maxParticipants exceeded server-side (never trust a frontend check) ->
+  // waitlist instead of a hard rejection, per RegistrationStatus enum.
+  const status = activeCount < event.maxParticipants ? 'REGISTERED' : 'WAITING_LIST'
+
+  const reg = existing
+    ? await tx.eventRegistration.update({
+        where: { id: existing.id },
+        data: { status, registeredAt: new Date() },
+      })
+    : await tx.eventRegistration.create({ data: { eventId: event.id, userId, status } })
+
+  if (event.isMultiDay) {
+    // Replace wholesale — covers both a fresh registration and a
+    // cancelled-then-rejoined one picking different days this time.
+    await tx.eventDaySelection.deleteMany({ where: { registrationId: reg.id } })
+    await tx.eventDaySelection.createMany({
+      data: dayIds.map((dayId) => ({ registrationId: reg.id, eventDayId: dayId })),
+    })
+  }
+
+  return reg
+}
+
+// A REGISTERED spot just opened up (cancellation, admin removal, or an
+// admin demoting someone to the waiting list): promote the longest-waiting
+// person, if any, rather than leaving the seat empty.
+async function promoteNextWaiting(tx: Prisma.TransactionClient, eventId: string): Promise<void> {
+  const nextWaiting = await tx.eventRegistration.findFirst({
+    where: { eventId, status: 'WAITING_LIST' },
+    orderBy: { registeredAt: 'asc' },
+  })
+  if (nextWaiting) {
+    await tx.eventRegistration.update({
+      where: { id: nextWaiting.id },
+      data: { status: 'REGISTERED' },
+    })
+  }
 }
 
 async function handleRegister(
@@ -356,65 +469,18 @@ async function handleRegister(
     return
   }
 
-  // A multi-day event requires picking at least one real day up front —
-  // enforced here rather than in the zod schema since "required" depends
-  // on which event this is, not on the shape of the body alone.
-  let dayIds: string[] = []
-  if (event.isMultiDay) {
-    const validDayIds = new Set(event.days.map((day) => day.id))
-    dayIds = parsed.data.dayIds ?? []
-    if (dayIds.length === 0 || dayIds.some((dayId) => !validDayIds.has(dayId))) {
-      sendError(res, 'At least one valid day must be selected for a multi-day event', 400)
-      return
-    }
+  let dayIds: string[]
+  try {
+    dayIds = resolveDayIds(event, parsed.data.dayIds)
+  } catch {
+    sendError(res, 'At least one valid day must be selected for a multi-day event', 400)
+    return
   }
 
   try {
-    // Capacity check + write happen inside a transaction so two concurrent
-    // registrations can't both read "1 spot left" and both get REGISTERED.
-    const registration = await prisma.$transaction(async (tx) => {
-      // Postgres's default READ COMMITTED isolation lets two concurrent
-      // transactions both read the same activeCount before either commits,
-      // over-filling a nearly-full event — an advisory lock keyed on this
-      // event's id serializes concurrent registration attempts for THE
-      // SAME event (different events don't contend), and auto-releases at
-      // commit/rollback since this is the _xact_ variant.
-      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${eventId})::bigint)`
-
-      const existing = await tx.eventRegistration.findUnique({
-        where: { eventId_userId: { eventId, userId: user.id } },
-      })
-
-      if (existing && existing.status !== 'CANCELLED') {
-        throw new AlreadyRegisteredError()
-      }
-
-      const activeCount = await tx.eventRegistration.count({
-        where: { eventId, status: 'REGISTERED' },
-      })
-      // maxParticipants exceeded server-side (never trust a frontend check)
-      // -> waitlist instead of a hard rejection, per RegistrationStatus enum.
-      const status = activeCount < event.maxParticipants ? 'REGISTERED' : 'WAITING_LIST'
-
-      const reg = existing
-        ? await tx.eventRegistration.update({
-            where: { id: existing.id },
-            data: { status, registeredAt: new Date() },
-          })
-        : await tx.eventRegistration.create({ data: { eventId, userId: user.id, status } })
-
-      if (event.isMultiDay) {
-        // Replace wholesale — covers both a fresh registration and a
-        // cancelled-then-rejoined one picking different days this time.
-        await tx.eventDaySelection.deleteMany({ where: { registrationId: reg.id } })
-        await tx.eventDaySelection.createMany({
-          data: dayIds.map((dayId) => ({ registrationId: reg.id, eventDayId: dayId })),
-        })
-      }
-
-      return reg
-    })
-
+    const registration = await prisma.$transaction((tx) =>
+      performRegistration(tx, event, user.id, dayIds),
+    )
     sendSuccess(res, registration, 201)
   } catch (error) {
     if (error instanceof AlreadyRegisteredError || isUniqueConstraintError(error)) {
@@ -440,20 +506,8 @@ async function handleCancel(eventId: string, user: AuthedUser, res: VercelRespon
       where: { id: existing.id },
       data: { status: 'CANCELLED' },
     })
-
-    // A REGISTERED spot just opened up: promote the longest-waiting person
-    // on the waiting list, if any, rather than leaving the seat empty.
     if (existing.status === 'REGISTERED') {
-      const nextWaiting = await tx.eventRegistration.findFirst({
-        where: { eventId, status: 'WAITING_LIST' },
-        orderBy: { registeredAt: 'asc' },
-      })
-      if (nextWaiting) {
-        await tx.eventRegistration.update({
-          where: { id: nextWaiting.id },
-          data: { status: 'REGISTERED' },
-        })
-      }
+      await promoteNextWaiting(tx, eventId)
     }
   })
 
@@ -572,6 +626,190 @@ async function handleParticipants(
   })
 
   sendSuccess(res, registrations)
+}
+
+// POST — ADMIN only. Registers a member on their behalf (walk-ins, fixing
+// a missed registration, etc), regardless of whether the event is upcoming
+// or already past — an admin should be able to record a participant after
+// the fact too, unlike a member's own self-service registration.
+async function handleAddParticipant(
+  eventId: string,
+  req: VercelRequest,
+  res: VercelResponse,
+  adminId: string,
+): Promise<void> {
+  const parsed = eventAddParticipantSchema.safeParse(req.body)
+  if (!parsed.success) {
+    sendError(res, parsed.error.issues.map((issue) => issue.message).join(', '), 400)
+    return
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: { days: { select: { id: true } } },
+  })
+  if (!event) {
+    sendError(res, 'Event not found', 404)
+    return
+  }
+
+  const { userId } = parsed.data
+  const targetUser = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { status: true },
+  })
+  if (!targetUser) {
+    sendError(res, 'User not found', 404)
+    return
+  }
+  if (targetUser.status === 'BANNED') {
+    sendError(res, 'This user is banned and cannot be registered', 400)
+    return
+  }
+
+  let dayIds: string[]
+  try {
+    dayIds = resolveDayIds(event, parsed.data.dayIds)
+  } catch {
+    sendError(res, 'At least one valid day must be selected for a multi-day event', 400)
+    return
+  }
+
+  try {
+    const registration = await prisma.$transaction((tx) =>
+      performRegistration(tx, event, userId, dayIds),
+    )
+    await logAdminAction(adminId, 'PARTICIPANT_ADDED', registration.id)
+    sendSuccess(res, registration, 201)
+  } catch (error) {
+    if (error instanceof AlreadyRegisteredError || isUniqueConstraintError(error)) {
+      sendError(res, 'This user is already registered for this event', 409)
+      return
+    }
+    throw error
+  }
+}
+
+// PATCH — ADMIN only. Corrects a participant's status (e.g. manually
+// promoting someone off the waiting list — a deliberate override, so no
+// capacity re-check here unlike self-registration) and/or, for a
+// multi-day event, which day(s) they're down for.
+async function handleEditParticipant(
+  eventId: string,
+  req: VercelRequest,
+  res: VercelResponse,
+  adminId: string,
+): Promise<void> {
+  const parsed = eventEditParticipantSchema.safeParse(req.body)
+  if (!parsed.success) {
+    sendError(res, parsed.error.issues.map((issue) => issue.message).join(', '), 400)
+    return
+  }
+
+  const event = await prisma.event.findUnique({
+    where: { id: eventId },
+    include: { days: { select: { id: true } } },
+  })
+  if (!event) {
+    sendError(res, 'Event not found', 404)
+    return
+  }
+
+  const { registrationId, status, dayIds } = parsed.data
+  const registration = await prisma.eventRegistration.findUnique({ where: { id: registrationId } })
+  if (!registration || registration.eventId !== eventId || registration.status === 'CANCELLED') {
+    sendError(res, 'Registration not found', 404)
+    return
+  }
+
+  let resolvedDayIds: string[] | undefined
+  if (dayIds !== undefined) {
+    try {
+      resolvedDayIds = resolveDayIds(event, dayIds)
+    } catch {
+      sendError(res, 'At least one valid day must be selected for a multi-day event', 400)
+      return
+    }
+  }
+
+  await prisma.$transaction(async (tx) => {
+    if (status && status !== registration.status) {
+      await tx.eventRegistration.update({ where: { id: registrationId }, data: { status } })
+      // Demoting someone off REGISTERED frees a spot — promote the next
+      // waitlisted person the same way a cancellation would.
+      if (registration.status === 'REGISTERED' && status === 'WAITING_LIST') {
+        await promoteNextWaiting(tx, eventId)
+      }
+    }
+    if (resolvedDayIds) {
+      await tx.eventDaySelection.deleteMany({ where: { registrationId } })
+      await tx.eventDaySelection.createMany({
+        data: resolvedDayIds.map((dayId) => ({ registrationId, eventDayId: dayId })),
+      })
+    }
+  })
+
+  await logAdminAction(adminId, 'PARTICIPANT_EDITED', registrationId)
+  sendSuccess(res, { id: registrationId })
+}
+
+// DELETE — ADMIN (any time) or the event's own leader ("chef de groupe",
+// only before the event starts — after that, marking attendance is the
+// relevant action, not removal). Soft-removal, same as a member's own
+// cancellation: frees the spot for the waiting list and, if the removed
+// participant happened to be the event's leader, clears that too.
+async function handleRemoveParticipant(
+  eventId: string,
+  req: VercelRequest,
+  res: VercelResponse,
+  userId: string,
+): Promise<void> {
+  const parsed = eventRemoveParticipantSchema.safeParse(req.body)
+  if (!parsed.success) {
+    sendError(res, parsed.error.issues.map((issue) => issue.message).join(', '), 400)
+    return
+  }
+
+  const event = await prisma.event.findUnique({ where: { id: eventId } })
+  if (!event) {
+    sendError(res, 'Event not found', 404)
+    return
+  }
+
+  const requester = await prisma.user.findUnique({ where: { id: userId }, select: { role: true } })
+  const isAdmin = requester?.role === 'ADMIN'
+  const isLeader = event.leaderId === userId
+  if (!isAdmin && !isLeader) {
+    sendError(res, 'Forbidden', 403)
+    return
+  }
+  if (!isAdmin && new Date(event.startDate) <= new Date()) {
+    sendError(res, 'The event has already started', 403)
+    return
+  }
+
+  const { registrationId } = parsed.data
+  const registration = await prisma.eventRegistration.findUnique({ where: { id: registrationId } })
+  if (!registration || registration.eventId !== eventId || registration.status === 'CANCELLED') {
+    sendError(res, 'Registration not found', 404)
+    return
+  }
+
+  await prisma.$transaction(async (tx) => {
+    await tx.eventRegistration.update({
+      where: { id: registrationId },
+      data: { status: 'CANCELLED' },
+    })
+    if (registration.status === 'REGISTERED') {
+      await promoteNextWaiting(tx, eventId)
+    }
+    if (event.leaderId === registration.userId) {
+      await tx.event.update({ where: { id: eventId }, data: { leaderId: null } })
+    }
+  })
+
+  await logAdminAction(userId, 'PARTICIPANT_REMOVED', registrationId)
+  sendSuccess(res, { id: registrationId })
 }
 
 // --- /api/events/:id?action=attendance --------------------------------------
