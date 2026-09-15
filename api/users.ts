@@ -34,6 +34,8 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
   const status: StatusFilter | undefined = STATUS_VALUES.includes(statusParam as StatusFilter)
     ? (statusParam as StatusFilter)
     : undefined
+  const sortParam = firstParam(req.query.sort)
+  const langParam = firstParam(req.query.lang)
 
   const where = {
     ...(status ? { status } : {}),
@@ -52,10 +54,39 @@ async function handleList(req: VercelRequest, res: VercelResponse): Promise<void
       : {}),
   }
 
+  // Sorting by "name" approximates the display name shown in the UI
+  // (memberProfile's name, falling back to the bare signup name) by
+  // ordering on memberProfile's own columns — a user with no completed
+  // membership profile has no value there and sorts to the edge of the
+  // list rather than being interleaved correctly, which is an acceptable
+  // approximation (Prisma can't order by a computed/coalesced column).
+  // `lang` picks which language's name columns to sort by, since French
+  // and Arabic collate differently.
+  const nameField = langParam === 'ar' ? ('firstNameAr' as const) : ('firstNameFr' as const)
+  const lastNameField = langParam === 'ar' ? ('lastNameAr' as const) : ('lastNameFr' as const)
+  const orderBy =
+    sortParam === 'name_asc'
+      ? [
+          { memberProfile: { [nameField]: 'asc' as const } },
+          { memberProfile: { [lastNameField]: 'asc' as const } },
+        ]
+      : sortParam === 'name_desc'
+        ? [
+            { memberProfile: { [nameField]: 'desc' as const } },
+            { memberProfile: { [lastNameField]: 'desc' as const } },
+          ]
+        : sortParam === 'email_asc'
+          ? [{ email: 'asc' as const }]
+          : sortParam === 'email_desc'
+            ? [{ email: 'desc' as const }]
+            : sortParam === 'joined_asc'
+              ? [{ createdAt: 'asc' as const }]
+              : [{ createdAt: 'desc' as const }]
+
   const [users, total] = await Promise.all([
     prisma.user.findMany({
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy,
       skip: (page - 1) * PAGE_SIZE,
       take: PAGE_SIZE,
       select: {

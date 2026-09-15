@@ -12,6 +12,7 @@ import { useAdminUsersList } from '@/features/admin/users/hooks/useAdminUsers'
 import { USER_STATUS_TONE } from '@/utils/statusTones'
 import { resolveMemberDisplayName } from '@/utils/displayName'
 import { useSignedPhotoUrls } from '@/hooks/useSignedPhotoUrls'
+import type { UserSort } from '@/features/admin/users/types'
 
 export function AdminUsersListPage() {
   const { t, i18n } = useTranslation()
@@ -19,8 +20,9 @@ export function AdminUsersListPage() {
   const [searchInput, setSearchInput] = useState('')
   const [search, setSearch] = useState('')
   const [status, setStatus] = useState('')
+  const [sort, setSort] = useState<UserSort>('default')
 
-  const { data, isLoading, isError } = useAdminUsersList(page, search, status)
+  const { data, isLoading, isError } = useAdminUsersList(page, search, status, sort)
   const photoUrls = useSignedPhotoUrls(data?.users.map((user) => user.photoUrl) ?? [])
 
   function handleSearchSubmit(event: React.FormEvent) {
@@ -31,6 +33,11 @@ export function AdminUsersListPage() {
 
   function handleStatusChange(value: string) {
     setStatus(value)
+    setPage(1)
+  }
+
+  function handleSortChange(value: UserSort) {
+    setSort(value)
     setPage(1)
   }
 
@@ -67,6 +74,22 @@ export function AdminUsersListPage() {
           {t('admin.users.search')}
         </Button>
       </form>
+
+      <Select
+        value={sort}
+        onChange={(event) => handleSortChange(event.target.value as UserSort)}
+        aria-label={t('admin.users.sort.label')}
+        className="w-auto sm:max-w-[220px]"
+        options={[
+          { value: 'default', label: t('admin.users.sort.default') },
+          { value: 'name_asc', label: t('admin.users.sort.nameAsc') },
+          { value: 'name_desc', label: t('admin.users.sort.nameDesc') },
+          { value: 'email_asc', label: t('admin.users.sort.emailAsc') },
+          { value: 'email_desc', label: t('admin.users.sort.emailDesc') },
+          { value: 'joined_asc', label: t('admin.users.sort.joinedAsc') },
+          { value: 'joined_desc', label: t('admin.users.sort.joinedDesc') },
+        ]}
+      />
 
       {isLoading && (
         <Card className="p-4">

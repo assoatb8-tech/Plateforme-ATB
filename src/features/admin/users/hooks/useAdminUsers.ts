@@ -1,4 +1,5 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useTranslation } from 'react-i18next'
 import {
   banUser,
   deleteUser,
@@ -8,18 +9,26 @@ import {
   updateUserStatus,
 } from '@/features/admin/users/services/usersService'
 import type { Role, UserStatus } from '@/types/domain'
+import type { UserSort } from '@/features/admin/users/types'
 
 export const adminUsersKeys = {
   all: ['admin', 'users'] as const,
-  list: (page: number, search: string, status: string) =>
-    ['admin', 'users', 'list', page, search, status] as const,
+  list: (page: number, search: string, status: string, sort: UserSort) =>
+    ['admin', 'users', 'list', page, search, status, sort] as const,
   detail: (id: string) => ['admin', 'users', 'detail', id] as const,
 }
 
-export function useAdminUsersList(page: number, search: string, status: string) {
+export function useAdminUsersList(
+  page: number,
+  search: string,
+  status: string,
+  sort: UserSort = 'default',
+) {
+  const { i18n } = useTranslation()
   return useQuery({
-    queryKey: adminUsersKeys.list(page, search, status),
-    queryFn: () => fetchUsers({ page, search, status: status as UserStatus | '' }),
+    queryKey: adminUsersKeys.list(page, search, status, sort),
+    queryFn: () =>
+      fetchUsers({ page, search, status: status as UserStatus | '', sort, lang: i18n.language }),
     placeholderData: keepPreviousData,
   })
 }

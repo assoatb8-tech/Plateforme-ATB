@@ -1,9 +1,11 @@
+import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { CalendarX } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
+import { Select } from '@/components/ui/Select'
 import { SkeletonRows } from '@/components/ui/SkeletonRows'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useMyRegistrations } from '@/features/dashboard/hooks/useDashboard'
@@ -12,10 +14,24 @@ import type { RegistrationDto } from '@/features/events/types'
 import { REGISTRATION_STATUS_TONE } from '@/utils/statusTones'
 import { TUNIS_TIMEZONE } from '@/utils/eventDays'
 
+type ParticipationSort = 'date_asc' | 'date_desc'
+
+function sortByEventDate(
+  registrations: RegistrationDto[],
+  sort: ParticipationSort,
+): RegistrationDto[] {
+  const sorted = [...registrations]
+  return sorted.sort((a, b) => {
+    const diff = new Date(a.event.startDate).getTime() - new Date(b.event.startDate).getTime()
+    return sort === 'date_asc' ? diff : -diff
+  })
+}
+
 export function ParticipationsPage() {
   const { t, i18n } = useTranslation()
   const { data: registrations, isLoading, isError } = useMyRegistrations()
   const queryClient = useQueryClient()
+  const [sort, setSort] = useState<ParticipationSort>('date_asc')
 
   const cancelMutation = useMutation({
     mutationFn: (eventId: string) => cancelEventRegistration(eventId),
@@ -26,11 +42,27 @@ export function ParticipationsPage() {
   })
 
   const now = new Date()
-  const upcoming = (registrations ?? []).filter(
-    (registration) => new Date(registration.event.startDate) >= now,
+  const upcoming = useMemo(
+    () =>
+      sortByEventDate(
+        (registrations ?? []).filter(
+          (registration) => new Date(registration.event.startDate) >= now,
+        ),
+        sort,
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [registrations, sort],
   )
-  const past = (registrations ?? []).filter(
-    (registration) => new Date(registration.event.startDate) < now,
+  const past = useMemo(
+    () =>
+      sortByEventDate(
+        (registrations ?? []).filter(
+          (registration) => new Date(registration.event.startDate) < now,
+        ),
+        sort,
+      ),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [registrations, sort],
   )
 
   function formatDate(value: string) {
@@ -83,7 +115,21 @@ export function ParticipationsPage() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-10 sm:px-6">
-      <h1 className="mb-8 text-2xl font-semibold text-slate-900">{t('participations.title')}</h1>
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-semibold text-slate-900">{t('participations.title')}</h1>
+        {!isLoading && (registrations ?? []).length > 0 && (
+          <Select
+            value={sort}
+            onChange={(event) => setSort(event.target.value as ParticipationSort)}
+            aria-label={t('participations.sort.label')}
+            className="w-auto"
+            options={[
+              { value: 'date_asc', label: t('participations.sort.dateAsc') },
+              { value: 'date_desc', label: t('participations.sort.dateDesc') },
+            ]}
+          />
+        )}
+      </div>
 
       {isLoading && <SkeletonRows count={4} />}
       {isError && <p className="text-sm text-error">{t('events.errorGeneric')}</p>}

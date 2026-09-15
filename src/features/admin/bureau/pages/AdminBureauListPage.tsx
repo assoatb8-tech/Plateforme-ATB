@@ -1,12 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useTranslation } from 'react-i18next'
 import { Pencil, Plus, Search, Trash2, UserRound, Users, X } from 'lucide-react'
-import { resolveBureauPosition } from '@/utils/displayName'
+import { resolveBureauPosition, resolveMemberDisplayName } from '@/utils/displayName'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
 import { Modal } from '@/components/ui/Modal'
 import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { useBureauMembers } from '@/features/bureau/hooks/useBureau'
@@ -22,9 +23,43 @@ import {
 } from '@/features/admin/bureau/validation'
 import { useAdminUsersList } from '@/features/admin/users/hooks/useAdminUsers'
 import type { UserListItemDto } from '@/features/admin/users/types'
-import { resolveMemberDisplayName } from '@/utils/displayName'
 import { useSignedPhotoUrls } from '@/hooks/useSignedPhotoUrls'
 import { clearFormDraft, loadFormDraft, useAutosaveFormDraft } from '@/hooks/useFormDraft'
+
+type BureauSort = 'date_desc' | 'date_asc' | 'name_asc' | 'name_desc'
+
+function sortBureauMembers(
+  members: BureauMemberDto[],
+  sort: BureauSort,
+  language: string,
+): BureauMemberDto[] {
+  const sorted = [...members]
+  switch (sort) {
+    case 'name_asc':
+      return sorted.sort((a, b) =>
+        resolveMemberDisplayName(a, language).localeCompare(
+          resolveMemberDisplayName(b, language),
+          language,
+        ),
+      )
+    case 'name_desc':
+      return sorted.sort((a, b) =>
+        resolveMemberDisplayName(b, language).localeCompare(
+          resolveMemberDisplayName(a, language),
+          language,
+        ),
+      )
+    case 'date_asc':
+      return sorted.sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      )
+    case 'date_desc':
+    default:
+      return sorted.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
+  }
+}
 
 // A mobile tab reload while an admin is mid-way through adding a Bureau
 // member (e.g. backgrounding the app to go copy a Facebook link) shouldn't
@@ -53,6 +88,7 @@ export function AdminBureauListPage() {
   const [selectedMember, setSelectedMember] = useState<UserListItemDto | null>(loadMemberDraft)
   const [memberError, setMemberError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [sort, setSort] = useState<BureauSort>('date_desc')
 
   useEffect(() => {
     if (selectedMember) {
@@ -63,6 +99,10 @@ export function AdminBureauListPage() {
   }, [selectedMember])
 
   const { data: members, isLoading, isError } = useBureauMembers()
+  const sortedMembers = useMemo(
+    () => sortBureauMembers(members ?? [], sort, i18n.language),
+    [members, sort, i18n.language],
+  )
   const createMutation = useCreateBureauMember()
   const updateMutation = useUpdateBureauMember()
   const deleteMutation = useDeleteBureauMember()
@@ -188,6 +228,21 @@ export function AdminBureauListPage() {
 
       {actionError && <p className="text-sm text-error">{actionError}</p>}
 
+      {!isLoading && members && members.length > 0 && (
+        <Select
+          value={sort}
+          onChange={(event) => setSort(event.target.value as BureauSort)}
+          aria-label={t('admin.bureau.sort.label')}
+          className="w-auto sm:max-w-[220px]"
+          options={[
+            { value: 'date_desc', label: t('admin.bureau.sort.dateDesc') },
+            { value: 'date_asc', label: t('admin.bureau.sort.dateAsc') },
+            { value: 'name_asc', label: t('admin.bureau.sort.nameAsc') },
+            { value: 'name_desc', label: t('admin.bureau.sort.nameDesc') },
+          ]}
+        />
+      )}
+
       {isLoading && <SkeletonCards count={3} />}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
@@ -200,7 +255,7 @@ export function AdminBureauListPage() {
 
       {!isLoading && members && members.length > 0 && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {members.map((member) => (
+          {sortedMembers.map((member) => (
             <Card key={member.id} className="flex items-center gap-4">
               {member.photoUrl ? (
                 <img

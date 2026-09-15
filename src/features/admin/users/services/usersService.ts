@@ -1,14 +1,27 @@
 import { apiRequest } from '@/services/apiClient'
-import type { UserDetailDto, UserSummaryDto, UsersListResponse } from '@/features/admin/users/types'
+import type {
+  UserDetailDto,
+  UserSort,
+  UserSummaryDto,
+  UsersListResponse,
+} from '@/features/admin/users/types'
 import type { Role, UserStatus } from '@/types/domain'
 
 export async function fetchUsers(params: {
   page?: number
   search?: string
   status?: UserStatus | ''
+  sort?: UserSort
+  lang?: string
 }): Promise<UsersListResponse> {
   return apiRequest<UsersListResponse>('/api/users', {
-    query: { page: params.page, search: params.search, status: params.status || undefined },
+    query: {
+      page: params.page,
+      search: params.search,
+      status: params.status || undefined,
+      sort: params.sort && params.sort !== 'default' ? params.sort : undefined,
+      lang: params.lang,
+    },
   })
 }
 

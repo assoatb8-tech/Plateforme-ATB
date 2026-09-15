@@ -1,10 +1,11 @@
-import { useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { useTranslation } from 'react-i18next'
 import { Building2, Plus, Trash2 } from 'lucide-react'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
+import { Select } from '@/components/ui/Select'
 import { Modal } from '@/components/ui/Modal'
 import { SkeletonCards } from '@/components/ui/SkeletonCards'
 import { useSponsors } from '@/features/sponsors/hooks/useSponsors'
@@ -16,9 +17,34 @@ import {
   uploadSponsorLogo,
   validateLogoFile,
 } from '@/features/admin/sponsors/services/adminSponsorsService'
+import type { SponsorDto } from '@/features/sponsors/types'
 
 interface CreateSponsorFormValues {
   name: string
+}
+
+// The list is fetched in full (no pagination), so sorting it is a pure
+// presentation concern with no server round-trip — same approach as the
+// participants table.
+type SponsorSort = 'name_asc' | 'name_desc' | 'date_asc' | 'date_desc'
+
+function sortSponsors(sponsors: SponsorDto[], sort: SponsorSort): SponsorDto[] {
+  const sorted = [...sponsors]
+  switch (sort) {
+    case 'name_asc':
+      return sorted.sort((a, b) => a.name.localeCompare(b.name))
+    case 'name_desc':
+      return sorted.sort((a, b) => b.name.localeCompare(a.name))
+    case 'date_asc':
+      return sorted.sort(
+        (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+      )
+    case 'date_desc':
+    default:
+      return sorted.sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      )
+  }
 }
 
 export function AdminSponsorsListPage() {
@@ -28,9 +54,11 @@ export function AdminSponsorsListPage() {
   const [logoFile, setLogoFile] = useState<File | null>(null)
   const [logoError, setLogoError] = useState<string | null>(null)
   const [actionError, setActionError] = useState<string | null>(null)
+  const [sort, setSort] = useState<SponsorSort>('date_desc')
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const { data: sponsors, isLoading, isError } = useSponsors()
+  const sortedSponsors = useMemo(() => sortSponsors(sponsors ?? [], sort), [sponsors, sort])
   const createMutation = useCreateSponsor()
   const deleteMutation = useDeleteSponsor()
 
@@ -104,6 +132,21 @@ export function AdminSponsorsListPage() {
 
       {actionError && <p className="text-sm text-error">{actionError}</p>}
 
+      {!isLoading && sponsors && sponsors.length > 0 && (
+        <Select
+          value={sort}
+          onChange={(event) => setSort(event.target.value as SponsorSort)}
+          aria-label={t('admin.sponsors.sort.label')}
+          className="w-auto sm:max-w-[220px]"
+          options={[
+            { value: 'date_desc', label: t('admin.sponsors.sort.dateDesc') },
+            { value: 'date_asc', label: t('admin.sponsors.sort.dateAsc') },
+            { value: 'name_asc', label: t('admin.sponsors.sort.nameAsc') },
+            { value: 'name_desc', label: t('admin.sponsors.sort.nameDesc') },
+          ]}
+        />
+      )}
+
       {isLoading && <SkeletonCards count={3} />}
       {isError && <p className="text-sm text-error">{t('admin.errorGeneric')}</p>}
 
@@ -116,7 +159,7 @@ export function AdminSponsorsListPage() {
 
       {!isLoading && sponsors && sponsors.length > 0 && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {sponsors.map((sponsor) => (
+          {sortedSponsors.map((sponsor) => (
             <Card key={sponsor.id} className="flex items-center gap-4">
               <img
                 src={sponsor.logoUrl}

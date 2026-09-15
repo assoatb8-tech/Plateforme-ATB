@@ -311,7 +311,12 @@
     "title": "Mes participations",
     "empty": "Vous ne participez à aucun événement pour le moment.",
     "upcoming": "À venir",
-    "past": "Passées"
+    "past": "Passées",
+    "sort": {
+      "label": "Trier par",
+      "dateAsc": "Date (croissante)",
+      "dateDesc": "Date (décroissante)"
+    }
   },
   "admin": {
     "title": "Administration",
@@ -342,6 +347,16 @@
       "search": "Rechercher",
       "statusFilterLabel": "Filtrer par statut",
       "statusFilterAll": "Tous les statuts",
+      "sort": {
+        "label": "Trier par",
+        "default": "Par défaut",
+        "nameAsc": "Nom (A → Z)",
+        "nameDesc": "Nom (Z → A)",
+        "emailAsc": "Email (A → Z)",
+        "emailDesc": "Email (Z → A)",
+        "joinedAsc": "Inscription (plus ancienne)",
+        "joinedDesc": "Inscription (plus récente)"
+      },
       "noResults": "Aucun adhérent ne correspond à votre recherche.",
       "noUsersYet": "Aucun adhérent pour le moment.",
       "noName": "Sans nom",
@@ -488,6 +503,13 @@
       "title": "Gestion des sponsors",
       "subtitle": "Ajouter ou retirer les sponsors affichés sur la page d'accueil.",
       "noSponsorsYet": "Aucun sponsor pour le moment.",
+      "sort": {
+        "label": "Trier par",
+        "dateDesc": "Ajouté récemment",
+        "dateAsc": "Ajouté en premier",
+        "nameAsc": "Nom (A → Z)",
+        "nameDesc": "Nom (Z → A)"
+      },
       "actionError": "Une erreur est survenue. Merci de réessayer.",
       "deleteAction": "Supprimer",
       "deleteConfirmTitle": "Supprimer ce sponsor",
@@ -511,6 +533,13 @@
       "title": "Gestion du bureau",
       "subtitle": "Ajouter ou retirer les membres affichés sur la page Bureau.",
       "noneYet": "Aucun membre du bureau pour le moment.",
+      "sort": {
+        "label": "Trier par",
+        "dateDesc": "Ajouté récemment",
+        "dateAsc": "Ajouté en premier",
+        "nameAsc": "Nom (A → Z)",
+        "nameDesc": "Nom (Z → A)"
+      },
       "actionError": "Une erreur est survenue. Merci de réessayer.",
       "editAction": "Modifier",
       "deleteAction": "Supprimer",

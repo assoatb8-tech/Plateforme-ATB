@@ -1,6 +1,12 @@
 import type { Role, UserStatus } from '@/types/domain'
 import type { RegistrationStatus } from '@/features/events/types'
 
+// 'default' means "don't send a sort param" — the server falls back to
+// newest-first. name_asc/name_desc alphabetize by whichever language's
+// name columns match the viewer's current UI language (see api/users.ts).
+export type UserSort =
+  'default' | 'name_asc' | 'name_desc' | 'joined_asc' | 'joined_desc' | 'email_asc' | 'email_desc'
+
 export interface UserListItemDto {
   id: string
   email: string
